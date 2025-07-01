@@ -1,0 +1,152 @@
+[
+  {
+    "id": 1,
+    "name": "Terracotta Pots",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Carob tree is a hardy evergreen shrub or tree known for its edible pods and sweet carob powder.",
+    "img": "/imges/Vaisselle de cuisine et de service en terre cuite….webp",
+    "category": "plants",
+    "stock_level": 25
+  },
+  {
+    "id": 2,
+    "name": "Ceramic Pots",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Spinach is a nutritious leafy green vegetable rich in iron, vitamins, and antioxidants.",
+    "img": "/imges/Karakashian - Balian joint workshop (_the common….webp",
+    "category": "plants",
+    "stock_level": 13
+  },
+  {
+    "id": 3,
+    "name": "Basket Planters",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Chamomile is a fragrant herb used mainly for herbal teas known for its calming effects.",
+    "img": "/imges/Mir de rangement en jonc de mer tissé à la main….webp",
+    "category": "plants",
+    "stock_level": 7
+  },
+  {
+    "id": 4,
+    "name": "Hanging Macramé Pots",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Purslane is a succulent plant often used in salads, rich in omega-3 fatty acids.",
+    "img": "/imges/Politica di ritorno Consegna veloce Venditore di….webp",
+    "category": "plants",
+    "stock_level": 30
+  },
+  {
+    "id": 5,
+    "name": "Olive Wood Pot Holders",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Olive tree is a traditional Mediterranean tree valued for its olives and olive oil.",
+    "img": "/imges/black-chitsulo-6vwyMg5QIM8-unsplash.webp",
+    "category": "all",
+    "stock_level": 45
+  },
+  {
+    "id": 6,
+    "name": "Painted Clay Pots",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Mulberry tree produces sweet edible berries and is popular for shade and fruit.",
+    "img": "/imges/a1326568-ad14-40b0-b198-bc3af40bddf0.webp",
+    "category": "all",
+    "stock_level": 22
+  },
+  {
+    "id": 7,
+    "name": "Self-Watering Pots",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Jasmine is a fragrant flower known for its sweet scent, often used in perfumes and teas.",
+    "img": "/imges/e9ca5c70-89e9-4978-93ba-a025ed04b8f4.webp",
+    "category": "all",
+    "stock_level": 14
+  },
+  {
+    "id": 8,
+    "name": "Mini Pots for Herbs",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Anemone is a delicate flower with vibrant colors, symbolizing protection and anticipation.",
+    "img": "/imges/1a057d86-4d83-403c-92c7-2fca6bd382f4.webp",
+    "category": "all",
+    "stock_level": 8
+  },
+  {
+    "id": 9,
+    "name": "Decorative Clay Holders",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Fig tree is known for its sweet fruit and is widely cultivated in warm climates.",
+    "img": "/imges/Pot de fleur déco _ les plus beaux pour votre… (1).webp",
+    "category": "all",
+    "stock_level": 27
+  },
+  {
+    "id": 10,
+    "name": "Speckled Ceramic Vases",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Poppy is a bright flower symbolizing remembrance and consolation, often used ornamentally.",
+    "img": "/imges/Enhance your home decor with our unique handmade… (1).webp",
+    "category": "all",
+    "stock_level": 19
+  },
+  {
+    "id": 11,
+    "name": "Painted Clay Pots",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Aloe Vera is a succulent plant used for its soothing gel with skin healing properties.",
+    "img": "/imges/d974c1e3-c8c3-4372-94f7-1d748c008b3b.webp",
+    "category": "all",
+    "stock_level": 33
+  },
+  {
+    "id": 12,
+    "name": "Bronze Leaf Planters",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Mallow is a flowering plant known for its medicinal and culinary uses.",
+    "img": "/imges/Bronze Classic Planter with Rim.webp",
+    "category": "all",
+    "stock_level": 11
+  },
+  {
+    "id": 13,
+    "name": "Decorative Clay Holders",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Dandelion is a resilient plant with bright yellow flowers, used in herbal remedies.",
+    "img": "/imges/Pot de fleur déco _ les plus beaux pour votre….webp",
+    "category": "all",
+    "stock_level": 24
+  },
+  {
+    "id": 14,
+    "name": "Speckled Ceramic Vases",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Mint is a fragrant herb used for culinary and medicinal purposes, known for its fresh aroma.",
+    "img": "/imges/Enhance your home decor with our unique handmade….webp",
+    "category": "plants",
+    "stock_level": 12
+  },
+  {
+    "id": 15,
+    "name": "Hand-Painted Pots",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Basil is a flavorful herb commonly used in cooking, especially in Mediterranean cuisine.",
+    "img": "/imges/3c795560-1925-4a76-8382-4c8c21dc2dac.png",
+    "category": "plants",
+    "stock_level": 20
+  }
+]

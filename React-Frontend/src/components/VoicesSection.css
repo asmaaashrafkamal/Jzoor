@@ -1,0 +1,17 @@
+/* VoicesSection.css */
+
+.custom-swiper .swiper-pagination {
+    padding-top: 30px;
+    position: relative;
+  }
+  
+  .custom-swiper .swiper-pagination-bullet {
+    background-color: #d9d9d9; /* اللون العادي */
+    opacity: 1;
+    transition: background-color 0.3s ease;
+  }
+  
+  .custom-swiper .swiper-pagination-bullet-active {
+    background-color: #51633c; /* لون الخلفية عند التفعيل */
+  }
+  

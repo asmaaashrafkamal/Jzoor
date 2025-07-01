@@ -1,0 +1,217 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* تعريف المتغيرات */
+:root {
+  --green: #4B5929;
+  --light-green: #4B5929;
+  --nilie: #af926a;
+  --red: #B22222;
+  --bron: #8B6F47;
+}
+
+/* سلوك التمرير */
+html {
+  scroll-behavior: smooth;
+}
+
+/* الخط الافتراضي */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  /* أو استخدم: font-family: 'Poppins', sans-serif; */
+}
+
+/* حاوية الهيدر */
+.containerheader {
+  padding: 0px 60px;
+  margin: auto;
+  /* height: 152px */
+}
+
+/* على الشاشات الصغيرة (أقل من 768px مثلاً) */
+@media (max-width: 768px) {
+  .containerheader {
+    padding: 15px 15px;
+  }
+
+  input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    height: 0;
+    width: 0;
+    display: none;
+  }
+}
+
+/* ============ Start Header ============ */
+
+#mobileNav a {
+  margin: 20px 0;
+}
+
+nav a.active {
+  text-shadow: 2px 2px 10px var(--green);
+}
+
+nav a:not(.active),
+#mobileNav a {
+  position: relative;
+}
+
+nav a:not(.active)::after,
+#mobileNav a::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 3px;
+  background-color: #4B5929;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: all 0.3s ease;
+}
+
+nav a:not(.active):hover::after,
+#mobileNav a:hover::after {
+  width: 100%;
+}
+
+nav a:not(.active):hover,
+#mobileNav a:hover {
+  color: #4B5929;
+}
+
+/* ============ End Header ============ */
+
+/* ============ Start Mogilat ============ */
+.mogilat::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 3;
+  top: 0;
+  left: 0;
+}
+/* ============ End Mogilat ============ */
+
+/* الأسهم */
+
+
+/* تأثير الصورة */
+.image::after {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 100%;
+  top: -20px;
+  right: -20px;
+  background-color: var(--green);
+  z-index: -1;
+  border-radius: 20px;
+}
+@media (max-width: 900px) {
+  .image::after {
+    right: auto;
+    left: -15px;
+    top: -15px;
+
+  }
+}
+.customegrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, auto));
+  gap: 50px;
+  justify-content: center;
+}
+@media (max-width:600px){
+  .customegrid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, auto));
+    gap: 30px;
+
+
+  }
+}
+@media (max-width:600px){
+  .customegrid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, auto));
+
+  }
+}
+
+
+.card {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  cursor:pointer
+
+}
+.cardimg {
+  position: relative; /* ضروري لتحديد موضع ::after بشكل صحيح */
+  display: inline-block; /* يفضل لتجنب مشاكل الحجم */
+}
+
+.cardss .card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cardss .card:hover::after {
+  opacity: 1;
+}
+
+.card-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2; /* فوق overlay */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.card:hover .card-content {
+  opacity: 1;
+}
+
+.card-title {
+  transform: translateY(-20px);
+}
+
+.card:hover .card-title {
+  transform: translateY(20px);
+}
+
+.card-button {
+  transform: translateY(20px);
+}
+
+.card:hover .card-button {
+  transform: translateY(-20px);
+}
+
+.imging::after {
+  position:absolute;
+  content:"";
+  width: 40px;
+  height:calc(100% + 20px);
+  top:-10px;
+  left:-20px;
+  background-color:var(--green);
+  z-index: 1; 
+  border-radius: 5px;
+}
+
+
+

@@ -1,0 +1,152 @@
+[
+  {
+    "id": 1,
+    "name": "Pots",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Hand-crocheted covers for plant pots, adding a cozy and decorative touch to your garden.",
+    "img": "/imges/Crocheted plant pot covers made to order to fit….webp",
+    "category": "plants",
+    "stock_level": 20
+  },
+  {
+    "id": 2,
+    "name": "Hanging Macrame Planter",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Boho-style macrame planter perfect for hanging your favorite indoor plants stylishly.",
+    "img": "/imges/Bring a touch of boho charm and greenery to your….webp",
+    "category": "plants",
+    "stock_level": 17
+  },
+  {
+    "id": 3,
+    "name": "Braided Leaf Keychains",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Handmade braided keychains in the shape of leaves — perfect for plant lovers.",
+    "img": "/imges/Discover the charm of handmade leaf-shaped….webp",
+    "category": "plants",
+    "stock_level": 30
+  },
+  {
+    "id": 4,
+    "name": "Macrame Leaf Clips",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Cute macrame leaf-shaped clips used for decoration or bundling plant gifts.",
+    "img": "/imges/Monstera Macrame Wristlet, Leaf Macrame Wristlet… (1).webp",
+    "category": "plants",
+    "stock_level": 24
+  },
+  {
+    "id": 5,
+    "name": "Steel Plant Trellis Insert",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Elegant steel trellis for supporting indoor climbing plants and adding structure.",
+    "img": "/imges/중공 잎 금속 식물 트렐리스 식물 등반 랙, 덩굴 아이비 지지대 말뚝, 실내 야외 화분에….webp",
+    "category": "all",
+    "stock_level": 22
+  },
+  {
+    "id": 6,
+    "name": "Artisan Plant Notebook",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Stylish notebook for tracking plant growth, care routines, or garden notes.",
+    "img": "/imges/We found the perfect companion for their gardening….webp",
+    "category": "all",
+    "stock_level": 18
+  },
+  {
+    "id": 7,
+    "name": "Pressed Plant Journal",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Beautiful journal with pages for recording garden memories or pressing plants.",
+    "img": "/imges/Gardening Journal, Planting Journal, Garden….webp",
+    "category": "all",
+    "stock_level": 14
+  },
+  {
+    "id": 8,
+    "name": "Crocheted Hanging Pots",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Unique crocheted pots designed for hanging indoor plants with charm and color.",
+    "img": "/imges/ac7749cd-d4cb-424d-a69f-4d8f5d6a6259.webp",
+    "category": "all",
+    "stock_level": 27
+  },
+  {
+    "id": 9,
+    "name": "Gift Wrapping Kit",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "A delightful plant-themed gift wrap set, ideal for wrapping plant-related gifts.",
+    "img": "/imges/Give the perfect gift for plant lovers with this….webp",
+    "category": "all",
+    "stock_level": 33
+  },
+  {
+    "id": 10,
+    "name": "Self-Watering Globe Stakes",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Decorative glass stakes that automatically water your plants while adding color.",
+    "img": "/imges/Gorgeously patterned vibrant glass adds a….webp",
+    "category": "all",
+    "stock_level": 16
+  },
+  {
+    "id": 11,
+    "name": "Embroidred Wall hoop",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Hand-embroidered hoop art with plant motifs — a unique wall decor piece.",
+    "img": "/imges/#freepalestine #handmade #embroidery.webp",
+    "category": "all",
+    "stock_level": 11
+  },
+  {
+    "id": 12,
+    "name": "Steel Plant Trellis Insert",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Sturdy black metal trellis insert to support climbing plants stylishly.",
+    "img": "/imges/This black metal plant stake is a must-have for….webp",
+    "category": "all",
+    "stock_level": 20
+  },
+  {
+    "id": 13,
+    "name": "Mini Succulent Gift Wraps",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Charming wraps perfect for gifting mini succulents at weddings or events.",
+    "img": "/imges/おしゃれ×安いが最強♡おすすめ【プチギフト】と節約術も公開！ _ 結婚式準備はウェディングニュース.webp",
+    "category": "all",
+    "stock_level": 35
+  },
+  {
+    "id": 14,
+    "name": "Green Gift With Tag",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Lovely plant-themed gift wrap with tag, perfect for eco-friendly presents.",
+    "img": "/imges/0568d98d-a0e1-40f1-a3bd-d9693a883f58.webp",
+    "category": "plants",
+    "stock_level": 26
+  },
+  {
+    "id": 15,
+    "name": "Plant Gift Wrapping Kit",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Complete wrapping kit designed specifically for plant-related gifts.",
+    "img": "/imges/f3329fe8-7733-4ecd-829d-ced2e03d631a.webp",
+    "category": "plants",
+    "stock_level": 28
+  }
+]

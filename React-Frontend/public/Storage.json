@@ -1,0 +1,132 @@
+[
+  {
+    "id": 1,
+    "name": "Compost",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "High-quality compost to enrich your soil and support healthy plant growth.",
+    "img": "/imges/1 PCS Plant Pots Seagrass Planter Basket Flower….webp",
+    "category": "plants",
+    "quantity": 50
+  },
+  {
+    "id": 2,
+    "name": "Seed Storage Tin",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Durable tin container perfect for keeping your seeds dry and safe.",
+    "img": "/imges/b131a720-68f8-4bc5-8ec2-6375b929b639.webp",
+    "category": "plants",
+    "quantity": 30
+  },
+  {
+    "id": 3,
+    "name": "Metal Compost",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Sturdy metal compost bin ideal for eco-friendly waste recycling in your garden.",
+    "img": "/imges/Let's send less to the landfill! Convert your own….webp",
+    "category": "plants",
+    "quantity": 40
+  },
+  {
+    "id": 4,
+    "name": "Garden Tool Tote Bag",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Multi-pocket tote bag designed for organizing and carrying garden tools easily.",
+    "img": "/imges/Description_ The garden bag with Multi-pockets can….webp",
+    "category": "plants",
+    "quantity": 25
+  },
+  {
+    "id": 5,
+    "name": "Soil Storage Bin",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Large storage bin for keeping soil dry and clean for your gardening needs.",
+    "img": "/imges/old washtub for soil!.webp",
+    "category": "all",
+    "quantity": 35
+  },
+  {
+    "id": 6,
+    "name": "Green Seed Storage Box",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Compact green box designed to safely store and organize seeds.",
+    "img": "/imges/PRICES MAY VARY_ Keep precious seeds safe and dry….webp",
+    "category": "all",
+    "quantity": 45
+  },
+  {
+    "id": 7,
+    "name": "Wicker Storage Basket",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Handwoven wicker basket perfect for storing garden accessories or harvested produce.",
+    "img": "/imges/629b1bb1-eee0-448b-8200-a261bdbe962a.webp",
+    "category": "all",
+    "quantity": 20
+  },
+  {
+    "id": 8,
+    "name": "Woven Storage Baskets",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Set of woven baskets suitable for versatile storage solutions in and out of the garden.",
+    "img": "/imges/PRICES MAY VARY_ Coin purse women-- unique….webp",
+    "category": "all",
+    "quantity": 30
+  },
+  {
+    "id": 9,
+    "name": "Storage Jars With Labels",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Reusable storage jars with labeling for easy identification of contents.",
+    "img": "/imges/Refillable small glass storage jar with airtight….webp",
+    "category": "all",
+    "quantity": 60
+  },
+  {
+    "id": 10,
+    "name": "Storage Rock For Pots",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Decorative rocks to improve drainage and aesthetics in potted plants.",
+    "img": "/imges/12 Outdoor Garden Shelves for Plants to Make Any….webp",
+    "category": "all",
+    "quantity": 80
+  },
+  {
+    "id": 11,
+    "name": "Hanled Wooden Crate",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Handy wooden crate with handle, perfect for carrying and storing garden tools.",
+    "img": "/imges/Garden Tool Carrier, Tool Caddy, Garden Gift….webp",
+    "category": "all",
+    "quantity": 15
+  },
+  {
+    "id": 12,
+    "name": "Handled Wooden Crate",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Durable wooden crate designed to transport garden supplies with ease.",
+    "img": "/imges/A Garden tool themed wooden carry caddy….webp",
+    "category": "all",
+    "quantity": 15
+  },
+  {
+    "id": 13,
+    "name": "Stackable Labeled Boxes",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Set of stackable storage boxes with labels to keep your garden essentials organized.",
+    "img": "/imges/Amazon_com_ Citylife 2 PCS Storage Bins with….webp",
+    "category": "all",
+    "quantity": 25
+  }
+]

@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "name": "scoop",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "A strong and practical gardening scoop ideal for digging and transplanting.",
+    "img": "/imges/Label your garden in style! 🌱 Make durable and….webp",
+    "category": "plants",
+    "stock_level": 23
+  },
+  {
+    "id": 2,
+    "name": "scoop",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Durable soil scoop for precise and easy handling of potting mix.",
+    "img": "/imges/About Soil Scoop_ Make plant care effortless with….webp",
+    "category": "plants",
+    "stock_level": 17
+  },
+  {
+    "id": 3,
+    "name": "gloves",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Comfortable and protective gloves designed for safe gardening work.",
+    "img": "/imges/Product Description_ Latex Grip Glove - A100 The….webp",
+    "category": "plants",
+    "stock_level": 34
+  },
+  {
+    "id": 4,
+    "name": "spray bottle",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Compact spray bottle for misting plants and applying leaf care solutions.",
+    "img": "/imges/500ml Watering Can Spray Household Gardening Small….webp",
+    "category": "plants",
+    "stock_level": 15
+  },
+  {
+    "id": 5,
+    "name": "minimalist tool kit",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Essential tool kit containing basic gardening tools with wooden handles.",
+    "img": "/imges/Description The wooden handle is polished and….webp",
+    "category": "all",
+    "stock_level": 28
+  },
+  {
+    "id": 6,
+    "name": "plant care kit tools set",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Complete gardening kit for beginners with tools for every basic task.",
+    "img": "/imges/Looking for the perfect gift for a budding….webp",
+    "category": "all",
+    "stock_level": 19
+  },
+  {
+    "id": 7,
+    "name": "plant care kit tools set",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "All-in-one bonsai and indoor plant tool set for delicate maintenance.",
+    "img": "/imges/Bonsai Tools _ Terrarium Tools _ 13pcs Mini Garden….webp",
+    "category": "all",
+    "stock_level": 21
+  },
+  {
+    "id": 8,
+    "name": "rake",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Small hand rake for loosening soil and removing debris from pots.",
+    "img": "/imges/Rake.webp",
+    "category": "all",
+    "stock_level": 32
+  },
+  {
+    "id": 9,
+    "name": "bug killer spray",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Effective bug spray designed to eliminate pests safely on houseplants.",
+    "img": "/imges/PRICES MAY VARY_ Houseplant Bug Killer_ Formulated….webp",
+    "category": "all",
+    "stock_level": 13
+  },
+  {
+    "id": 10,
+    "name": "plant pest spray natural",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Natural formula pest spray to protect your plants from insects without chemicals.",
+    "img": "/imges/This Leaf Care Spray Is Carefully Formulated To….webp",
+    "category": "all",
+    "stock_level": 25
+  },
+  {
+    "id": 11,
+    "name": "clay soil mix plants",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Rich clay-based soil mix to support healthy root development and moisture retention.",
+    "img": "/imges/A nutrient dense, sustainable, living soil for….webp",
+    "category": "all",
+    "stock_level": 31
+  },
+  {
+    "id": 12,
+    "name": "organic plant fertilizrt bag",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Organic fertilizer to enhance plant growth and improve soil health.",
+    "img": "/imges/Give your plants the ultimate nutrient boost with….webp",
+    "category": "all",
+    "stock_level": 27
+  },
+  {
+    "id": 13,
+    "name": "wooden plant labls",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Eco-friendly wooden labels for identifying plants and herbs in your garden.",
+    "img": "/imges/Ceramic vegetable garden stake markers, a….webp",
+    "category": "all",
+    "stock_level": 18
+  },
+  {
+    "id": 14,
+    "name": "vintage watering can",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Stylish metal watering can for controlled and elegant plant watering.",
+    "img": "/imges/material_ metal Size_ as shown in the picture….webp",
+    "category": "plants",
+    "stock_level": 12
+  },
+  {
+    "id": 15,
+    "name": "cermic plant labels",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Durable and beautiful ceramic labels for decorative garden organization.",
+    "img": "/imges/11ba912c-f80f-4a23-8526-85a9dc50aad2.webp",
+    "category": "plants",
+    "stock_level": 16
+  },
+  {
+    "id": 16,
+    "name": "plant moisture meter stick",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Quickly check your plant's soil moisture to avoid over or under-watering.",
+    "img": "/imges/Moisture Meters Support Healthy, Thriving Plants….webp",
+    "category": "plants",
+    "stock_level": 22
+  }
+]

@@ -1,0 +1,90 @@
+[
+  {
+    "id": 5,
+    "name": "Olive Tree",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Olive tree is a traditional Mediterranean tree valued for its olives and olive oil.",
+    "img": "/imges/ma1.webp",
+    "category": "all",
+    "stock_level": 34,
+    "seller": "GreenRoots"
+  },
+  {
+    "id": 6,
+    "name": "Mulberry Tree",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Mulberry tree produces sweet edible berries and is popular for shade and fruit.",
+    "img": "/imges/Mulberry Tree.webp",
+    "category": "all",
+    "stock_level": 19,
+    "seller": "Plantify"
+  },
+  {
+    "id": 7,
+    "name": "Jasmine",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Jasmine is a fragrant flower known for its sweet scent, often used in perfumes and teas.",
+    "img": "/imges/ma4.webp",
+    "category": "all",
+    "stock_level": 25,
+    "seller": "FloraHouse"
+  },
+  {
+    "id": 8,
+    "name": "Anemone",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Anemone is a delicate flower with vibrant colors, symbolizing protection and anticipation.",
+    "img": "/imges/ma5.webp",
+    "category": "all",
+    "stock_level": 44,
+    "seller": "BloomTime"
+  },
+  {
+    "id": 1,
+    "name": "Carob Tree",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Carob tree is a hardy evergreen shrub or tree known for its edible pods and sweet carob powder.",
+    "img": "/imges/Tree Spotlight_ Carob tree - Canopy _ Canopy.png",
+    "category": "plants",
+    "stock_level": 38,
+    "seller": "EcoPlants"
+  },
+  {
+    "id": 2,
+    "name": "Spinach",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Spinach is a nutritious leafy green vegetable rich in iron, vitamins, and antioxidants.",
+    "img": "/imges/Spinach.webp",
+    "category": "plants",
+    "stock_level": 22,
+    "seller": "NatureBloom"
+  },
+  {
+    "id": 3,
+    "name": "Chamomile",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Chamomile is a fragrant herb used mainly for herbal teas known for its calming effects.",
+    "img": "/imges/ma2.webp",
+    "category": "plants",
+    "stock_level": 14,
+    "seller": "GardenFresh"
+  },
+  {
+    "id": 4,
+    "name": "Purslane",
+    "prev_price": 15,
+    "new_price": 10,
+    "description": "Purslane is a succulent plant often used in salads, rich in omega-3 fatty acids.",
+    "img": "/imges/77333746-1110-4fff-87c0-8107b3e76820.png",
+    "category": "plants",
+    "stock_level": 27,
+    "seller": "Plantify"
+  }]
+  
