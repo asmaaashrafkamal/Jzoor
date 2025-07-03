@@ -17,7 +17,7 @@ class Admin extends Authenticatable
     const SELLER_TYPE = "S";
     const DELIVERY_TYPE = "D";
     protected $fillable=['id','full_name',
-    'email','password','status',
+    'email','password','image','status',
     'type'];
 
 //relations

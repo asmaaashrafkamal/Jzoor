@@ -1,13 +1,41 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import OverviewCard from './components/OverviewCard'
 import ReportChart from './components/ReportChart'
 import SalesInsights from './components/SalesInsights'
-import { TransactionHistory } from './components/TransactionHistory' 
+import { TransactionHistory } from './components/TransactionHistory'
 import { TopProducts } from './components/TopProducts'
 import { BestSellingProduct } from './components/BestSellingProduct'
 import { AddNewProduct } from './components/AddNewProduct'
 
 const AdminDash = () => {
+const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    axios.get("http://localhost:8000/check-login", { withCredentials: true })
+      .then(res => {
+         console.log(res.data);
+        if (res.data.role == "A"||res.data.role == "D") {
+         console.log(res.data.user);
+          setUser(res.data.user); // session data from backend
+        } else {
+         // If no session, redirect to login page
+          navigate("/admin/login");
+        }
+      })
+      .catch(() => {
+        // On any error, redirect to login page
+        navigate("/admin/login");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [navigate]);
+
+  if (loading) return <div>Checking login status...</div>;
   return (
     <div className="p-6 space-y-6 bg-[#f3f4f6]">
     {/* Overview cards */}
@@ -53,7 +81,7 @@ const AdminDash = () => {
 </div>
 
 
-      
+
     </div>
   )
 }

@@ -11,26 +11,13 @@ export const ProductProvider = ({ children }) => {
   const [storage, setStorage] = useState([]);
   const [care, setCare] = useState([]);
   const [Accessories, setAccessories] = useState([]);
-
-
-
-
   const [cart, setCart] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedGift, setSelectedGift] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [selectedJournal, setSelectedJournal] = useState(null);
   // تحميل البيانات من JSON باستخدام fetch
-  useEffect(() => {
-    fetch('data.json')
-      .then((res) => res.json())
-      .then((data) => {
-        setProducts(data); // عرض أول 8 منتجات فقط
-      })
-      .catch((err) => {
-        console.error('حدث خطأ أثناء تحميل المنتجات:', err);
-      });
-  }, []);
+
   useEffect(() => {
     fetch('SellerProduct.json')
       .then((res) => res.json())
@@ -57,7 +44,7 @@ export const ProductProvider = ({ children }) => {
     fetch('journals.json')
       .then((res) => res.json())
       .then((data) => {
-        setJournals(data); //ض أول 
+        setJournals(data); //ض أول
       })
       .catch((err) => {
         console.error('حدث خطأ:', err);
@@ -67,7 +54,7 @@ export const ProductProvider = ({ children }) => {
     fetch('Care.json')
       .then((res) => res.json())
       .then((data) => {
-        setCare(data); //ض أول 
+        setCare(data); //ض أول
       })
       .catch((err) => {
         console.error('حدث خطأ:', err);
@@ -79,7 +66,7 @@ export const ProductProvider = ({ children }) => {
     fetch('Pots.json')
       .then((res) => res.json())
       .then((data) => {
-        setPots(data); //ض أول 
+        setPots(data); //ض أول
       })
       .catch((err) => {
         console.error('حدث خطأ:', err);
@@ -90,7 +77,7 @@ export const ProductProvider = ({ children }) => {
     fetch('Accessories.json')
       .then((res) => res.json())
       .then((data) => {
-        setAccessories(data); //ض أول 
+        setAccessories(data); //ض أول
       })
       .catch((err) => {
         console.error('حدث خطأ:', err);
@@ -102,7 +89,7 @@ export const ProductProvider = ({ children }) => {
     fetch('Storage.json')
       .then((res) => res.json())
       .then((data) => {
-        setStorage(data); //ض أول 
+        setStorage(data); //ض أول
       })
       .catch((err) => {
         console.error('حدث خطأ:', err);

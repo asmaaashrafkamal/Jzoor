@@ -3,7 +3,6 @@ import { HashLink } from "react-router-hash-link";
 import { Link, useNavigate }  from "react-router-dom";
 import { ProductContext } from "../context/ProductContext";
 import "../App.css";
-
 // أيقونات
 import {
   FaBars,
@@ -21,13 +20,31 @@ export default function Navbar() {
   const [searchInput, setSearchInput] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [activeIcon, setActiveIcon] = useState("");
-
   const mobileSearchRef = useRef();
   const menuBtnRef = useRef();
   const mobileNavRef = useRef();
-
+  const [categoriesWithProducts, setCategoriesWithProducts] = useState([]);
   const { products, setSelectedProduct,cart } = useContext(ProductContext);
   const navigate = useNavigate();
+const [productsByCategory, setProductsByCategory] = useState([]);
+
+const handleCategoryClick = (catId) => {
+  navigate(`/ProductList/${catId}`);
+};
+useEffect(() => {
+  let isMounted = true;
+  fetch("http://localhost:8000/getAllCategoryProduct")
+    .then(res => res.json())
+    .then(data => {
+      if (isMounted) {
+        setCategoriesWithProducts(data);
+      }
+    });
+
+  return () => {
+    isMounted = false;
+  };
+}, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -122,26 +139,47 @@ export default function Navbar() {
           </Link>
 
           {/* الروابط العلوية */}
-          <nav className="items-center justify-center gap-[30px] lg:gap-[40px] font-normal md:text-[16px] lg:text-[18px] hidden lg:flex">
-            {sections.map((section) => (
-              <HashLink
-                key={section}
-                smooth
-                to={`/#${section}`}
-                className={`no-underline transition ${
-                  activeLink === `#${section}` && activeIcon === ""
-                    ? "active font-bold underline"
-                    : "text-black"
-                }`}
-                onClick={() => {
-                  setActiveLink(`#${section}`);
-                  setActiveIcon("");
-                }}
-              >
-                {section === "contact" ? "Contact Us" : section}
-              </HashLink>
-            ))}
-          </nav>
+         <nav className="items-center justify-center gap-[30px] lg:gap-[40px] font-normal md:text-[16px] lg:text-[18px] hidden lg:flex">
+  {sections.map((section) => (
+    <HashLink
+      key={section}
+      smooth
+      to={`/#${section}`}
+      className={`no-underline transition ${
+        activeLink === `#${section}` && activeIcon === ""
+          ? "active font-bold underline"
+          : "text-black"
+      }`}
+      onClick={() => {
+        setActiveLink(`#${section}`);
+        setActiveIcon("");
+      }}
+    >
+      {section === "contact" ? "Contact Us" : section}
+    </HashLink>
+  ))}
+
+  {/* 🔽 Categories dropdown here */}
+ <div className="relative group">
+  <button className="text-black no-underline transition hover:underline">
+    Categories
+  </button>
+  <div className="absolute left-0 top-full bg-white p-3 rounded shadow-lg hidden group-hover:block z-50 w-[250px] max-h-[400px] overflow-y-auto text-left">
+    {categoriesWithProducts.map((cat) => (
+      <div key={cat.id} className="mb-2">
+        <button
+          onClick={() => handleCategoryClick(cat.id)}
+          className="text-black font-bold hover:underline w-full text-left"
+        >
+          {cat.cat_name}
+        </button>
+      </div>
+    ))}
+  </div>
+</div>
+
+</nav>
+
 
           {/* أيقونات */}
           <div className="flex items-center gap-4 xl:gap-5 text-xl">

@@ -28,6 +28,7 @@ public function getCat() {
         $category = Category::all();
         return response()->json($category);
     }
+
 public function update(Request $request, $id) {
         $category = Category::findOrFail($id);
         $category->update($request->all());

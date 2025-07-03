@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   HiOutlineDocumentArrowDown,
   HiOutlinePlus,
@@ -10,6 +10,9 @@ import {
 } from 'react-icons/hi2';
 
 export function AddNewProductForm() {
+  const [categories, setCategories] = useState([]);
+const [productTag, setProductTag] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [productName, setProductName] = useState('Poppy');
   const [productDescription, setProductDescription] = useState("Bring, vibrant beauty and timeless symbolism to any space with the Poppy Flower—a striking bloom known for its delicate, paper-like petals and bold, captivating colors. Most commonly found in vivid shades of red, orange, and white, the poppy is more than just a flower; it's a powerful emblem of remembrance, peace, and resilience.");
   const [productPrice, setProductPrice] = useState('15.00');
@@ -21,6 +24,11 @@ export function AddNewProductForm() {
   const [highlightFeatured, setHighlightFeatured] = useState(true);
   const [productImage, setProductImage] = useState(null); // State for the image file
   const imageInputRef = useRef(null); // Ref for the hidden file input
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState([]);
+
+const [potColors, setPotColors] = useState(['#F3F4F6', '#FDE047', '#FCA5A5', '#4B5563', '#000000']);
+const [potSizes, setPotSizes] = useState(['S', 'M', 'XL']);
 
   // --- Handlers for button functionality ---
 
@@ -29,10 +37,49 @@ export function AddNewProductForm() {
     console.log('Draft Data:', { productName, productDescription, productPrice, discountedPrice, taxIncluded, stockQuantity, stockStatus, isUnlimited, highlightFeatured, productImage });
   };
 
-  const handlePublishProduct = () => {
-    alert('Product published! (Functionality to be implemented)');
-    console.log('Published Data:', { productName, productDescription, productPrice, discountedPrice, taxIncluded, stockQuantity, stockStatus, isUnlimited, highlightFeatured, productImage });
-  };
+useEffect(() => {
+  fetch("http://localhost:8000/getCat")
+    .then((res) => res.json())
+    .then((data) => setCategories(data))
+    .catch((err) => console.error("Failed to load categories", err));
+}, []);
+const handlePublishProduct = async () => {
+  const formData = new FormData();
+  formData.append('name', productName);
+  formData.append('description', productDescription);
+  formData.append('price', productPrice);
+  formData.append('discount', discountedPrice);
+  formData.append('tax_included', taxIncluded === 'yes' ? 1 : 0);
+  formData.append('stock', isUnlimited ? -1 : stockQuantity);
+  formData.append('stock_status', stockStatus);
+  formData.append('highlight', highlightFeatured ? 1 : 0);
+  formData.append('category_id', selectedCategory);
+  formData.append('tags', productTag);
+  formData.append('pot_colors', JSON.stringify(selectedColors));
+  formData.append('pot_sizes', JSON.stringify(selectedSizes));
+
+  if (imageInputRef.current?.files[0]) {
+    formData.append('image', imageInputRef.current.files[0]);
+  }
+
+  try {
+    const response = await fetch('http://localhost:8000/products', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert('Product added successfully!');
+    } else {
+      console.error(result);
+      alert('Error: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Something went wrong while saving the product.');
+  }
+};
 
   const handleEditDescription = () => {
     alert('Edit description activated! (Functionality to be implemented)');
@@ -73,13 +120,21 @@ export function AddNewProductForm() {
   };
 
   // --- Color and Size Handlers (Placeholders) ---
-  const handleAddPotColor = () => {
-    alert('Add new pot color functionality! (To be implemented)');
-  };
+ const handleAddPotColor = () => {
+  const newColor = prompt("Enter new hex color (e.g. #34D399):");
+  if (newColor && /^#[0-9A-F]{6}$/i.test(newColor)) {
+    setPotColors([...potColors, newColor]);
+  } else {
+    alert("Invalid color code.");
+  }
+};
+const handleAddPotSize = () => {
+  const newSize = prompt("Enter new size (e.g. L, XXL):");
+  if (newSize) {
+    setPotSizes([...potSizes, newSize.toUpperCase()]);
+  }
+};
 
-  const handleAddPotSize = () => {
-    alert('Add new pot size functionality! (To be implemented)');
-  };
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-sm font-sans mx-auto ">
@@ -107,6 +162,7 @@ export function AddNewProductForm() {
       </div>
 
       {/* Main Content Area */}
+            {/* <form onSubmit={(e) => { e.preventDefault(); handleSaveCategory(); }}> */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Basic Details, Pricing, Inventory */}
         <div className="lg:col-span-2 space-y-6">
@@ -379,70 +435,99 @@ export function AddNewProductForm() {
             <div className="mb-4">
               <label htmlFor="productCategories" className="block text-sm font-medium text-[#374151] mb-1">Product Categories</label>
               <select
-                id="productCategories"
-                className="w-full border border-[#D1D5DB] rounded-md shadow-sm p-2 text-[#374151] text-sm focus:outline-none focus:ring-1 focus:ring-[#22C55E]"
-              >
-                <option>Select your product</option>
-                <option>Flowers</option>
-                <option>Plants</option>
-                <option>Gifts</option>
-                <option>Pots</option>
-                <option>Care</option>
-                <option>Accessory</option>
-              </select>
+              id="productCategories"
+              className="w-full border border-[#D1D5DB] rounded-md shadow-sm p-2 text-[#374151] text-sm focus:outline-none focus:ring-1 focus:ring-[#22C55E]"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
+              <option value="">Select your product</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.cat_name}</option>
+              ))}
+            </select>
+
             </div>
             <div className="mb-4">
               <label htmlFor="productTag" className="block text-sm font-medium text-[#374151] mb-1">Product Tag</label>
               <select
-                id="productTag"
-                className="w-full border border-[#D1D5DB] rounded-md shadow-sm p-2 text-[#374151] text-sm focus:outline-none focus:ring-1 focus:ring-[#22C55E]"
-              >
-                <option>Select your product</option>
-                <option>New Arrivals</option>
-                <option>Best Sellers</option>
-                <option>On Sale</option>
-              </select>
+  id="productTag"
+  value={productTag}
+  onChange={(e) => setProductTag(e.target.value)}
+  className="w-full border border-[#D1D5DB] rounded-md shadow-sm p-2 text-[#374151] text-sm focus:outline-none focus:ring-1 focus:ring-[#22C55E]"
+>
+  <option value="">Select your product</option>
+  <option value="New Arrivals">New Arrivals</option>
+  <option value="Best Sellers">Best Sellers</option>
+  <option value="On Sale">On Sale</option>
+</select>
             </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-[#374151] mb-2">Select Pot color</label>
-              <div className="flex space-x-2">
-                {/* Pot Color Buttons (color set via bg-HEX) */}
-                <button className="w-8 h-8 rounded-full border border-[#D1D5DB] bg-[#F3F4F6] hover:scale-105 transition-transform duration-200"></button>
-                <button className="w-8 h-8 rounded-full border border-[#D1D5DB] bg-[#FDE047] hover:scale-105 transition-transform duration-200"></button>
-                <button className="w-8 h-8 rounded-full border border-[#D1D5DB] bg-[#FCA5A5] hover:scale-105 transition-transform duration-200"></button>
-                <button className="w-8 h-8 rounded-full border border-[#D1D5DB] bg-[#4B5563] hover:scale-105 transition-transform duration-200"></button>
-                <button className="w-8 h-8 rounded-full border border-[#D1D5DB] bg-[#000000] hover:scale-105 transition-transform duration-200"></button>
-                {/* Add Pot Color Button */}
-                <button
-                  onClick={handleAddPotColor}
-                  className="w-8 h-8 rounded-full border-2 border-[#22C55E] text-[#22C55E] flex items-center justify-center hover:bg-[#F0FDF4] transition-colors duration-200"
-                  style={{ backgroundColor: '#F9FAFB' }}
-                >
-                  <HiOutlinePlus className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[#374151] mb-2">Select Pot Sizes</label>
-              <div className="flex space-x-2">
-                {/* Pot Size Buttons */}
-                <button className="px-4 py-2 border border-[#D1D5DB] rounded-md text-[#4B5563] text-sm hover:bg-[#E5E7EB] transition-colors duration-200" style={{ backgroundColor: '#F9FAFB' }}>S</button>
-                <button className="px-4 py-2 border border-[#D1D5DB] rounded-md text-[#4B5563] text-sm hover:bg-[#E5E7EB] transition-colors duration-200" style={{ backgroundColor: '#F9FAFB' }}>M</button>
-                <button className="px-4 py-2 border border-[#D1D5DB] rounded-md text-[#4B5563] text-sm hover:bg-[#E5E7EB] transition-colors duration-200" style={{ backgroundColor: '#F9FAFB' }}>XL</button>
-                {/* Add Pot Size Button */}
-                <button
-                  onClick={handleAddPotSize}
-                  className="px-4 py-2 border-2 border-[#22C55E] text-[#22C55E] rounded-md text-sm flex items-center justify-center hover:bg-[#F0FDF4] transition-colors duration-200"
-                  style={{ backgroundColor: '#F9FAFB' }}
-                >
-                  <HiOutlinePlus className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+ <div className="mb-4">
+ <label htmlFor="potColors" className="block text-sm font-medium text-[#374151] mb-1">Pot Colors</label>
+
+  {potColors.map((color, index) => (
+  <button
+    key={index}
+    onClick={() =>
+      setSelectedColors((prev) =>
+        prev.includes(color)
+          ? prev.filter((c) => c !== color)
+          : [...prev, color]
+      )
+    }
+    className={`w-8 h-8 rounded-full border ${
+      selectedColors.includes(color)
+        ? 'border-[#22C55E] ring-2 ring-[#22C55E]'
+        : 'border-[#D1D5DB]'
+    }`}
+    style={{ backgroundColor: color }}
+  />
+))}
+
+  {/* Add Pot Color Button */}
+  <button
+    onClick={handleAddPotColor}
+    className="w-8 h-8 rounded-full border-2 border-[#22C55E] text-[#22C55E] flex items-center justify-center hover:bg-[#F0FDF4] transition-colors duration-200"
+    style={{ backgroundColor: '#F9FAFB' }}
+  >
+    <HiOutlinePlus className="w-4 h-4" />
+  </button>
+       </div>
+<div className="mb-4">
+ <label htmlFor="potSizes" className="block text-sm font-medium text-[#374151] mb-1">Pot Sizes</label>
+
+  {potSizes.map((size, index) => (
+  <button
+    key={index}
+    onClick={() =>
+      setSelectedSizes((prev) =>
+        prev.includes(size)
+          ? prev.filter((s) => s !== size)
+          : [...prev, size]
+      )
+    }
+    className={`px-4 py-2 rounded-md text-sm transition-colors duration-200 border ${
+      selectedSizes.includes(size)
+        ? 'bg-[#DCFCE7] text-[#15803D] border-[#22C55E]'
+        : 'bg-[#F9FAFB] text-[#4B5563] border-[#D1D5DB] hover:bg-[#E5E7EB]'
+    }`}
+  >
+    {size}
+  </button>
+))}
+
+  {/* Add Pot Size Button */}
+  <button
+    onClick={handleAddPotSize}
+    className="px-4 py-2 border-2 border-[#22C55E] text-[#22C55E] rounded-md text-sm flex items-center justify-center hover:bg-[#F0FDF4] transition-colors duration-200"
+    style={{ backgroundColor: '#F9FAFB' }}
+  >
+    <HiOutlinePlus className="w-4 h-4" />
+  </button>
+</div>
+
           </div>
         </div>
       </div>
-
       {/* Footer Buttons (Mobile/Smaller Screens) */}
       <div className="mt-6 flex justify-end space-x-3">
         {/* Save to Draft Button (Footer) */}
@@ -461,6 +546,8 @@ export function AddNewProductForm() {
           Publish Product
         </button>
       </div>
+{/* </form>
+ */}
     </div>
   );
 }

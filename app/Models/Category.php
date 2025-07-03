@@ -14,4 +14,7 @@ class Category extends Model
     public function admin(){
         return $this->belongsTo('App\Models\Admin','created_by','id');
     }
+   public function products(){
+        return $this->hasMany('App\Models\Product','category_id','id');
+    }
 }

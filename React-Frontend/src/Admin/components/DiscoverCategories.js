@@ -19,7 +19,7 @@ export function DiscoverCategories() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/getCat');
+      const res = await fetch('http://localhost:8000/getCat');
       const data = await res.json();
       setCategories(Array.isArray(data) ? data : []);
     } catch (err) {

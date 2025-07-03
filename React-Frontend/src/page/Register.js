@@ -1,20 +1,66 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Register = () => {
-  const navigate = useNavigate();
-  const [accountType, setAccountType] = useState("Customer"); // القيمة الافتراضية
+    const navigate = useNavigate();
+    const [accountType, setAccountType] = useState(''); // القيمة الافتراضية
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [agree, setAgree] = useState(false);
+    const [image, setImage] = useState(null);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  if (!agree) {
+    alert("You must agree to the terms and conditions.");
+    return;
+  }
 
-    // تحقق وهمي - يمكن استبداله بتحقق حقيقي
-    if (accountType === "Seller") {
-      navigate("/SellerLogin");
-    } else {
-      navigate("/Login");
+  if (password !== confirmPassword) {
+    alert("Passwords do not match.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("name", fullName);
+  formData.append("email", email);
+  formData.append("password", password);
+  formData.append("password_confirmation", confirmPassword);
+  formData.append("account_type", accountType);
+  if (image) {
+    formData.append("image", image);
+  }
+
+  try {
+    const response = await axios.post(
+      "http://localhost:8000/register",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    if (response.status === 201) {
+      alert("Registration successful! Please log in.");
+      navigate(accountType === "Seller" ? "/SellerLogin" : "/Login");
     }
-  };
+  } catch (error) {
+    if (error.response && error.response.data.errors) {
+      const errors = error.response.data.errors;
+      alert(Object.values(errors).flat().join("\n"));
+    } else {
+      alert("Registration failed. Please try again.");
+    }
+  }
+};
+
+
+
 
   return (
     <main className="pt-[40px] pb-[40px] px-[20px] w-full flex justify-center">
@@ -35,6 +81,26 @@ const Register = () => {
           </h2>
           <div className="space-y-4">
             <div className="text-left">
+            <label
+                htmlFor="image"
+                className="block text-gray-700 text-sm font-bold mb-2"
+              >
+                Profile Image
+              </label>
+              <input
+                type="file"
+                id="image"
+                accept="image/*"
+                onChange={(e) => setImage(e.target.files[0])}
+                className="w-full text-sm text-gray-500
+               file:mr-4 file:py-2 file:px-4
+               file:rounded-full file:border-0
+               file:text-sm file:font-semibold
+               file:bg-[#4B5929] file:text-white
+               hover:file:bg-[#3c471f]"
+             />
+           </div>
+            <div className="text-left">
               <label
                 htmlFor="full-name"
                 className="block text-gray-700 text-sm font-bold mb-2"
@@ -44,6 +110,8 @@ const Register = () => {
               <input
                 type="text"
                 id="full-name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] placeholder:text-[14px]"
                 placeholder="Your Full Name"
               />
@@ -58,6 +126,8 @@ const Register = () => {
               <input
                 type="email"
                 id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] placeholder:text-[14px]"
                 placeholder="Your Email"
               />
@@ -72,6 +142,8 @@ const Register = () => {
               <input
                 type="password"
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] placeholder:text-[14px]"
                 placeholder="Your Password"
               />
@@ -86,6 +158,8 @@ const Register = () => {
               <input
                 type="password"
                 id="confirm-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] placeholder:text-[14px]"
                 placeholder="Confirm Your Password"
               />
@@ -122,12 +196,14 @@ const Register = () => {
               </div>
             </div>
 
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="agree"
-                className="mr-2 leading-tight"
-              />
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="agree"
+              checked={agree}
+              onChange={(e) => setAgree(e.target.checked)}
+              className="mr-2 leading-tight"
+            />
               <label
                 className="inline-block text-gray-700 text-sm"
                 htmlFor="agree"

@@ -1,14 +1,57 @@
-import React from "react";
+import React, { useState } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const SellerLogin = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    // هنا ممكن تضيف تحقق لاحقاً
-    navigate("/SellerDash");
-  };
+// Inside SellerLogin component
+useEffect(() => {
+  axios
+    .get("http://localhost:8000/check-login", { withCredentials: true })
+    .then((res) => {
+      if (res.data.logged_in && res.data.role === "S") {
+        navigate("/seller");
+      }
+    })
+    .catch((err) => {
+      // optional: log error
+      console.error("Session check failed", err);
+    });
+}, []);
+const handleLogin = async (e) => {
+  e.preventDefault();
+
+  try {
+   const response = await axios.post(
+  "http://localhost:8000/login",
+  {
+    email,
+    password,
+    remember_me: rememberMe,
+  },
+  {
+    withCredentials: true, // 🔥 Important for session cookies!
+  }
+);
+
+
+    alert(response.data.message || "Login successful");
+console.log(response.data);
+    // Redirect to dashboard
+navigate("/seller"); // ✅ Correct spelling
+  } catch (error) {
+    if (error.response?.data?.message) {
+      alert(error.response.data.message);
+    } else {
+      alert("Login failed. Please check your credentials.");
+    }
+  }
+};
 
   return (
     <main className="pt-[100px] px-[20px] w-full flex justify-center">
@@ -38,6 +81,8 @@ const SellerLogin = () => {
               <input
                 type="email"
                 id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter Your Email"
                 className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929]"
               />
@@ -52,6 +97,8 @@ const SellerLogin = () => {
               <input
                 type="password"
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter Your Password"
                 className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929]"
               />
@@ -60,6 +107,8 @@ const SellerLogin = () => {
               <label className="flex items-center">
                 <input
                   type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="form-checkbox h-4 w-4 text-[#4B5929] rounded focus:ring-0"
                 />
                 <span className="ml-2 text-gray-600 text-xs">Remember Me</span>

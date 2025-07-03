@@ -1,13 +1,17 @@
-import React from 'react'
-import OverviewCard from './components/OverviewCard'
-import ReportChart from './components/ReportChart'
-import SalesInsights from './components/SalesInsights'
-import { TransactionHistory } from './components/TransactionHistory' 
-import { TopProducts } from './components/TopProducts'
-import { BestSellingProduct } from './components/BestSellingProduct'
-import { AddNewProduct } from './components/AddNewProduct'
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+import OverviewCard from './components/OverviewCard';
+import ReportChart from './components/ReportChart';
+import SalesInsights from './components/SalesInsights';
+import { TransactionHistory } from './components/TransactionHistory';
+import { TopProducts } from './components/TopProducts';
+import { BestSellingProduct } from './components/BestSellingProduct';
+import { AddNewProduct } from './components/AddNewProduct';
 
 const SellerDash = () => {
+
   return (
     <div className="p-6 space-y-6 bg-[#f3f4f6]">
     {/* Overview cards */}
@@ -53,7 +57,7 @@ const SellerDash = () => {
 </div>
 
 
-      
+
     </div>
   )
 }
