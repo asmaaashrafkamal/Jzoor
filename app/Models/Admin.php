@@ -24,4 +24,14 @@ class Admin extends Authenticatable
     public function categories(){
         return $this->hasMany('App\Models\Category','created_by','id');
     }
+    public function isSeller()
+    {
+        return $this->type === 'seller';
+    }
+   public function products(){
+        return $this->hasMany('App\Models\Product','category_id','id');
+    }
+   public function articles(){
+        return $this->hasMany('App\Models\Article','created_by','id');
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\site;
+use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ class CategoryController extends Controller
         'description' => $validated['description'],
         'productNo'  => $validated['productNo'],
         'image'       => $validated['image'] ?? null,
-        'created_by'=>  1 ,
+        'created_by'=>  Auth::guard('Admin')->id() ,
     ]);
 
     return response()->json(['message' => 'Category created', 'category' => $category], 201);

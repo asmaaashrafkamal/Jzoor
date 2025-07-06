@@ -176,8 +176,8 @@ const Cart = () => {
                 >
                   <div className="flex items-center space-x-4 rtl:space-x-reverse">
                     <img
-                      src={item.img}
-                      alt={item.name}
+                  src={`http://localhost:8000/storage/${item.image}`}
+                  alt={item.name}
                       className="w-16 h-16 rounded object-cover"
                     />
                     <div>
@@ -185,7 +185,7 @@ const Cart = () => {
                         {item.name}
                       </h3>
                       <p className="text-xs text-gray-500">
-                        ${item.new_price}
+                        ${item.price}
                       </p>
                     </div>
                   </div>
@@ -197,7 +197,7 @@ const Cart = () => {
                       -
                     </button>
                     <span className="w-10 h-8 flex items-center justify-center border-t border-b">
-                      {item.quantity}
+                      {item.stock_quantity}
                     </span>
                     <button
                       onClick={() => handleIncrement(item.id)}
@@ -207,7 +207,7 @@ const Cart = () => {
                     </button>
                   </div>
                   <p className="text-center font-semibold mt-2 md:mt-0">
-                    ${(item.new_price * item.quantity).toFixed(2)}
+                    ${(item.price * item.stock_quantity).toFixed(2)}
                   </p>
                   <div className="flex justify-end">
                     <button
@@ -224,7 +224,7 @@ const Cart = () => {
 
           {/* Sidebar */}
           <div className="bg-gray-100/40 p-6 rounded-lg shadow-md border-left">
-<h2 className="text-md md:text-3xl font-bold text-[#4B5929]">
+           <h2 className="text-md md:text-3xl font-bold text-[#4B5929]">
                 Check Out
               </h2>
             <h4 className="text-lg font-bold mb-4 text-gray-600">

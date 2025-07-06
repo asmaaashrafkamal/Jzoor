@@ -26,11 +26,10 @@ export default function Navbar() {
   const [categoriesWithProducts, setCategoriesWithProducts] = useState([]);
   const { products, setSelectedProduct,cart } = useContext(ProductContext);
   const navigate = useNavigate();
-const [productsByCategory, setProductsByCategory] = useState([]);
 
-const handleCategoryClick = (catId) => {
-  navigate(`/ProductList/${catId}`);
-};
+  const handleCategoryClick = (catId) => {
+      navigate(`/ProductList/${catId}`);
+    };
 useEffect(() => {
   let isMounted = true;
   fetch("http://localhost:8000/getAllCategoryProduct")

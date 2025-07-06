@@ -1,66 +1,154 @@
-import React from "react";
-import Title from "./Title";
-import { Link } from "react-router-dom";
-import useScrollReveal from "../assets/useScrollReveal";
+import { useNavigate } from "react-router-dom";
+import React, { useContext, useState, useEffect } from "react";
+import axios from "axios";
+import { ProductContext } from "../context/ProductContext";
+import Title from "../components/Title";
+import { FaHeart } from "react-icons/fa";
+import ScrollReveal from "scrollreveal";
 
 const ToolsSection = () => {
-    useScrollReveal('.reveal-top-tools', 'topInterval');
-  
-  return (
-    <section className="tools pt-[60px] pb-[60px] container" id="Tools">
-     <Title name="Tools & Care" description="Because every leaf deserves a little extra care" />
-    
-     <div className=" sm:py-2 md:py-5 cardss mx-auto grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-6 justify-items-center">
-  {[
-    {
-      title: 'Pots',
-      to:'/Pots',
-      img: '/imges/Keep ALIVE_ 10 Best LOW Light Indoor Plants (Easy….webp', // استبدل باسم صورة حقيقي
-    },
-    {
-      title: 'Care',
-      to:'/Care',
-      img: '/imges/Person Holding Green Succulent Plant · Free Stock….webp',
-    },
-    {
-      to:'/Accessories',
-      title: 'Accessories',
-      img: '/imges/Monstera Macrame Wristlet, Leaf Macrame Wristlet….webp',
-    },
-    {
-      to:'/Storage',
-        title: 'Storage & Maintenance',
-        img: '/imges/Storage.webp',
-      },
-     
-  ].map((card, index) => (
-    <div
-      key={index}
-      className="reveal-top-tools group cursor-pointer relative rounded-xl overflow-hidden bg-white max-w-sm w-full h-[400px]"
-    >
-      <img
-        src={card.img}
-        alt={card.title}
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-in-out scale-110 group-hover:scale-125 group-hover:rotate-2 cursor-pointer"
-      />
-      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/60 transition duration-500"></div>
-      <div className="absolute inset-0 flex flex-col justify-between text-white text-center z-10">
-        <h2 className="text-xl md:text-2xl font-bold mt-[60px]">{card.title}</h2>
-        <div className="flex justify-center mb-[60px]">
-        <Link
-                to={card.to}
-                className="no-underline px-3 py-2 bg-[#8B6F47]/70 border-2 border-[#5a422b] hover:bg-[#5a422b] hover:border-[#4a341f]  rounded-full hidden group-hover:block translate-y-10  group-hover:translate-y-0 transition-all duration-500 text-white text-center"
-              >
-                See All
-              </Link>
-        </div>
-      </div>
-    </div>
-  ))}
-</div>
+  const navigate = useNavigate();
 
-     
-    </section>
+  const [category, setCategory] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showToast, setShowToast] = useState(false);
+
+  const {
+    setSelectedGift,
+    handleAddToCart,
+    isFavorite,
+    handleAddToFavorite,
+    handleRemoveFromFavorite,
+  } = useContext(ProductContext);
+
+  const handleAddToCartWithToast = (product) => {
+    handleAddToCart(product);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 1000);
+  };
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:8000/api/category/name3`)
+      .then((res) => {
+        setCategory(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching category:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (category?.products?.length > 0) {
+      ScrollReveal().reveal(".reveal-top-Product", {
+        origin: "top",
+        distance: "50px",
+        duration: 1000,
+        delay: 200,
+        easing: "ease",
+        reset: false,
+        opacity: 0,
+        scale: 0.9,
+        interval: 100,
+      });
+    }
+  }, [category]);
+
+  const handleProductClick = (product) => {
+    setSelectedGift(product);
+    navigate(`/product/${product.id}`);
+  };
+
+  if (loading) return <div className="text-center py-20">Loading...</div>;
+  if (!category) return <div className="text-center py-20">Category not found</div>;
+
+  return (
+    <div className="bg-[#FAF7F2]">
+      <section className="gift relative pt-[60px] pb-[60px] overflow-hidden container" id="Gifts">      {showToast && (
+        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-green text-white px-4 py-2 rounded shadow-lg z-50">
+          ✅ Added to cart!
+        </div>
+      )}
+
+      <Title
+        name={category.cat_name ?? "Tools & Care"}
+        description={category.description}
+      />
+
+        <div className="cards bg-[#FAF7F2] sm:py-2 md:py-5">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-6 justify-items-center">
+{category.products.length > 0 ? (
+  category.products.map((product) => (
+                <div
+                  key={product.id}
+                  className="reveal-top-Product group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 max-w-sm w-full cursor-pointer"
+                >
+                  <div className="relative w-full h-60 overflow-hidden">
+                    <img
+                      src={`http://localhost:8000/storage/${product.image}`}
+                      alt={product.name}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-300"></div>
+
+                    <button
+                      onClick={() =>
+                        isFavorite(product.id)
+                          ? handleRemoveFromFavorite(product.id)
+                          : handleAddToFavorite(product)
+                      }
+                      className="absolute top-2 right-2 w-9 h-9 rounded-full border-2 border-white flex items-center justify-center hidden group-hover:flex transition duration-300 bg-white/10 hover:bg-white/30"
+                    >
+                      <FaHeart
+                        className={`text-lg transition-colors duration-300 ${
+                          isFavorite(product.id) ? "text-red" : "text-white"
+                        }`}
+                      />
+                    </button>
+
+                    <p className="absolute bottom-2 left-2 text-white text-lg font-semibold bg-black/40 px-2 py-1 rounded group-hover:-translate-y-20 transition duration-300">
+                      {product.name}
+                    </p>
+                  </div>
+
+                  <div className="p-4">
+                    <div className="flex justify-between items-center mb-1 text-sm md:text-[16px] text-gray-600">
+                      <span className="line-through text-gray-400">
+                        ${product.price}
+                      </span>
+                      <span className="text-[#af926a] font-bold text-[18px]">
+                        ${(product.price * (1 - product.discounted_price / 100)).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-all duration-300 p-4 flex flex-col items-center gap-2 bg-white/90">
+                      <button
+                        onClick={() => handleAddToCartWithToast(product)}
+                        className="bg-[#af926a] no-underline text-white w-full text-center py-2 rounded-full hover:bg-[#8B6F47] transition"
+                      >
+                        Add To Cart
+                      </button>
+                      <button
+                        onClick={() => handleProductClick(product)}
+                        className="bg-[#333]/10 no-underline text-[#8B6F47] w-full text-center py-2 rounded-full border-[#8B6F47] hover:bg-[#8B6F47] hover:text-white transition"
+                      >
+                        More Details
+                      </button>
+                    </div>
+                  </div>
+                </div>
+  ))
+): (
+  <p className="col-span-full text-center text-gray-500 text-lg py-10">
+    No products found in this category.
+  </p>
+)}
+            </div>
+          </div>
+</div>
+      </section></div>
   );
 };
 

@@ -11,6 +11,10 @@ const Register = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [agree, setAgree] = useState(false);
     const [image, setImage] = useState(null);
+    const [gender, setGender] = useState('');
+    const [state, setState] = useState('');
+    const [address, setAdressName] = useState('');
+
  const handleSubmit = async (e) => {
   e.preventDefault();
 
@@ -30,6 +34,10 @@ const Register = () => {
   formData.append("password", password);
   formData.append("password_confirmation", confirmPassword);
   formData.append("account_type", accountType);
+  formData.append("gender", gender);
+  formData.append("state", state);
+  formData.append("address", address);
+
   if (image) {
     formData.append("image", image);
   }
@@ -63,11 +71,10 @@ const Register = () => {
 
 
   return (
-    <main className="pt-[40px] pb-[40px] px-[20px] w-full flex justify-center">
+<main className="min-h-screen overflow-y-auto pt-[40px] pb-[40px] px-[20px] w-full flex justify-center">
       <div
         className="bg-white shadow-lg rounded-lg w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 overflow-hidden"
         style={{
-          height: "calc(100vh + 80px)",
           boxShadow: "0 0 10px rgba(0,0,0,.3)",
         }}
       >
@@ -163,6 +170,57 @@ const Register = () => {
                 className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] placeholder:text-[14px]"
                 placeholder="Confirm Your Password"
               />
+            </div>
+    <div className="text-left">
+              <label
+                htmlFor="full-name"
+                className="block text-gray-700 text-sm font-bold mb-2"
+              >
+                State
+              </label>
+              <input
+                type="text"
+                id="state"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] placeholder:text-[14px]"
+                placeholder="Your Full Name"
+              />
+            </div>
+    <div className="text-left">
+              <label
+                htmlFor="full-name"
+                className="block text-gray-700 text-sm font-bold mb-2"
+              >
+             Address
+              </label>
+              <input
+                type="text"
+                id="adress"
+                value={address}
+                onChange={(e) => setAdressName(e.target.value)}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] placeholder:text-[14px]"
+                placeholder="Your Full Name"
+              />
+            </div>
+            <div className="text-left">
+              <label
+                htmlFor="gender"
+                className="block text-gray-700 text-sm font-bold mb-2"
+              >
+                Gender
+              </label>
+              <select
+                id="gender"
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] text-sm"
+              >
+                <option value="">Select Gender</option>
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+                <option value="other">Other</option>
+              </select>
             </div>
 
             {/* اختيار نوع الحساب */}

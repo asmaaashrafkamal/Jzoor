@@ -38,7 +38,7 @@ const [potSizes, setPotSizes] = useState(['S', 'M', 'XL']);
   };
 
 useEffect(() => {
-  fetch("http://localhost:8000/getCat")
+  fetch("http://localhost:8000/getAllCategory")
     .then((res) => res.json())
     .then((data) => setCategories(data))
     .catch((err) => console.error("Failed to load categories", err));
@@ -63,10 +63,15 @@ const handlePublishProduct = async () => {
   }
 
   try {
-    const response = await fetch('http://localhost:8000/products', {
-      method: 'POST',
-      body: formData,
-    });
+   const response = await fetch('http://localhost:8000/AdminStoreproducts', {
+  method: 'POST',
+  body: formData,
+  headers: {
+    'Accept': 'application/json',
+    // Don't set Content-Type when using FormData; browser sets it with boundary
+  },
+  credentials: 'include', // Important for cookies/session!
+});
 
     const result = await response.json();
     if (response.ok) {

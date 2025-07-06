@@ -1,25 +1,25 @@
+import { useNavigate } from "react-router-dom";
 import React, { useContext, useState, useEffect } from "react";
+import axios from "axios";
 import { ProductContext } from "../context/ProductContext";
 import Title from "../components/Title";
 import { FaHeart } from "react-icons/fa";
-import { Link } from "react-router-dom";
 import ScrollReveal from "scrollreveal";
 
 const GiftSection = () => {
+  const navigate = useNavigate();
+
+  const [category, setCategory] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showToast, setShowToast] = useState(false);
+
   const {
-    gifts,
     setSelectedGift,
     handleAddToCart,
     isFavorite,
     handleAddToFavorite,
     handleRemoveFromFavorite,
   } = useContext(ProductContext);
-
-  const [showToast, setShowToast] = useState(false);
-
-  const handleProductClick = (product) => {
-    setSelectedGift(product);
-  };
 
   const handleAddToCartWithToast = (product) => {
     handleAddToCart(product);
@@ -29,12 +29,21 @@ const GiftSection = () => {
     }, 1000);
   };
 
-  const giftsToShow = gifts.slice(0, 4); // يجب أن يكون قبل useEffect
-
-  // ✅ ScrollReveal للبطاقات
   useEffect(() => {
-    if (giftsToShow.length > 0) {
-      ScrollReveal().reveal(".reveal-top-card", {
+    axios.get(`http://localhost:8000/api/category/name2`)
+      .then((res) => {
+        setCategory(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching category:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (category?.products?.length > 0) {
+      ScrollReveal().reveal(".reveal-top-Product", {
         origin: "top",
         distance: "50px",
         duration: 1000,
@@ -46,7 +55,15 @@ const GiftSection = () => {
         interval: 100,
       });
     }
-  }, [giftsToShow]);
+  }, [category]);
+
+  const handleProductClick = (product) => {
+    setSelectedGift(product);
+    navigate(`/product/${product.id}`);
+  };
+
+  if (loading) return <div className="text-center py-20">Loading...</div>;
+  if (!category) return <div className="text-center py-20">Category not found</div>;
 
   return (
     <div className="bg-[#FAF7F2]">
@@ -65,18 +82,19 @@ const GiftSection = () => {
         <div className="cards bg-[#FAF7F2] sm:py-2 md:py-5">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-6 justify-items-center">
-              {giftsToShow.map((product) => (
+              {category.products.map((product) => (
                 <div
                   key={product.id}
-                  className="reveal-top-card group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 max-w-sm w-full cursor-pointer"
+                  className="reveal-top-Product group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 max-w-sm w-full cursor-pointer"
                 >
                   <div className="relative w-full h-60 overflow-hidden">
                     <img
-                      src={product.img}
+                      src={`http://localhost:8000/storage/${product.image}`}
                       alt={product.name}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-300"></div>
+
                     <button
                       onClick={() =>
                         isFavorite(product.id)
@@ -96,44 +114,35 @@ const GiftSection = () => {
                       {product.name}
                     </p>
                   </div>
+
                   <div className="p-4">
                     <div className="flex justify-between items-center mb-1 text-sm md:text-[16px] text-gray-600">
                       <span className="line-through text-gray-400">
-                        ${product.prev_price}
+                        ${product.price}
                       </span>
                       <span className="text-[#af926a] font-bold text-[18px]">
-                        ${product.new_price}
+                        ${(product.price * (1 - product.discounted_price / 100)).toFixed(2)}
                       </span>
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-all duration-300 p-4 flex flex-col items-center gap-2 bg-white/90">
                       <button
                         onClick={() => handleAddToCartWithToast(product)}
-                        className="bg-[#af926a] text-white w-full text-center py-2 rounded-full hover:bg-[#8B6F47] transition"
+                        className="bg-[#af926a] no-underline text-white w-full text-center py-2 rounded-full hover:bg-[#8B6F47] transition"
                       >
                         Add To Cart
                       </button>
-                      <Link
-                        to={`/gift/${product.id}`}
+                      <button
                         onClick={() => handleProductClick(product)}
-                        className="bg-[#333]/10 no-underline text-[#8B6F47] w-full text-center py-2 rounded-full border-[##8B6F47] hover:bg-[#8B6F47] hover:text-white transition"
+                        className="bg-[#333]/10 no-underline text-[#8B6F47] w-full text-center py-2 rounded-full border-[#8B6F47] hover:bg-[#8B6F47] hover:text-white transition"
                       >
                         More Details
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-
-        <div className="flex justify-center mt-8 relative">
-          <Link
-            to="/GiftList"
-            className="no-underline relative bg-[#4B5929] text-center hover:bg-[#A8C686] text-white font-medium text-lg px-3 py-3 rounded-[10px] transition-all duration-300 transform hover:scale-105 shadow-md cursor-pointer"
-          >
-            See More Gifts
-          </Link>
         </div>
       </section>
     </div>

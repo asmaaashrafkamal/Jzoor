@@ -15,7 +15,7 @@ return [
     |
     */
      'credentials' => true,
-'paths' => ['*'],
+'paths' => ['api/*', 'sanctum/csrf-cookie', '*'],
 
     // 'paths' => ['api/*', 'sanctum/csrf-cookie', 'check-login', 'login', 'logout'], // Add your paths
 

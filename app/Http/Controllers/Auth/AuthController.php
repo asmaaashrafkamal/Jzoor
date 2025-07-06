@@ -17,6 +17,9 @@ public function register(Request $request)
 {
     $validated = $request->validate([
         'name' => 'required|string|max:255',
+        'state' => 'required|string|max:255',
+        'gender' => 'required|string|max:255',
+        'address' => 'required|string|max:255',
         'email' => 'required|string|email|unique:users,email|unique:admins,email',
         'password' => 'required|string|min:6|confirmed',
         'account_type' => 'required|in:Customer,Seller',
@@ -26,6 +29,9 @@ public function register(Request $request)
     $data = [
         'full_name' => $validated['name'],
         'email' => $validated['email'],
+        'state' => $validated['state'],
+        'gender' => $validated['gender'],
+        'address' => $validated['address'],
         'password' => Hash::make($validated['password']),
     ];
 

@@ -1,37 +1,73 @@
-import React, { useState } from 'react';
-import { FiUploadCloud } from 'react-icons/fi'; // استيراد أيقونة للرفع
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { FiUploadCloud } from "react-icons/fi";
 
 const AddNewArticle = () => {
-  const [status, setStatus] = useState('Published');
-  const [postTitle, setPostTitle] = useState('The Art of Palestinian Embroidery');
-  const [postBody, setPostBody] = useState(
-    `Every thread tells a story. Palestinian embroidery, known as tatreez, is more than decorative stitching — it’s a language passed from mother to daughter, a quiet act of remembrance, and a form of cultural resistance. Each pattern, color, and motif has meaning. Some mark a woman’s village or marital status. Others, like the olive branch or watermelon, carry political symbolism — especially during times when national expression was restricted. The watermelon, for instance, became a symbol of resistance after the Palestinian flag was banned. Tatreez has always adapted. Today, artists incorporate traditional motifs into bags, jackets, and accessories, keeping the heritage alive while making it accessible to younger generations. At its heart, Palestinian embroidery is about survival — of identity, of beauty, and of belonging stitched into every square.`
-  );
-  const [image, setImage] = useState(null);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
-  const handleStatusChange = (newStatus) => {
-    setStatus(newStatus);
-  };
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [status, setStatus] = useState("Published");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
-  const handleTitleChange = (event) => {
-    setPostTitle(event.target.value);
-  };
+  // ✅ Check admin login
+  useEffect(() => {
+  axios
+    .get("http://localhost:8000/check-login", { withCredentials: true })
+    .then((res) => {
+      console.log("Session Response:", res.data); // Debug
 
-  const handleBodyChange = (event) => {
-    setPostBody(event.target.value);
-  };
+      const role = res.data?.role;
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files?.[0];
+      if (role === "A" || role === "D") {
+        setUser(res.data.user);
+      } else {
+        console.warn("Unauthorized role or missing session.");
+        window.location.href="/admin/login";
+      }
+    })
+    .catch((error) => {
+      console.error("Login check failed:", error);
+        window.location.href="/admin/login";
+    })
+    .finally(() => setLoading(false));
+}, [navigate]);
+
+
+  if (loading) return <div>Checking login status...</div>;
+
+  // ✅ Handle image selection
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
     if (file) {
-      setImage(URL.createObjectURL(file));
-      console.log('Selected image:', file);
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
-  const handlePublish = () => {
-    console.log('Publishing article with:', { status, postTitle, postBody, image });
-    alert('Article published (data logged to console)!');
+  // ✅ Submit form
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("body", body);
+    formData.append("status", status);
+    if (imageFile) formData.append("image", imageFile);
+
+    try {
+      const res = await axios.post("http://localhost:8000/articles", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+      });
+      alert("Article created successfully!");
+      console.log(res.data);
+    } catch (err) {
+      console.error("Error:", err.response?.data || err.message);
+      alert("Failed to publish article. See console.");
+    }
   };
 
   return (
@@ -39,104 +75,88 @@ const AddNewArticle = () => {
       <div className="bg-white rounded-md shadow-md p-6 max-w-2xl mx-auto">
         <h2 className="text-xl font-semibold mb-4 text-gray-800">Add New Article</h2>
 
-        {/* Status Buttons Section */}
-        <div className="mb-4 flex items-center space-x-2 rtl:space-x-reverse">
+        {/* Status Selection */}
+        <div className="mb-4 flex items-center space-x-2">
           <label className="text-sm text-gray-700">Status:</label>
-          <button
-            type="button"
-            onClick={() => handleStatusChange('Status')}
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
-              status === 'Status' ? 'bg-gray-200 text-[#6C757D]' : 'bg-gray-200 text-[#6C757D] hover:bg-gray-300'
-            }`}
-          >
-            Status
-          </button>
-          <button
-            type="button"
-            onClick={() => handleStatusChange('Published')}
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
-              status === 'Published' ? 'bg-[#D4EDDA] text-[#28A745]' : 'bg-gray-200 text-[#6C757D] hover:bg-gray-300'
-            }`}
-          >
-            Published
-          </button>
-          <button
-            type="button"
-            onClick={() => handleStatusChange('Drafted')}
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
-              status === 'Drafted' ? 'bg-[#FFF3CD] text-[#FFC107]' : 'bg-gray-200 text-[#6C757D] hover:bg-gray-300'
-            }`}
-          >
-            Drafted
-          </button>
+          {["Published", "Drafted", "Status"].map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setStatus(s)}
+              className={`px-3 py-1 rounded-full text-sm font-medium ${
+                status === s
+                  ? s === "Published"
+                    ? "bg-green-100 text-green-700"
+                    : s === "Drafted"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : "bg-gray-200 text-gray-700"
+                  : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+              }`}
+            >
+              {s}
+            </button>
+          ))}
         </div>
 
-        {/* Post Title Input Field */}
+        {/* Title Input */}
         <div className="mb-4">
-          <label htmlFor="postTitle" className="block text-sm font-medium text-gray-700 mb-2">
-            Post Title
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Post Title</label>
           <input
             type="text"
-            id="postTitle"
-            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2"
-            placeholder="Enter post title"
-            value={postTitle}
-            onChange={handleTitleChange}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="shadow-sm w-full border-gray-300 rounded-md p-2"
+            placeholder="Enter title"
           />
         </div>
 
-        {/* Post Body Textarea */}
+        {/* Body Textarea */}
         <div className="mb-4">
-          <label htmlFor="postBody" className="block text-sm font-medium text-gray-700 mb-2">
-            Post Body
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Post Body</label>
           <textarea
-            id="postBody"
-            rows="8"
-            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2"
+            rows="6"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            className="shadow-sm w-full border-gray-300 rounded-md p-2"
             placeholder="Write your article here..."
-            value={postBody}
-            onChange={handleBodyChange}
           ></textarea>
         </div>
 
-        {/* Image Upload Section */}
+        {/* Image Upload */}
         <div className="mb-4">
-          <label htmlFor="imageUpload" className="block text-sm font-medium text-gray-700 mb-2">
-            Featured Image
-          </label>
-          {/* هنا تم تغيير بنية label لتغليف منطقة السحب والإفلات بالكامل */}
+          <label className="block text-sm font-medium text-gray-700 mb-2">Featured Image</label>
           <label
             htmlFor="imageUpload"
-            className="cursor-pointer mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-indigo-400 hover:bg-gray-50 transition-all duration-200"
+            className="cursor-pointer flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md hover:border-indigo-400 hover:bg-gray-50 transition"
           >
             <div className="space-y-1 text-center">
-              {image ? (
-                <img src={image} alt="Uploaded" className="max-h-40 rounded-md mx-auto" />
+              {imagePreview ? (
+                <img src={imagePreview} alt="Preview" className="max-h-40 rounded-md mx-auto" />
               ) : (
                 <>
                   <FiUploadCloud className="mx-auto h-12 w-12 text-gray-400" />
-                  <div className="flex text-sm text-gray-600 justify-center"> {/* إضافة justify-center هنا */}
-                    <span className="font-medium text-indigo-600 hover:text-indigo-500">
-                      Upload a file
-                    </span>
-                    <p className="pl-1">or drag and drop</p>
-                  </div>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium text-indigo-600">Upload</span> or drag and drop
+                  </p>
                   <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
                 </>
               )}
             </div>
-            {/* حقل الإدخال الفعلي مخفي ولكن يتم تنشيطه عند النقر على الـ label */}
-            <input id="imageUpload" type="file" className="sr-only" onChange={handleImageUpload} />
+            <input
+              id="imageUpload"
+              type="file"
+              className="sr-only"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
           </label>
         </div>
 
-        {/* Publish Button */}
+        {/* Submit */}
         <div className="flex justify-end">
           <button
-            onClick={handlePublish}
-            className="bg-[#4B5929] text-white font-semibold rounded-md py-2 px-4 hover:bg-[#3c471f] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4B5929] transition"
+            onClick={handleSubmit}
+            className="bg-[#4B5929] text-white font-semibold rounded-md py-2 px-4 hover:bg-[#3c471f] focus:ring-2 focus:ring-offset-2 focus:ring-[#4B5929]"
           >
             Publish
           </button>

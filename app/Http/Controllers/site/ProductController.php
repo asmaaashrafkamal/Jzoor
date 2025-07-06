@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Admin;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -24,7 +26,7 @@ public function store(Request $request)
         'tags' => 'nullable|string',
         'image' => 'nullable|image|max:2048',
     ]);
-$adminId = Auth::guard('admin')->id();
+$adminId = Auth::guard('Admin')->id();
 
     $product = new Product();
     $product->name = $request->name;
@@ -70,6 +72,33 @@ $adminId = Auth::guard('admin')->id();
         'product' => $product
     ], 201);
 }
+public function getProductsBySeller()
+{
+    $sellerId = Auth::guard('Admin')->id();
+    $products = Product::where('created_by', $sellerId)->get();
+    return response()->json( $products);
+}
+public function getAllSellerProducts()
+{
+    try {
+        $products = Admin::where('type', 'S')->with('products')->get()
+            ->flatMap(function ($seller) {
+                return $seller->products->map(function ($product) use ($seller) {
+                    $productData = $product->toArray();
+                    $productData['seller_name'] = $seller->full_name; // or $seller->admin_name
+                    return $productData;
+                });
+            })->values(); // Reset collection keys
 
+        return response()->json($products);
+    } catch (\Exception $e) {
+        Log::error('Error fetching seller products: ' . $e->getMessage());
+
+        return response()->json([
+            'error' => true,
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+}
 
 }
