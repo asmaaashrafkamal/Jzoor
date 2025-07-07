@@ -24,6 +24,8 @@ public function register(Request $request)
         'password' => 'required|string|min:6|confirmed',
         'account_type' => 'required|in:Customer,Seller',
         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // ✅ validate image
+        'Birth_date' => 'required|string|max:255',
+        'phone' => 'required|string|max:255',
     ]);
 
     $data = [
@@ -32,6 +34,8 @@ public function register(Request $request)
         'state' => $validated['state'],
         'gender' => $validated['gender'],
         'address' => $validated['address'],
+        'Birth_date' => $validated['Birth_date'],
+        'phone' => $validated['phone'],
         'password' => Hash::make($validated['password']),
     ];
 
@@ -65,7 +69,15 @@ public function login(LoginRequest $request)
     $remember_me = $request->has('remember_me');
     $email = $request->input("email");
     $pass = $request->input("password");
-
+  // ✅ Step 1: Clear any existing sessions before new login
+    session()->forget([
+        'admin_logged_in', 'admin_id', 'admin_name', 'admin_type', 'admin_email', 'admin_image',
+        'admin_gender', 'admin_state', 'admin_address', 'admin_date', 'admin_phone',
+        'customer_logged_in', 'customer_id', 'customer_name', 'customer_type', 'customer_email',
+        'customer_image', 'customer_gender', 'customer_state', 'customer_address', 'customer_date', 'customer_phone',
+    ]);
+    Auth::guard('Admin')->logout();
+    Auth::guard('web')->logout();
     // Try admin login
     if (Auth::guard('Admin')->attempt(['email' => $email, 'password' => $pass], $remember_me)) {
         $admin = Auth::guard('Admin')->user();
@@ -75,7 +87,13 @@ public function login(LoginRequest $request)
             'admin_name' => $admin->full_name,
             'admin_type' => $admin->type,
             'admin_email' => $admin->email,
-            'admin_image' => $admin->image
+            'admin_image' => $admin->image,
+            'admin_gender' => $admin->gender,
+            'admin_state' => $admin->state,
+            'admin_address' => $admin->address,
+            'admin_date' => $admin->Birth_date,
+            'admin_phone' => $admin->phone,
+
         ]);
 
         return response()->json([
@@ -87,7 +105,10 @@ public function login(LoginRequest $request)
                 'admin_name',
                 'admin_type',
                 'admin_email',
-                'admin_image'
+                'admin_image',
+                'admin_state',
+                'admin_address',
+                'admin_gender','admin_date','admin_phone'
             ])
         ], 200);
     }
@@ -101,19 +122,30 @@ public function login(LoginRequest $request)
             'customer_name' => $customer->full_name,
             'customer_type' => $customer->type,
             'customer_email' => $customer->email,
-            'customer_image' => $customer->image
+            'customer_image' => $customer->image,
+            'customer_gender' => $customer->gender,
+            'customer_state' => $customer->state,
+            'customer_address' => $customer->address,
+            'customer_date' => $customer->Birth_date,
+            'customer_phone' => $customer->phone,
+
         ]);
 
         return response()->json([
             'message' => 'Customer logged in successfully.',
-            'role' => 'customer',
+            'role' => session('customer_type'),
             'session' => session()->only([
                 'customer_logged_in',
                 'customer_id',
                 'customer_name',
                 'customer_type',
                 'customer_email',
-                'customer_image'
+                'customer_image',
+                'customer_gender',
+                'customer_address',
+                'customer_state',
+                'customer_date',
+                'customer_phone'
             ])
         ], 200);
     }

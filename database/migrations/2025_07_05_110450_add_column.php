@@ -13,26 +13,21 @@ return new class extends Migration
      */
     public function up()
     {
-    Schema::table('users', function (Blueprint $table) {
-            $table->string('state')->nullable();
-            $table->string('gender')->nullable();
-            $table->string('address')->nullable();
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropColumn('status'); // 🔻 Drop old column
         });
 
-        Schema::table('admins', function (Blueprint $table) {
-            $table->string('state')->nullable();
-            $table->string('gender')->nullable();
-            $table->string('address')->nullable();
+        Schema::table('orders', function (Blueprint $table) {
+            $table->enum('status', ['Preparing', 'Pending', 'Shipped', 'Delivered', 'Canceled', 'Waiting Picked Up'])
+                  ->default('Pending'); // ➕ Add new column
+
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-
+        // Schema::table('orders', function (Blueprint $table) {
+        //     $table->string('status')->default('new')->change(); // or revert to original type
+        // });
     }
 };

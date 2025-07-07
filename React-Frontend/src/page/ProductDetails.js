@@ -83,9 +83,9 @@ const AddToCart = async () => {
     const res = await axios.get("http://localhost:8000/check-login", {
       withCredentials: true,
     });
-
-if (!res.data.logged_in) {
-      navigate("/login", { state: { id } }
+console.log(res.data);
+ if (!res.data.role === "C") {
+      navigate("/login", { state: { id }}
 );
       return;
     }

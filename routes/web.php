@@ -6,6 +6,9 @@ use App\Http\Controllers\site\ArticleController;
 use App\Http\Controllers\site\ProductController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Home\LandingPageController;
+use App\Http\Controllers\Home\StripeController;
+use App\Http\Controllers\Home\ProfileController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -25,13 +28,13 @@ Route::get('/check-login', function () {
         return response()->json([
             'logged_in' => true,
             'role' => session('admin_type'),
-            'user' => session()->only(['admin_id', 'admin_name', 'admin_email', 'admin_type', 'admin_image']),
+            'user' => session()->only(['admin_id', 'admin_name', 'admin_email', 'admin_type', 'admin_image','admin_gender','admin_state','admin_address','admin_date','admin_phone']),
         ]);
     } elseif (session('customer_logged_in')) {
         return response()->json([
             'logged_in' => true,
-            'role' => 'C',
-            'user' => session()->only(['customer_id', 'customer_name', 'customer_email', 'customer_type', 'customer_image']),
+            'role' => session('customer_type'),
+            'user' => session()->only(['customer_id', 'customer_name', 'customer_email', 'customer_type', 'customer_image','customer_gender','customer_state','customer_address','customer_date','customer_phone']),
         ]);
     }
 
@@ -55,6 +58,10 @@ Route::get('/{any}', function () {
 })->where('any', '.*');
 
 Route::middleware(['auth.session'])->group(function () {
+Route::post('/StoreProfile', [ProfileController::class, 'store']);
+Route::post( '/place-order', [StripeController::class, 'checkout']);
+Route::post( '/create-payment-intent', [StripeController::class, 'createPaymentIntent']);
+
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/AdminStoreproducts', [ProductController::class, 'store']);
     Route::post('/categories', [CategoryController::class, 'store']);

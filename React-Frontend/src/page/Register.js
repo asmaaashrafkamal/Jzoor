@@ -14,7 +14,8 @@ const Register = () => {
     const [gender, setGender] = useState('');
     const [state, setState] = useState('');
     const [address, setAdressName] = useState('');
-
+    const [Birth_date, setBirthDate] = useState('');
+    const [phone, setPhone] = useState('');
  const handleSubmit = async (e) => {
   e.preventDefault();
 
@@ -37,7 +38,8 @@ const Register = () => {
   formData.append("gender", gender);
   formData.append("state", state);
   formData.append("address", address);
-
+  formData.append("Birth_date", Birth_date);
+  formData.append("phone", phone);
   if (image) {
     formData.append("image", image);
   }
@@ -137,6 +139,38 @@ const Register = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] placeholder:text-[14px]"
                 placeholder="Your Email"
+              />
+            </div>
+  <div className="text-left">
+              <label
+                htmlFor="full-name"
+                className="block text-gray-700 text-sm font-bold mb-2"
+              >
+             Birth Date
+              </label>
+              <input
+                type="text"
+                id="full-name"
+                value={Birth_date}
+                onChange={(e) => setBirthDate(e.target.value)}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] placeholder:text-[14px]"
+                placeholder="Your Date of Birth"
+              />
+            </div>
+  <div className="text-left">
+              <label
+                htmlFor="full-name"
+                className="block text-gray-700 text-sm font-bold mb-2"
+              >
+                 Phone
+              </label>
+              <input
+                type="text"
+                id="full-name"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] placeholder:text-[14px]"
+                placeholder="Your Phone"
               />
             </div>
             <div className="text-left">

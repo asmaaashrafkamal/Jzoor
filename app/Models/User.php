@@ -20,9 +20,11 @@ class User extends Authenticatable
     protected $fillable = [
         'full_name',
         'email',
-        'password','image','type'
+        'password','image','type','state', 'gender','address','Birth_date','phone'
     ];
-
+  public function orders(){
+        return $this->hasMany('App\Models\Order','user_id','id');
+    }
     /**
      * The attributes that should be hidden for serialization.
      *

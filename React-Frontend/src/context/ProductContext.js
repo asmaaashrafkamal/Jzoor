@@ -16,7 +16,13 @@ export const ProductProvider = ({ children }) => {
   const [selectedGift, setSelectedGift] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [selectedJournal, setSelectedJournal] = useState(null);
+
+  // 💾 Save cart to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
   // تحميل البيانات من JSON باستخدام fetch
+
 
   useEffect(() => {
     fetch('SellerProduct.json')
