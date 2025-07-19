@@ -13,7 +13,7 @@ import {
   HiXCircle
 } from 'react-icons/hi';
 import axios from 'axios';
-
+import { useNavigate } from 'react-router-dom';
 const Title = ({ title }) => (
   <h1 className="text-3xl font-bold mb-4" style={{ color: '#1F2937' }}>{title}</h1>
 );
@@ -35,6 +35,29 @@ const ArticlesOverview = () => {
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [newStatus, setNewStatus] = useState('');
+const [loading, setLoading] = useState(false);
+const navigate = useNavigate();
+const [user, setUser] = useState(null);
+  useEffect(() => {
+    axios.get("http://localhost:8000/check-login", { withCredentials: true })
+      .then(res => {
+         console.log(res.data);
+        if (res.data.role == "A"||res.data.role == "D") {
+         console.log(res.data.user);
+          setUser(res.data.user); // session data from backend
+        } else {
+         // If no session, redirect to login page
+          navigate("/admin/login");
+        }
+      })
+      .catch(() => {
+        // On any error, redirect to login page
+        navigate("/admin/login");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [navigate]);
 
   const fetchArticles = useCallback(async () => {
     try {

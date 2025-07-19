@@ -129,7 +129,7 @@ public function logout(Request $request)
     $request->session()->invalidate();
     $request->session()->regenerateToken();
 
-    return redirect()->route('HomePage'); // or route('admin.login') if needed
+    return response()->json(['message' => 'logout successfully'], 200);
 }
 public function get_customer()
 {

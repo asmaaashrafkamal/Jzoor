@@ -1,4 +1,3 @@
-import React , {useState} from 'react';
 import { NavLink } from 'react-router-dom';
 import { FaChartLine, FaUsers, FaTags } from 'react-icons/fa';
 import { FaCartShopping } from "react-icons/fa6";
@@ -10,6 +9,9 @@ import { RiAdminFill, RiMenuFoldLine } from "react-icons/ri";
 import { CiLogin } from "react-icons/ci";
 import { AiOutlineShop } from "react-icons/ai";
 import { LuSquareArrowOutUpRight } from "react-icons/lu";
+import { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import {
   Accordion,
   AccordionBody,
@@ -19,6 +21,33 @@ import {
 import { FaUserFriends, FaStore, FaTruck } from 'react-icons/fa';
 // import { Link } from 'react-router-dom';
 const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
+ const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const navigate = useNavigate();
+const toggleDropdown = () => setDropdownOpen((prev) => !prev);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Handle logout request
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:8000/logout', {}, { withCredentials: true });
+      navigate('/login');
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
+
   const [open, setOpen] = useState('1');
   const toggle = (id) => {
     if (open === id) {
@@ -37,7 +66,7 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
     const link2=[
       { to: '/admin/category', label: 'Categories', icon: <BiSolidCategoryAlt /> },
       { to: '/admin/transaction', label: 'Transactions', icon: <GrTransaction /> },
-   
+
     ]
 
   const Product = [
@@ -75,9 +104,9 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </NavLink>
         ))}
       </nav>
-     
 
-    
+
+
 
       <nav className="space-y-3 pt-2">
         {link2.map(({ to, label, icon, end }) => (
@@ -177,13 +206,43 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
       </NavLink>
 
       {/* بيانات المستخدم */}
-      <div className="pt-8 flex cursor-pointer items-center justify-between">
+      {/* <div className="pt-8 flex cursor-pointer items-center justify-between">
         <img src="/imges/17 Picture.webp" alt="user" className="w-[40px]" />
         <div className="text-sm">
           <span className="block">Ahmad Kanaan</span>
         </div>
         <CiLogin className="text-xl" />
-      </div>
+      </div> */}
+   <div className="relative pt-8" ref={dropdownRef}>
+  {/* User Info Clickable */}
+  <div
+    className="flex cursor-pointer items-center justify-between"
+    onClick={toggleDropdown}
+  >
+    <img
+      src="/imges/17 Picture.webp"
+      alt="user"
+      className="w-[40px] rounded-full"
+    />
+    <div className="text-sm mx-2">
+      <span className="block">Ahmad Kanaan</span>
+    </div>
+    <CiLogin className="text-xl" />
+  </div>
+
+  {/* Dropdown */}
+  {isDropdownOpen && (
+    <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-md z-50">
+      <button
+        onClick={handleLogout}
+        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+      >
+        Logout
+      </button>
+    </div>
+  )}
+</div>
+
 
       <div className="pt-4 flex cursor-pointer items-center justify-between">
         <AiOutlineShop className="text-3xl" />

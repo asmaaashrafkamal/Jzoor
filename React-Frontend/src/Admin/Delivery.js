@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
 import axios from 'axios';
-
+import { useNavigate } from 'react-router-dom';
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -259,6 +259,29 @@ const DeliveryModal = ({ isOpen, onClose, delivery, mode, onSave, onDeleteConfir
 const DeliveryDashboard = () => {
   // Dummy data for delivery dashboard cards
   const [deliveryStats, setDeliveryStats] = useState(null);
+const [loading, setLoading] = useState(false);
+const navigate = useNavigate();
+const [user, setUser] = useState(null);
+  useEffect(() => {
+    axios.get("http://localhost:8000/check-login", { withCredentials: true })
+      .then(res => {
+         console.log(res.data);
+        if (res.data.role == "A"||res.data.role == "D") {
+         console.log(res.data.user);
+          setUser(res.data.user); // session data from backend
+        } else {
+         // If no session, redirect to login page
+          navigate("/admin/login");
+        }
+      })
+      .catch(() => {
+        // On any error, redirect to login page
+        navigate("/admin/login");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [navigate]);
 useEffect(() => {
   axios.get('http://localhost:8000/api/delivery-stats')
     .then(res => {

@@ -76,11 +76,11 @@ public function login(LoginRequest $request)
         'customer_logged_in', 'customer_id', 'customer_name', 'customer_type', 'customer_email',
         'customer_image', 'customer_gender', 'customer_state', 'customer_address', 'customer_date', 'customer_phone',
     ]);
-    Auth::guard('Admin')->logout();
+    Auth::guard('admin')->logout();
     Auth::guard('web')->logout();
     // Try admin login
-    if (Auth::guard('Admin')->attempt(['email' => $email, 'password' => $pass], $remember_me)) {
-        $admin = Auth::guard('Admin')->user();
+    if (Auth::guard('admin')->attempt(['email' => $email, 'password' => $pass], $remember_me)) {
+        $admin = Auth::guard('admin')->user();
         session([
             'admin_logged_in' => true,
             'admin_id' => $admin->id,
@@ -167,7 +167,7 @@ public function logout(Request $request)
     $request->session()->invalidate();
     $request->session()->regenerateToken();
 
-    return response()->json(['message' => 'Invalid credentials.'], 401);
+    return response()->json(['message' => 'success.'], 200);
 }
 
 }

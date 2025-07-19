@@ -78,10 +78,10 @@ Route::post( '/create-payment-intent', [StripeController::class, 'createPaymentI
 
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/AdminStoreproducts', [ProductController::class, 'store']);
-    Route::post('/categories', [CategoryController::class, 'store']);
+    // Route::post('/categories', [CategoryController::class, 'store']);
     Route::get('/getCat', [CategoryController::class, 'getCat']);
-    Route::put('/categories/{id}', [CategoryController::class, 'update']);
-    Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+    // Route::put('/categories/{id}', [CategoryController::class, 'update']);
+    // Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
     Route::get('/seller/products', [ProductController::class, 'getProductsBySeller']);//in seller dashboard
 
 });

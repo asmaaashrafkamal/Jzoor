@@ -2,10 +2,10 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { HiOutlinePlus, HiOutlineChevronDown, HiOutlineEye, HiOutlinePencil, HiOutlineTrash, HiX } from 'react-icons/hi';
 import { GoSearch } from 'react-icons/go';
 import { HiDotsVertical } from 'react-icons/hi';
-import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 // Assuming Title component is defined elsewhere or will be provided.
 // For demonstration, a simple Title component is included here if not provided.
 const Title = ({ title }) => <h1 className="text-3xl font-bold text-[#1F2937] mb-6 md:mb-0">{title}</h1>;
@@ -14,6 +14,28 @@ const Title = ({ title }) => <h1 className="text-3xl font-bold text-[#1F2937] mb
 // Main Orders Dashboard Component
 const OrdersDashboard = () => {
 const [loading, setLoading] = useState(false);
+const navigate = useNavigate();
+const [user, setUser] = useState(null);
+  useEffect(() => {
+    axios.get("http://localhost:8000/check-login", { withCredentials: true })
+      .then(res => {
+         console.log(res.data);
+        if (res.data.role == "A"||res.data.role == "D") {
+         console.log(res.data.user);
+          setUser(res.data.user); // session data from backend
+        } else {
+         // If no session, redirect to login page
+          navigate("/admin/login");
+        }
+      })
+      .catch(() => {
+        // On any error, redirect to login page
+        navigate("/admin/login");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [navigate]);
 
   // Dummy data for order dashboard cards (using useState for potential future dynamic updates)
   const [orderStats, setOrderStats] = useState({
@@ -242,7 +264,7 @@ const saveStatus = async () => {
       pauseOnHover
       theme="light"
     />
-    // Main dashboard container with padding and background color
+    {/* Main dashboard container with padding and background color */}
     <div className="min-h-screen p-4 sm:p-6 lg:p-8 font-inter bg-[#F3F4F6]">
       {/* Header section with Title and potential action buttons (currently empty as per image) */}
       <header className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center">

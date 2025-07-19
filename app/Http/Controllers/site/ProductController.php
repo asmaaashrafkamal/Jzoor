@@ -8,12 +8,13 @@ use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
 public function store(Request $request)
 {
-    $request->validate([
+   $validator = Validator::make($request->all(), [
         'name' => 'required|string',
         'description' => 'nullable|string',
         'price' => 'required|numeric',
@@ -24,9 +25,15 @@ public function store(Request $request)
         'highlight' => 'required|boolean',
         'category_id' => 'required|exists:categories,id',
         'tags' => 'nullable|string',
-        'image' => 'nullable|image|max:2048',
+        'image' => 'required|image|max:2048',
     ]);
-$adminId = Auth::guard('Admin')->id();
+
+    if ($validator->fails()) {
+        return response()->json([
+            'errors' => $validator->errors()
+        ], 422);
+    }
+$adminId = Auth::guard('admin')->id();
 
     $product = new Product();
     $product->name = $request->name;

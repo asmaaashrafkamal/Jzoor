@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Order_Item;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+
 class OrderController extends Controller
 {
 //-------------------------------------------start orders admin dashboard order page--------------------------------------
@@ -79,7 +81,8 @@ public function assignDeliveryPerson(Request $request, $orderId)
 //--------------------------------------------start orders delivery dashboard------------------------------------------
 public function getActiveOrders(Request $request)
 {
-    $deliveryPersonId = $request->input('delivery_person_id', 5); // default to 5 if not provided
+
+    $deliveryPersonId = Auth::guard('admin')->id(); // default to 5 if not provided
 
     $orders = Order::with(['user', 'items.product.creator', 'payment', 'deliveryPerson'])
         ->where('delivery_person_id', $deliveryPersonId)

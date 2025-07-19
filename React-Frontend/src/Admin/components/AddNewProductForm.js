@@ -8,15 +8,17 @@ import {
   HiOutlineCalendar,
   HiOutlinePhoto,
 } from 'react-icons/hi2';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export function AddNewProductForm() {
   const [categories, setCategories] = useState([]);
 const [productTag, setProductTag] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [productName, setProductName] = useState('Poppy');
-  const [productDescription, setProductDescription] = useState("Bring, vibrant beauty and timeless symbolism to any space with the Poppy Flower—a striking bloom known for its delicate, paper-like petals and bold, captivating colors. Most commonly found in vivid shades of red, orange, and white, the poppy is more than just a flower; it's a powerful emblem of remembrance, peace, and resilience.");
-  const [productPrice, setProductPrice] = useState('15.00');
-  const [discountedPrice, setDiscountedPrice] = useState('5');
+  const [productName, setProductName] = useState('');
+  const [productDescription, setProductDescription] = useState("");
+  const [productPrice, setProductPrice] = useState('');
+  const [discountedPrice, setDiscountedPrice] = useState('');
   const [taxIncluded, setTaxIncluded] = useState('yes');
   const [stockQuantity, setStockQuantity] = useState('Unlimited');
   const [stockStatus, setStockStatus] = useState('In Stock');
@@ -26,10 +28,33 @@ const [productTag, setProductTag] = useState('');
   const imageInputRef = useRef(null); // Ref for the hidden file input
   const [selectedColors, setSelectedColors] = useState([]);
   const [selectedSizes, setSelectedSizes] = useState([]);
-
+const [errors, setErrors] = useState({});
+const [message, setMessage] = useState('');
 const [potColors, setPotColors] = useState(['#F3F4F6', '#FDE047', '#FCA5A5', '#4B5563', '#000000']);
 const [potSizes, setPotSizes] = useState(['S', 'M', 'XL']);
-
+const [loading, setLoading] = useState(false);
+const navigate = useNavigate();
+const [user, setUser] = useState(null);
+  useEffect(() => {
+    axios.get("http://localhost:8000/check-login", { withCredentials: true })
+      .then(res => {
+         console.log(res.data);
+        if (res.data.role == "A"||res.data.role == "D") {
+         console.log(res.data.user);
+          setUser(res.data.user); // session data from backend
+        } else {
+         // If no session, redirect to login page
+          navigate("/admin/login");
+        }
+      })
+      .catch(() => {
+        // On any error, redirect to login page
+        navigate("/admin/login");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [navigate]);
   // --- Handlers for button functionality ---
 
   const handleSaveToDraft = () => {
@@ -63,28 +88,40 @@ const handlePublishProduct = async () => {
   }
 
   try {
-   const response = await fetch('http://localhost:8000/AdminStoreproducts', {
-  method: 'POST',
-  body: formData,
-  headers: {
-    'Accept': 'application/json',
-    // Don't set Content-Type when using FormData; browser sets it with boundary
-  },
-  credentials: 'include', // Important for cookies/session!
-});
+    const response = await fetch('http://localhost:8000/AdminStoreproducts', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Accept': 'application/json',
+        // Do NOT set 'Content-Type' for FormData
+      },
+      credentials: 'include',
+    });
 
     const result = await response.json();
-    if (response.ok) {
-      alert('Product added successfully!');
-    } else {
-      console.error(result);
-      alert('Error: ' + result.message);
+
+    // ✅ Handle validation error (422)
+    if (response.status === 422) {
+      setErrors(result.errors); // Laravel returns { errors: { field: ['msg'] } }
+      setMessage('Validation failed');
+      return;
     }
+
+    // ❌ Any other non-success status
+    if (!response.ok) {
+      throw new Error(result.message || 'Request failed');
+    }
+
+    // ✅ Success
+    setMessage('Product saved successfully!');
+    alert('Product Saved Successfully');
+    setErrors({});
   } catch (error) {
     console.error('Error:', error);
     alert('Something went wrong while saving the product.');
   }
 };
+
 
   const handleEditDescription = () => {
     alert('Edit description activated! (Functionality to be implemented)');
@@ -183,6 +220,10 @@ const handleAddPotSize = () => {
                 value={productName}
                 onChange={(e) => setProductName(e.target.value)}
               />
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name[0]}</p>
+            )}
+
             </div>
             <div>
               <label htmlFor="productDescription" className="block text-sm font-medium text-[#374151] mb-1">Product Description</label>
@@ -194,6 +235,7 @@ const handleAddPotSize = () => {
                   value={productDescription}
                   onChange={(e) => setProductDescription(e.target.value)}
                 ></textarea>
+             {errors.description && <p className="text-red-500">{errors.description[0]}</p>}
                 <div className="absolute bottom-2 right-2 flex space-x-2 text-[#9CA3AF]">
                   {/* Edit Button */}
                   <button onClick={handleEditDescription} className="hover:text-[#22C55E] transition-colors duration-200">
@@ -229,6 +271,7 @@ const handleAddPotSize = () => {
                     <img src="https://flagcdn.com/w20/ps.webp" alt="Palestine Flag" className="h-4 w-6 rounded-sm" />
                     <HiOutlineChevronDown className="w-4 h-4 ml-1 text-[#9CA3AF]" />
                   </div>
+            {errors.price && <p className="text-red-500">{errors.price[0]}</p>}
                 </div>
               </div>
               <div>
@@ -404,6 +447,7 @@ const handleAddPotSize = () => {
               className="hidden"
               accept="image/*"
             />
+             {errors.image && <p className="text-red-500">{errors.image[0]}</p>}
             <div className="flex space-x-3 mb-4">
               {/* Browse Button */}
               <button
@@ -445,6 +489,9 @@ const handleAddPotSize = () => {
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
             >
+            {errors.category_id && (
+              <p className="text-red-500 text-sm">{errors.category_id[0]}</p>
+            )}
               <option value="">Select your product</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>{cat.cat_name}</option>

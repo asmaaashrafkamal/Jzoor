@@ -2,11 +2,37 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FaSearch, FaUserCircle } from 'react-icons/fa';
 import { MdOutlineNotifications } from "react-icons/md";
 import { RiMenuFold2Line } from "react-icons/ri";
-
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 const AdminHeader = ({ setSidebarOpen }) => {
   const [showSearch, setShowSearch] = useState(false);
   const searchRef = useRef(null);
+const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const navigate = useNavigate();
+const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Handle logout request
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:8000/logout', {}, { withCredentials: true });
+      navigate('/admin/login');
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (searchRef.current && !searchRef.current.contains(e.target)) {
@@ -56,8 +82,35 @@ const AdminHeader = ({ setSidebarOpen }) => {
 
           <MdOutlineNotifications className="text-gray-600 text-[24px] md:text-2xl cursor-pointer" />
           {/* <FaUserCircle className="text-gray-600 text-[24px] md:text-2xl cursor-pointer" /> */}
-          <img src="/imges/17 Picture.webp" alt="profile" className="w-[24px] h-[24px] rounded-full" />
+        <div className="relative" ref={dropdownRef}>
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={toggleDropdown}
+          >
+            <img
+              src="/imges/17 Picture.webp"
+              alt="user"
+              className="w-[40px] rounded-full border"
+            />
+          </div>
+
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-md z-50">
+              {/* Optional: Add profile or settings */}
+              {/* <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
+                My Profile
+              </button> */}
+
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
+   </div>
       </header>
 
       {/* Mobile Search Box - appears below header */}

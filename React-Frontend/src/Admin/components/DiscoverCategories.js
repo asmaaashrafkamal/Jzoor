@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 import { FaSearch, FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import Title from './Title';
@@ -15,7 +16,31 @@ export function DiscoverCategories() {
   const [modalCategoryDescription, setModalCategoryDescription] = useState('');
   const [modalCategoryNoProducts, setModalCategoryNoProducts] = useState('');
   const [modalCategoryImage, setModalCategoryImage] = useState('');
-  const [message, setMessage] = useState('');
+const [errors, setErrors] = useState({});
+const [message, setMessage] = useState('');
+    const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    axios.get("http://localhost:8000/check-login", { withCredentials: true })
+      .then(res => {
+         console.log(res.data);
+        if (res.data.role == "A"||res.data.role == "D") {
+         console.log(res.data.user);
+          setUser(res.data.user); // session data from backend
+        } else {
+         // If no session, redirect to login page
+          navigate("/admin/login");
+        }
+      })
+      .catch(() => {
+        // On any error, redirect to login page
+        navigate("/admin/login");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [navigate]);
 
   const fetchCategories = async () => {
     try {
@@ -91,34 +116,44 @@ export function DiscoverCategories() {
       description: modalCategoryDescription,
       productNo: parseInt(modalCategoryNoProducts, 10),
       image: modalCategoryImage || `https://placehold.co/40x40/CCCCCC/000000?text=${modalCategoryName.charAt(0).toUpperCase()}`,
+      created_by:user.admin_id
     };
 
-    try {
-      const url = editingCategory
-        ? `http://localhost:8000/api/categories/${editingCategory.id}`
-        : 'http://localhost:8000/api/categories';
+  try {
+  const url = editingCategory
+    ? `http://localhost:8000/api/categories/${editingCategory.id}`
+    : 'http://localhost:8000/api/categories';
 
-      const method = editingCategory ? 'PUT' : 'POST';
+  const method = editingCategory ? 'PUT' : 'POST';
 
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(categoryData),
-      });
+const res = await fetch(url, {
+  method,
+  headers: { 'Content-Type': 'application/json' },
+  credentials: 'include', // ✅ this is required to send cookies
+  body: JSON.stringify(categoryData),
+});
 
-      const data = await res.json();
 
-      if (res.ok) {
-        await fetchCategories();
-        setMessage('Saved successfully');
-        closeCategoryModal();
-      } else {
-        setMessage(data.message || 'Error occurred');
-      }
-    } catch (error) {
-      console.error(error);
-      setMessage('Failed to save category');
+  const data = await res.json(); // Call once here
+
+  if (!res.ok) {
+    if (res.status === 422) {
+      setErrors(data.errors); // Use `data`, already parsed
+      setMessage('Validation failed');
+      return;
     }
+    throw new Error('Request failed');
+  }
+   await fetchCategories();
+  setMessage('Category saved successfully!');
+  setErrors({});
+  closeCategoryModal();
+} catch (error) {
+  console.error('Fetch error:', error);
+  setMessage('An error occurred');
+}
+
+
   };
 
   const handleDeleteCategory = async (id) => {
@@ -134,6 +169,7 @@ export function DiscoverCategories() {
       }
     }
   };
+  if (loading) return <div>Checking login status...</div>;
 
   return (
   <div className="p-6 w-full min-h-screen" style={{ backgroundColor: '#F3F4F6' }}>
@@ -283,6 +319,9 @@ export function DiscoverCategories() {
                   onChange={(e) => setModalCategoryName(e.target.value)}
                   required
                 />
+                {errors.cat_name && (
+                  <p className="text-red-500 text-sm mt-1">{errors.cat_name[0]}</p>
+                )}
               </div>
               <div className="mb-4">
                 <label htmlFor="categoryDescription" className="block text-sm font-medium text-gray-700 mb-1">
@@ -296,6 +335,9 @@ export function DiscoverCategories() {
                   onChange={(e) => setModalCategoryDescription(e.target.value)}
                   required
                 ></textarea>
+                {errors.description && (
+                  <p className="text-red-500 text-sm mt-1">{errors.description[0]}</p>
+                )}
               </div>
               <div className="mb-4">
                 <label htmlFor="noProducts" className="block text-sm font-medium text-gray-700 mb-1">
@@ -310,6 +352,9 @@ export function DiscoverCategories() {
                   required
                   min="0"
                 />
+                {errors.productNo && (
+                  <p className="text-red-500 text-sm mt-1">{errors.productNo[0]}</p>
+                )}
               </div>
               <div className="mb-6">
                 <label htmlFor="categoryImage" className="block text-sm font-medium text-gray-700 mb-1">

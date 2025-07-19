@@ -176,7 +176,11 @@ useEffect(() => {
     ))}
   </div>
 </div>
-
+ <div className="relative group">
+<Link to="/profile" className="text-black no-underline transition hover:underline">
+  MyProfile
+</Link>
+</div>
 </nav>
 
 

@@ -22,7 +22,6 @@ Route::post('/register', [CustomerController::class, 'register']);
 
 // Protected routes: only accessible if logged in
 Route::middleware(['auth.session'])->group(function () {
-    Route::post('/logout', [CustomerController::class, 'logout']);
 //----------------------------------start products---------------------------------------------
     Route::get('/sellerProducts', [ProductController::class, 'getAllSellerProducts']);//in landing page
     Route::post('/products', [ProductController::class, 'store']);
