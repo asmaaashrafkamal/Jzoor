@@ -43,4 +43,61 @@ if (!Auth::guard('Admin')->id()) {
     ], 422);
 }
 }
+  public function index(Request $request)
+{
+    $query = Article::query();
+
+    if ($request->search) {
+        $query->where('title', 'like', '%' . $request->search . '%');
+    }
+
+    if ($request->status && $request->status !== 'all') {
+        $query->where('status', $request->status);
+    }
+
+    return response()->json($query->paginate(10));
+}
+
+    // GET /api/articles/{id}
+    public function show($id)
+    {
+        $article = Article::find($id);
+
+        if (!$article) {
+            return response()->json(['message' => 'Article not found'], 404);
+        }
+
+        return response()->json($article);
+    }
+  public function update(Request $request, $id)
+    {
+        $article = Article::find($id);
+
+        if (!$article) {
+            return response()->json(['message' => 'Article not found'], 404);
+        }
+
+        $validated = $request->validate([
+            'status' => 'required|in:Published,Drafted,Canceled',
+        ]);
+
+        $article->status = $validated['status'];
+        $article->save();
+
+        return response()->json(['message' => 'Status updated successfully']);
+    }
+
+    // DELETE /api/articles/{id}
+    public function destroy($id)
+    {
+        $article = Article::find($id);
+
+        if (!$article) {
+            return response()->json(['message' => 'Article not found'], 404);
+        }
+
+        $article->delete();
+
+        return response()->json(['message' => 'Article deleted successfully']);
+    }
 }

@@ -9,17 +9,16 @@ import ScrollReveal from "scrollreveal";
 const ToolsSection = () => {
   const navigate = useNavigate();
 
-  const [category, setCategory] = useState(null);
+  const [category3, setCategory3] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showToast, setShowToast] = useState(false);
 
   const {
-    setSelectedGift,
     handleAddToCart,
     isFavorite,
     handleAddToFavorite,
     handleRemoveFromFavorite,
-  } = useContext(ProductContext);
+  }= useContext(ProductContext);
 
   const handleAddToCartWithToast = (product) => {
     handleAddToCart(product);
@@ -31,7 +30,7 @@ const ToolsSection = () => {
     axios
       .get(`http://localhost:8000/api/category/name3`)
       .then((res) => {
-        setCategory(res.data);
+        setCategory3(res.data);
         setLoading(false);
       })
       .catch((err) => {
@@ -41,7 +40,7 @@ const ToolsSection = () => {
   }, []);
 
   useEffect(() => {
-    if (category?.products?.length > 0) {
+    if (category3?.products?.length > 0) {
       ScrollReveal().reveal(".reveal-top-Product", {
         origin: "top",
         distance: "50px",
@@ -54,34 +53,34 @@ const ToolsSection = () => {
         interval: 100,
       });
     }
-  }, [category]);
+  }, [category3]);
 
   const handleProductClick = (product) => {
-    setSelectedGift(product);
     navigate(`/product/${product.id}`);
   };
 
   if (loading) return <div className="text-center py-20">Loading...</div>;
-  if (!category) return <div className="text-center py-20">Category not found</div>;
+  if (!category3) return <div className="text-center py-20">Category not found</div>;
 
   return (
     <div className="bg-[#FAF7F2]">
-      <section className="gift relative pt-[60px] pb-[60px] overflow-hidden container" id="Gifts">      {showToast && (
-        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-green text-white px-4 py-2 rounded shadow-lg z-50">
+    <section className="tools pt-[60px] pb-[60px] container" id="Tools">
+         {showToast && (
+       <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-green text-white px-4 py-2 rounded shadow-lg z-50">
           ✅ Added to cart!
         </div>
       )}
 
       <Title
-        name={category.cat_name ?? "Tools & Care"}
-        description={category.description}
+        name={category3.cat_name ?? "Tools & Care"}
+        description={category3.description}
       />
 
         <div className="cards bg-[#FAF7F2] sm:py-2 md:py-5">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-6 justify-items-center">
-{category.products.length > 0 ? (
-  category.products.map((product) => (
+{category3.products.length > 0 ? (
+  category3.products.map((product) => (
                 <div
                   key={product.id}
                   className="reveal-top-Product group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 max-w-sm w-full cursor-pointer"

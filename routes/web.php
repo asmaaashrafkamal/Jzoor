@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\site\CategoryController;
 use App\Http\Controllers\site\ArticleController;
 use App\Http\Controllers\site\ProductController;
+use App\Http\Controllers\site\OrderController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Home\LandingPageController;
 use App\Http\Controllers\Home\StripeController;
@@ -49,11 +50,24 @@ Route::get('/check-login', function () {
     Route::get('/products/{id}', [LandingPageController::class, 'getSpecificProduct']);
     Route::get('/products_sizes/{id}', [LandingPageController::class, 'getSpecificProductSizes']);
     Route::get('/products_colors/{id}', [LandingPageController::class, 'getSpecificProductColors']);
-Route::post('/articles', [ArticleController::class, 'store']);//
+    // Route::post('/articles', [ArticleController::class, 'store']);//
+    Route::get('/JournalsDetails/{id}', [LandingPageController::class, 'getJornalsList']);
+    Route::get('/getCat', [CategoryController::class, 'getCat']);
+    Route::post( '/categories', [CategoryController::class, 'store']);
+    Route::put('/categories/{id}', [CategoryController::class, 'update']);
+    Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+
+    Route::prefix('articles')->group(function () {
+    Route::get('/', [ArticleController::class, 'index']);
+    Route::get('/{id}', [ArticleController::class, 'show']);
+    Route::post('/', [ArticleController::class, 'store']);
+    Route::put('/{id}', [ArticleController::class, 'update']);
+    Route::delete('/{id}', [ArticleController::class, 'destroy']);
+});
 
     //end
 
-Route::get('/{any}', function () {
+Route::get('/{any}', action: function () {
     return file_get_contents(public_path('index.html'));
 })->where('any', '.*');
 

@@ -13,19 +13,26 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('status'); // 🔻 Drop old column
-        });
+//            Schema::table('orders', function (Blueprint $table) {
+//       $table->foreignId('delivery_person_id')
+//       ->constrained('admins')
+//       ->onDelete('cascade');
+//          $table->decimal('shipping_price', 10, 2);
+//
+//         });
+// Schema::table('orders', function (Blueprint $table) {
+//             $table->dropColumn('status'); // ✅ Drop the column
+//         });
+Schema::table('users', function (Blueprint $table) {
+    $table->enum('status', ['Inactive', 'Active', 'VIP'])
+          ->default('Inactive'); // ✅ Default is valid
+});
 
-        Schema::table('orders', function (Blueprint $table) {
-            $table->enum('status', ['Preparing', 'Pending', 'Shipped', 'Delivered', 'Canceled', 'Waiting Picked Up'])
-                  ->default('Pending'); // ➕ Add new column
-
-        });
     }
 
     public function down()
     {
+
         // Schema::table('orders', function (Blueprint $table) {
         //     $table->string('status')->default('new')->change(); // or revert to original type
         // });

@@ -11,6 +11,7 @@ import {
   FaCreditCard, // For credit card icon
   FaPlus // For the add icon in biography, if applicable
 } from 'react-icons/fa'; // Importing necessary icons from react-icons/fa
+import { Link } from 'react-router-dom';
 
 export function UserProfilePage() {
   // State for Profile Update section
@@ -91,7 +92,7 @@ export function UserProfilePage() {
                     {showCurrentPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
                   </button>
                 </div>
-                <a href="#" className="text-blue-600 text-sm mt-1 block">Forgot Current Password? Click here</a>
+                <Link to="/ForgetPass"  className="text-blue-600 text-sm mt-1 block">Forgot Current Password? Click here</Link>
               </div>
               <div className="mb-4">
                 <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">New Password</label>

@@ -11,6 +11,7 @@ import { CiLogin } from "react-icons/ci";
 import { AiOutlineShop } from "react-icons/ai";
 import { LuSquareArrowOutUpRight } from "react-icons/lu";
 import { IoIosSettings } from "react-icons/io";
+import { Link } from 'react-router-dom';
 
 const DeliverySidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const links = [
@@ -20,7 +21,7 @@ const DeliverySidebar = ({ sidebarOpen, setSidebarOpen }) => {
       { to: '/delivery/message', label: 'Message', icon: <GrTransaction /> },
   ];
 
-  
+
 
   return (
     <aside
@@ -52,7 +53,7 @@ const DeliverySidebar = ({ sidebarOpen, setSidebarOpen }) => {
         ))}
       </nav>
 
-      
+
 
       <div className="text-md mt-6 mb-2 text-gray-600">Settings</div>
       <NavLink
@@ -67,15 +68,15 @@ const DeliverySidebar = ({ sidebarOpen, setSidebarOpen }) => {
       </NavLink>
 
       {/* بيانات المستخدم */}
-      <div className="pt-8 flex items-center justify-between">
+      <Link to="/delivery/login" className="text-black pt-8 no-underline flex items-center justify-between">
         <img src="/imges/deivery.webp" alt="user" className="w-[40px]" />
         <div className="text-sm">
           <span className="block">Ahmad Kanaan</span>
         </div>
         <CiLogin className="text-xl" />
-      </div>
+      </Link>
 
-     
+
     </aside>
   );
 };

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Home;
 
 use App\Http\Controllers\Controller;
+use App\Models\Article;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
@@ -11,13 +12,16 @@ use App\Models\Product_Size;
 
 class LandingPageController extends Controller
 {
+//---------------------------------start category----------------------------------------------
 public function getCat() {
-        $category = Category::all();
+$category = Category::all();
         return response()->json($category);
  }
-public function getAllCategoriesWithProducts()
-{
-    $categories = Category::with('products')->get();
+public function getAllCategoriesWithProducts(){
+$excludedNames = ['Product', 'Gifts', 'Tools&Care']; // example names
+$categories = Category::with('products')
+    ->whereNotIn('cat_name', $excludedNames)
+    ->get();
     return response()->json($categories);
 }
 
@@ -60,7 +64,7 @@ public function getSpecificProductSizes($id)
 }
 public function getCategoryByName1()
 {
-    $category = Category::where('cat_name', 'Trees')->with('products')->first();
+    $category = Category::where('cat_name', 'Product')->with('products')->first();
 
     if (!$category) {
         return response()->json(['message' => 'Category not found'], 404);
@@ -80,12 +84,30 @@ public function getCategoryByName2()
 }
 public function getCategoryByName3()
 {
-    $category = Category::where('cat_name', 'Tools&Care')->with('products')->first();
+    $category3 = Category::where('cat_name', 'Tools&Care')->with('products')->first();
 
-    if (!$category) {
+    if (!$category3) {
         return response()->json(['message' => 'Category not found'], 404);
     }
 
-    return response()->json($category);
+    return response()->json($category3);
 }
+//------------------------end category-----------------------------------------------
+//------------------------start journals---------------------------------------------
+public function getJornalsHome() {
+$articles = Article::where('status', 'Published')->get();
+        return response()->json($articles);
+ }
+public function getJornalsList($id)
+{
+    $article = Article::where('id', $id)->first();
+
+    if (!$article){
+        return response()->json(['message' => 'This Article Is Not Found'], 404);
+    }
+
+    return response()->json( $article);
+}
+//-------------------------end journals-----------------------------------------------
+
 }

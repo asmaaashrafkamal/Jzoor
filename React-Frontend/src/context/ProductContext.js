@@ -16,14 +16,17 @@ export const ProductProvider = ({ children }) => {
   const [selectedGift, setSelectedGift] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [selectedJournal, setSelectedJournal] = useState(null);
-
-  // 💾 Save cart to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
   // تحميل البيانات من JSON باستخدام fetch
-
-
+  useEffect(() => {
+    fetch('data.json')
+      .then((res) => res.json())
+      .then((data) => {
+        setProducts(data); // عرض أول 8 منتجات فقط
+      })
+      .catch((err) => {
+        console.error('حدث خطأ أثناء تحميل المنتجات:', err);
+      });
+  }, []);
   useEffect(() => {
     fetch('SellerProduct.json')
       .then((res) => res.json())

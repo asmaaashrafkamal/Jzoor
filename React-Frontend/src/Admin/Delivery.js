@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
+import axios from 'axios';
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
@@ -127,13 +128,13 @@ const DeliveryModal = ({ isOpen, onClose, delivery, mode, onSave, onDeleteConfir
               >
                 Cancel
               </button>
-              <button
-                type="button"
-                onClick={onDeleteConfirm}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-              >
-                Delete
-              </button>
+               <button
+               onClick={onDeleteConfirm}
+              className="px-4 py-2 rounded-md text-white text-sm font-medium"
+              style={{ backgroundColor: '#DC2626' }} // Red for delete
+            >
+              Delete
+            </button>
             </div>
           </>
         ) : (
@@ -257,30 +258,35 @@ const DeliveryModal = ({ isOpen, onClose, delivery, mode, onSave, onDeleteConfir
 // Main Delivery Dashboard Component
 const DeliveryDashboard = () => {
   // Dummy data for delivery dashboard cards
-  const [deliveryStats, setDeliveryStats] = useState({
-    totalDelivery: { value: '300', change: '14.4%', isPositive: true },
-    newDelivery: { value: '20', change: '20%', isPositive: true },
-    deliveredToday: { value: '1500', change: '20%', isPositive: true },
-  });
-
+  const [deliveryStats, setDeliveryStats] = useState(null);
+useEffect(() => {
+  axios.get('http://localhost:8000/api/delivery-stats')
+    .then(res => {
+      setDeliveryStats(res.data);
+    })
+    .catch(err => {
+      console.error('Failed to fetch customer stats:', err);
+    });
+}, []);
   // Dummy data for Delivery table
-  const [allDeliveries, setAllDeliveries] = useState([
-    { id: '#DEL001', name: 'John Doe', phone: '+1234567890', activeOrder: 25, completed: 200, status: 'Active' },
-    { id: '#DEL002', name: 'Jane Smith', phone: '+1234567891', activeOrder: 5, completed: 150, status: 'Suspended' },
-    { id: '#DEL003', name: 'Emily Davis', phone: '+1234567892', activeOrder: 30, completed: 300, status: 'Waiting' },
-    { id: '#DEL004', name: 'Michael Brown', phone: '+1234567893', activeOrder: 10, completed: 180, status: 'Active' },
-    { id: '#DEL005', name: 'Sarah Wilson', phone: '+1234567894', activeOrder: 12, completed: 90, status: 'Waiting' },
-    { id: '#DEL006', name: 'David Lee', phone: '+1234567895', activeOrder: 8, completed: 210, status: 'Suspended' },
-    { id: '#DEL007', name: 'Laura Garcia', phone: '+1234567896', activeOrder: 18, completed: 120, status: 'Active' },
-    { id: '#DEL008', name: 'James Martinez', phone: '+1234567897', activeOrder: 7, completed: 50, status: 'Waiting' },
-    { id: '#DEL009', name: 'Olivia Rodriguez', phone: '+1234567898', activeOrder: 22, completed: 250, status: 'Active' },
-    { id: '#DEL010', name: 'William Hernandez', phone: '+1234567899', activeOrder: 3, completed: 70, status: 'Suspended' },
-    { id: '#DEL011', name: 'Sophia Lopez', phone: '+1234567800', activeOrder: 15, completed: 190, status: 'Active' },
-    { id: '#DEL012', name: 'Daniel Gonzalez', phone: '+1234567801', activeOrder: 28, completed: 320, status: 'Waiting' },
-    { id: '#DEL013', name: 'Ava Perez', phone: '+1234567802', activeOrder: 6, completed: 100, status: 'Suspended' },
-    { id: '#DEL014', name: 'Matthew Sanchez', phone: '+1234567803', activeOrder: 19, completed: 230, status: 'Active' },
-    { id: '#DEL015', name: 'Isabella Rivera', phone: '+1234567804', activeOrder: 9, completed: 110, status: 'Waiting' },
-  ]);
+//   const [allDeliveries, setAllDeliveries] = useState([
+//     { id: '#DEL001', name: 'John Doe', phone: '+1234567890', activeOrder: 25, completed: 200, status: 'Active' },
+//     { id: '#DEL002', name: 'Jane Smith', phone: '+1234567891', activeOrder: 5, completed: 150, status: 'Suspended' },
+//     { id: '#DEL003', name: 'Emily Davis', phone: '+1234567892', activeOrder: 30, completed: 300, status: 'Waiting' },
+//     { id: '#DEL004', name: 'Michael Brown', phone: '+1234567893', activeOrder: 10, completed: 180, status: 'Active' },
+//     { id: '#DEL005', name: 'Sarah Wilson', phone: '+1234567894', activeOrder: 12, completed: 90, status: 'Waiting' },
+//     { id: '#DEL006', name: 'David Lee', phone: '+1234567895', activeOrder: 8, completed: 210, status: 'Suspended' },
+//     { id: '#DEL007', name: 'Laura Garcia', phone: '+1234567896', activeOrder: 18, completed: 120, status: 'Active' },
+//     { id: '#DEL008', name: 'James Martinez', phone: '+1234567897', activeOrder: 7, completed: 50, status: 'Waiting' },
+//     { id: '#DEL009', name: 'Olivia Rodriguez', phone: '+1234567898', activeOrder: 22, completed: 250, status: 'Active' },
+//     { id: '#DEL010', name: 'William Hernandez', phone: '+1234567899', activeOrder: 3, completed: 70, status: 'Suspended' },
+//     { id: '#DEL011', name: 'Sophia Lopez', phone: '+1234567800', activeOrder: 15, completed: 190, status: 'Active' },
+//     { id: '#DEL012', name: 'Daniel Gonzalez', phone: '+1234567801', activeOrder: 28, completed: 320, status: 'Waiting' },
+//     { id: '#DEL013', name: 'Ava Perez', phone: '+1234567802', activeOrder: 6, completed: 100, status: 'Suspended' },
+//     { id: '#DEL014', name: 'Matthew Sanchez', phone: '+1234567803', activeOrder: 19, completed: 230, status: 'Active' },
+//     { id: '#DEL015', name: 'Isabella Rivera', phone: '+1234567804', activeOrder: 9, completed: 110, status: 'Waiting' },
+//   ]);
+const [allDeliveries, setAllDeliveries] = useState([]);
 
   const [chartPeriod, setChartPeriod] = useState('This week');
   const [activeTab, setActiveTab] = useState('All Delivery');
@@ -318,6 +324,30 @@ const DeliveryDashboard = () => {
     );
     return finalFiltered;
   }, [allDeliveries, activeTab, searchTerm]);
+useEffect(() => {
+  const fetchDeliveries = async () => {
+    try {
+      const res = await axios.get('http://localhost:8000/api/get_delivery', {
+        params: { searchTerm },
+      });
+
+      const formatted = res.data.map((d, index) => ({
+        id: `#DEL${d.id}`,
+        name: d.full_name || '',
+        phone: d.phone || '',
+        activeOrder: d.active_orders || 0,
+        completed: d.completed_orders || 0,
+        status: d.status || 'Active',
+      }));
+
+      setAllDeliveries(formatted);
+    } catch (err) {
+      console.error('Error fetching deliveries:', err);
+    }
+  };
+
+  fetchDeliveries();
+}, [searchTerm]);
 
   // Reset page to 1 whenever tab or search term changes
   useEffect(() => {
@@ -486,22 +516,44 @@ const DeliveryDashboard = () => {
   }, []);
 
   const confirmDeleteDelivery = useCallback(() => {
-    setAllDeliveries(prev => prev.filter(d => d.id !== modalDelivery.id));
-    // Adjust page if current page becomes empty
-    if (currentDeliveries.length === 1 && currentPage > 1) {
+const id = modalDelivery.id.replace('#DEL', '');
+
+  axios
+    .delete(`http://localhost:8000/api/delivery/${id}`)
+    .then(() => {
+setAllDeliveries(prev => prev.filter(d => d.id !== modalDelivery.id));
+  if (currentDeliveries.length === 1 && currentPage > 1) {
       setCurrentPage(prev => prev - 1);
     }
-    setIsModalOpen(false);
+       setIsModalOpen(false);
     setModalDelivery(null);
+    })
+    .catch(err => {
+      console.error('Failed to delete customer', err);
+    });
   }, [modalDelivery, currentDeliveries.length, currentPage]);
 
   const handleSaveDelivery = useCallback((updatedDelivery) => {
-    setAllDeliveries(prev =>
+  const id = updatedDelivery.id.replace('#DEL', '');
+  axios
+    .put(`http://localhost:8000/api/delivery/${id}`, {
+      full_name: updatedDelivery.name,
+      phone: updatedDelivery.phone,
+      status: updatedDelivery.status,
+    })
+    .then(() => {
+      setAllDeliveries(prev =>
       prev.map(d => (d.id === updatedDelivery.id ? updatedDelivery : d))
     );
-    setIsModalOpen(false);
-    setModalDelivery(null);
-  }, []);
+        setIsModalOpen(false);
+        setModalDelivery(null);
+    })
+    .catch(err => {
+      console.error('Failed to update customer', err);
+    });
+
+
+  });
 
 
   return (
@@ -510,8 +562,7 @@ const DeliveryDashboard = () => {
         <Title title="Delivery Overview" />
       </header>
       <div className="flex flex-col lg:flex-row gap-4">
-
-        {/* Top Delivery Stats Cards */}
+      {deliveryStats && (
         <div className="grid grid-cols-1 w-full md:w-[300px] gap-4 mb-6">
           <DashboardCard
             title="Total Delivery"
@@ -532,6 +583,7 @@ const DeliveryDashboard = () => {
             isPositive={deliveryStats.deliveredToday.isPositive}
           />
         </div>
+      )};
 
         {/* Delivery Overview Chart Section */}
         <div className="bg-white p-6 rounded-lg max-w-full flex-1 flex flex-col shadow-md mb-6">

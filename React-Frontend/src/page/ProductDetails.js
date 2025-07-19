@@ -84,7 +84,7 @@ const AddToCart = async () => {
       withCredentials: true,
     });
 console.log(res.data);
- if (!res.data.role === "C") {
+ if (res.data.role != "C") {
       navigate("/login", { state: { id }}
 );
       return;

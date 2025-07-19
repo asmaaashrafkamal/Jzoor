@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 class CustomerController extends Controller
 {
 public function register(Request $request)
@@ -129,5 +131,88 @@ public function logout(Request $request)
 
     return redirect()->route('HomePage'); // or route('admin.login') if needed
 }
+public function get_customer()
+{
+    return User::with('orders')->get();
+}
+public function customer_update(Request $request, $id)
+{
+    $request->validate([
+        'full_name' => 'required|string|max:255',
+        'phone'     => 'required|string',
+        'status'    => 'nullable|string',
+    ]);
+
+    $user = User::findOrFail($id);
+    $user->full_name = $request->full_name;
+    $user->phone = $request->phone;
+    $user->save();
+
+    return response()->json(['message' => 'Customer updated successfully']);
+}
+
+public function customer_destroy($id)
+{
+    $user = User::with('orders')->findOrFail($id);
+
+    // Check if any order has status 'Pick Up' or 'In Transit'
+    $hasRestrictedStatus = $user->orders->contains(function ($order) {
+        $status = strtolower($order->status);
+        return $status === 'picked up' || $status === 'in transit';
+    });
+
+    if ($hasRestrictedStatus) {
+        return response()->json([
+            'error' => 'Cannot delete user with orders in "Pick Up" or "In Transit" status'
+        ], 403);
+    }
+
+    // Optional: delete user's non-restricted orders too
+    // $user->orders()->delete();
+
+    $user->delete();
+
+    return response()->json(['message' => 'User deleted successfully']);
+}
+public function monthlyCustomers()
+{
+    $months = collect(range(1, 12))->mapWithKeys(fn($m) => [$m => 0]);
+
+    $users = User::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+        ->whereYear('created_at', now()->year)
+        ->groupBy('month')
+        ->pluck('count', 'month');
+
+    // Merge actual counts into zero-filled months
+    $monthlyCounts = $months->merge($users)->values();
+
+    return response()->json($monthlyCounts);
+}
+
+public function stats()
+{
+    $totalCustomers = User::count();
+    $newCustomersLast7Days = User::where('created_at', '>=', now()->subDays(7))->count();
+    $visitors = 250000; // Optional: Replace with real logic if needed
+
+    return response()->json([
+        'totalCustomers' => [
+            'value' => number_format($totalCustomers),
+            'change' => '14.4%', // Optional: calculate vs previous period
+            'isPositive' => true
+        ],
+        'newCustomers' => [
+            'value' => number_format($newCustomersLast7Days),
+            'change' => '20%',
+            'isPositive' => true
+        ],
+        'visitors' => [
+            'value' => '250k', // hardcoded or calculate
+            'change' => '20%',
+            'isPositive' => true
+        ],
+    ]);
+}
+
 
 }

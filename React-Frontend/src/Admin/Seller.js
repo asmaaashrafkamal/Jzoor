@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Doughnut, Bar } from 'react-chartjs-2';
+import {
+  HiOutlineSearch,     // For the search icon
+  HiOutlinePencil,      // For the edit/pencil icon
+  HiOutlineTrash,       // For the delete/trash icon
+  HiOutlineDotsVertical, // For the three dots in the card
+  HiX // For closing modals
+} from 'react-icons/hi'; // Importing Heroicons
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
-
+import axios from 'axios';
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -107,13 +114,22 @@ const SellerModal = ({ isOpen, onClose, seller, mode, onSave, onDeleteConfirm })
               >
                 Cancel
               </button>
-              <button
+             <button
+                  onClick={onDeleteConfirm}
+              className="px-4 py-2 rounded-md text-white text-sm font-medium"
+              style={{ backgroundColor: '#DC2626' }} // Red for delete
+            >
+              Delete
+            </button>
+              {/* <button
                 type="button"
+                className="text-gray-500 hover:text-red-600" // Hover to red color
+                title="Delete"
                 onClick={onDeleteConfirm}
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
               >
                 Delete
-              </button>
+              </button> */}
             </div>
           </>
         ) : (
@@ -235,25 +251,33 @@ const SellerModal = ({ isOpen, onClose, seller, mode, onSave, onDeleteConfirm })
 // Main Sellers Dashboard Component
 const SellersDashboard = () => {
   // Dummy data for seller dashboard cards
-  const [sellerStats, setSellerStats] = useState({
-    totalSellers: { value: '300', change: '14.4%', isPositive: true },
-    newSellers: { value: '20', change: '20%', isPositive: true },
-    totalSalesValue: { value: '250.995$', change: '20%', isPositive: true },
-  });
-
+  const [sellerStats, setSellerStats] = useState(null);
+useEffect(() => {
+  axios.get('http://localhost:8000/api/seller-stats')
+    .then(res => {
+      setSellerStats(res.data);
+    })
+    .catch(err => {
+      console.error('Failed to fetch customer stats:', err);
+    });
+}, []);
   // Dummy data for sellers table
-  const [sellers, setSellers] = useState([
-    { id: '#SELL001', name: 'John Doe', phone: '+1234567890', productCount: 25, joinDate: '01-01-2025', status: 'Active' },
-    { id: '#SELL002', name: 'John Doe', phone: '+1234567890', productCount: 25, joinDate: '01-01-2025', status: 'Active' },
-    { id: '#SELL003', name: 'John Doe', phone: '+1234567890', productCount: 25, joinDate: '01-01-2025', status: 'Active' },
-    { id: '#SELL004', name: 'John Doe', phone: '+1234567890', productCount: 25, joinDate: '01-01-2025', status: 'Active' },
-    { id: '#SELL005', name: 'Jane Smith', phone: '+1234567890', productCount: 5, joinDate: '01-01-2025', status: 'Suspended' },
-    { id: '#SELL006', name: 'Emily Davis', phone: '+1234567890', productCount: 30, joinDate: '01-01-2025', status: 'Waiting' },
-    { id: '#SELL007', name: 'Jane Smith', phone: '+1234567890', productCount: 5, joinDate: '01-01-2025', status: 'Suspended' },
-    { id: '#SELL008', name: 'John Doe', phone: '+1234567890', productCount: 25, joinDate: '01-01-2025', status: 'Active' },
-    { id: '#SELL009', name: 'Emily Davis', phone: '+1234567890', productCount: 30, joinDate: '01-01-2025', status: 'Waiting' },
-    { id: '#SELL010', name: 'Jane Smith', phone: '+1234567890', productCount: 5, joinDate: '01-01-2025', status: 'Suspended' },
-  ]);
+//   const [sellers, setSellers] = useState([
+//     { id: '#SELL001', name: 'John Doe', phone: '+1234567890', productCount: 25, joinDate: '01-01-2025', status: 'Active' },
+//     { id: '#SELL002', name: 'John Doe', phone: '+1234567890', productCount: 25, joinDate: '01-01-2025', status: 'Active' },
+//     { id: '#SELL003', name: 'John Doe', phone: '+1234567890', productCount: 25, joinDate: '01-01-2025', status: 'Active' },
+//     { id: '#SELL004', name: 'John Doe', phone: '+1234567890', productCount: 25, joinDate: '01-01-2025', status: 'Active' },
+//     { id: '#SELL005', name: 'Jane Smith', phone: '+1234567890', productCount: 5, joinDate: '01-01-2025', status: 'Suspended' },
+//     { id: '#SELL006', name: 'Emily Davis', phone: '+1234567890', productCount: 30, joinDate: '01-01-2025', status: 'Waiting' },
+//     { id: '#SELL007', name: 'Jane Smith', phone: '+1234567890', productCount: 5, joinDate: '01-01-2025', status: 'Suspended' },
+//     { id: '#SELL008', name: 'John Doe', phone: '+1234567890', productCount: 25, joinDate: '01-01-2025', status: 'Active' },
+//     { id: '#SELL009', name: 'Emily Davis', phone: '+1234567890', productCount: 30, joinDate: '01-01-2025', status: 'Waiting' },
+//     { id: '#SELL010', name: 'Jane Smith', phone: '+1234567890', productCount: 5, joinDate: '01-01-2025', status: 'Suspended' },
+//   ]);
+
+const [sellers, setSellers] = useState([]);
+
+
 
   const [chartPeriod, setChartPeriod] = useState('This week');
   const [activeTab, setActiveTab] = useState('All');
@@ -265,6 +289,61 @@ const SellersDashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalSeller, setModalSeller] = useState(null);
   const [modalMode, setModalMode] = useState(''); // 'view', 'edit', 'deleteConfirm'
+useEffect(() => {
+  axios
+    .get('http://localhost:8000/api/get_seller', {
+      params: { searchTerm } // ✅ Send searchTerm as query string
+    })
+    .then(res => {
+      const users = res.data;
+
+      const transformed = users.map(user => {
+        let totalSpend = 0;
+        let orderCount = 0;
+        let latestDate = null;
+
+        user.orders?.forEach(order => {
+          totalSpend += parseFloat(order.total_price) || 0;
+          orderCount += 1;
+
+          const orderDate = new Date(order.updated_at);
+          if (!latestDate || orderDate > new Date(latestDate)) {
+            latestDate = order.updated_at;
+          }
+        });
+
+        const formattedDate = latestDate
+          ? new Date(latestDate).toLocaleDateString('en-GB')
+          : 'N/A';
+
+        return {
+          id: `#SELL${user.id}`,
+          name: user.full_name,
+          phone: user.phone,
+          productCount: user.products?.length || 0,
+          joinDate: user.created_at
+            ? new Date(user.created_at).toLocaleDateString('en-GB')
+            : 'N/A',
+          orderCount,
+          totalSpend: totalSpend.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          }),
+          status: user.status || (
+            totalSpend >= 3000
+              ? 'VIP'
+              : totalSpend > 0
+              ? 'Active'
+              : 'Inactive'
+          ),
+          date: formattedDate,
+        };
+      });
+
+      setSellers(transformed);
+    })
+    .catch(err => console.error('Failed to fetch sellers with orders:', err));
+}, [searchTerm]); // ✅ re-run fetch when searchTerm changes
 
 
   // Calculate counts for each status using useMemo for efficiency
@@ -370,30 +449,31 @@ const SellersDashboard = () => {
   };
 
   // Filter sellers based on activeTab and search term using useMemo
-  const filteredSellers = useMemo(() => {
-    let currentFiltered = sellers;
+ const filteredSellers = useMemo(() => {
+  let currentFiltered = sellers;
 
-    // Filter by tab
-    if (activeTab === 'Active') {
-      currentFiltered = currentFiltered.filter(seller => seller.status === 'Active');
-    } else if (activeTab === 'Waiting') { // 'Accept Waiting' in UI maps to 'Waiting' status
-      currentFiltered = currentFiltered.filter(seller => seller.status === 'Waiting');
-    } else if (activeTab === 'Suspended') {
-      currentFiltered = currentFiltered.filter(seller => seller.status === 'Suspended');
-    }
-    // 'All' tab doesn't require filtering by status, it's the base list
+  // Filter by tab
+  if (activeTab === 'Active') {
+    currentFiltered = currentFiltered.filter(seller => seller.status === 'Active');
+  } else if (activeTab === 'Waiting') {
+    currentFiltered = currentFiltered.filter(seller => seller.status === 'Waiting');
+  } else if (activeTab === 'Suspended') {
+    currentFiltered = currentFiltered.filter(seller => seller.status === 'Suspended');
+  }
 
-    // Filter by search term
-    const finalFiltered = currentFiltered.filter(seller =>
-      seller.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      seller.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      seller.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      String(seller.productCount).toLowerCase().includes(searchTerm.toLowerCase()) ||
-      seller.joinDate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      seller.status.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    return finalFiltered;
-  }, [sellers, activeTab, searchTerm]);
+  // Filter by search term
+  const lowerSearch = searchTerm.toLowerCase();
+  const finalFiltered = currentFiltered.filter(seller =>
+    String(seller.id).toLowerCase().includes(lowerSearch) ||
+    (seller.name && seller.name.toLowerCase().includes(lowerSearch)) ||
+    (seller.phone && seller.phone.toLowerCase().includes(lowerSearch)) ||
+    String(seller.productCount).toLowerCase().includes(lowerSearch) ||
+    (seller.joinDate && seller.joinDate.toLowerCase().includes(lowerSearch)) ||
+    (seller.status && seller.status.toLowerCase().includes(lowerSearch))
+  );
+
+  return finalFiltered;
+}, [sellers, activeTab, searchTerm]);
 
 
   // Reset page to 1 whenever tab or search term changes
@@ -499,20 +579,41 @@ const SellersDashboard = () => {
   const confirmDeleteSeller = useCallback(() => {
     setSellers(prev => prev.filter(s => s.id !== modalSeller.id));
     // Adjust page if current page becomes empty
+axios
+  .delete(`http://localhost:8000/api/seller/${modalSeller.id.replace('#SELL', '')}`)
+  .then(() => {
+    setSellers(prev => prev.filter(s => s.id !== modalSeller.id));
+    setIsModalOpen(false);
+    setModalSeller(null);
+  })
+  .catch(err => {
+    console.error('Failed to delete seller', err);
+  });
+
     if (currentSellers.length === 1 && currentPage > 1) {
       setCurrentPage(prev => prev - 1);
     }
     setIsModalOpen(false);
     setModalSeller(null);
   }, [modalSeller, currentSellers.length, currentPage]);
-
-  const handleSaveSeller = useCallback((updatedSeller) => {
-    setSellers(prev =>
-      prev.map(s => (s.id === updatedSeller.id ? updatedSeller : s))
-    );
-    setIsModalOpen(false);
-    setModalSeller(null);
-  }, []);
+const handleSaveSeller = useCallback((updatedSeller) => {
+  axios
+    .put(`http://localhost:8000/api/sellers/${updatedSeller.id.replace('#SELL', '')}`, {
+      full_name: updatedSeller.name,
+      phone: updatedSeller.phone,
+      status: updatedSeller.status,
+    })
+    .then(() => {
+      setSellers(prev =>
+        prev.map(s => (s.id === updatedSeller.id ? updatedSeller : s))
+      );
+      setIsModalOpen(false);
+      setModalSeller(null);
+    })
+    .catch(err => {
+      console.error('Failed to update seller', err);
+    });
+}, []);
 
 
   return (
@@ -523,7 +624,10 @@ const SellersDashboard = () => {
       <div className="flex flex-col lg:flex-row gap-4">
 
         {/* Top Seller Stats Cards */}
+      {sellerStats && (
+
         <div className="grid grid-cols-1 w-full md:w-[300px] gap-4 mb-6">
+
           <DashboardCard
             title="Total Sellers"
             value={sellerStats.totalSellers.value}
@@ -543,7 +647,7 @@ const SellersDashboard = () => {
             isPositive={sellerStats.totalSalesValue.isPositive}
           />
         </div>
-
+      )};
         {/* Sellers Overview Chart Section */}
         <div className="bg-white p-6 rounded-lg max-w-full flex-1 flex flex-col shadow-md mb-6">
           <div className="flex flex-col md:flex-row justify-between items-center mb-4">
@@ -702,7 +806,7 @@ const SellersDashboard = () => {
                           <IconEdit className="h-5 w-5" />
                         </button>
                         <button
-                          className="text-gray-500 hover:text-red-600 transition-colors"
+                          className="text-gray-500 hover:text-red-600" // Hover to red color
                           title="Delete"
                           onClick={() => handleDeleteSellerClick(seller)}
                         >

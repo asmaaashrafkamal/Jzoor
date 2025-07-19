@@ -20,7 +20,7 @@ class CategoryController extends Controller
         'description' => $validated['description'],
         'productNo'  => $validated['productNo'],
         'image'       => $validated['image'] ?? null,
-        'created_by'=>  Auth::guard('Admin')->id() ,
+        'created_by'=>2,
     ]);
 
     return response()->json(['message' => 'Category created', 'category' => $category], 201);

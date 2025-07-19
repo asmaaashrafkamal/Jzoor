@@ -1,126 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { FiSearch, FiChevronLeft, FiChevronRight, FiX } from 'react-icons/fi'; // Import icons from Feather Icons
+import OrderDetailsModal from './OrderDetailsModal'; // Import the new modal component
 
 const App = () => {
   const [activeTab, setActiveTab] = useState('All order (240)');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [showDateModal, setShowDateModal] = useState(false);
+  const [showAreaModal, setShowAreaModal] = useState(false);
+  const [filterDate, setFilterDate] = useState('');
+  const [filterArea, setFilterArea] = useState('');
+  // New state for OrderDetailsModal
+  const [showOrderDetailsModal, setShowOrderDetailsModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
   const itemsPerPage = 8; // Number of items to display per page
 
   // Dummy data for archived deliveries
-  const allDeliveries = [
-    {
-      orderId: '#Order001',
-      customerName: 'John Doe',
-      date: '01-01-2023',
-      deliveryTime: '29 min',
-      destination: 'Gaza',
-    },
-    {
-      orderId: '#Order002',
-      customerName: 'Jane Doe',
-      date: '01-01-2023',
-      deliveryTime: '42 min',
-      destination: 'Rafah',
-    },
-    {
-      orderId: '#Order003',
-      customerName: 'John Doe',
-      date: '01-01-2023',
-      deliveryTime: '28 min',
-      destination: 'Ramallah',
-    },
-    {
-      orderId: '#Order004',
-      customerName: 'John Doe',
-      date: '01-01-2023',
-      deliveryTime: '29 min',
-      destination: 'Ashqelon',
-    },
-    {
-      orderId: '#Order005',
-      customerName: 'Jane Smith',
-      date: '01-01-2023',
-      deliveryTime: '29 min',
-      destination: 'AlQuds',
-    },
-    {
-      orderId: '#Order006',
-      customerName: 'Emily Davis',
-      date: '01-01-2023',
-      deliveryTime: '29 min',
-      destination: 'Yafa',
-    },
-    {
-      orderId: '#Order007',
-      customerName: 'Jane Smith',
-      date: '01-01-2023',
-      deliveryTime: '29 min',
-      destination: 'Jabalya',
-    },
-    {
-      orderId: '#Order008',
-      customerName: 'John Doe',
-      date: '01-01-2023',
-      deliveryTime: '29 min',
-      destination: 'Gaza',
-    },
-    {
-      orderId: '#Order009',
-      customerName: 'Emily Davis',
-      date: '01-01-2023',
-      deliveryTime: '29 min',
-      destination: 'AlMaghazi',
-    },
-    {
-      orderId: '#Order010',
-      customerName: 'Jane Smith',
-      date: '01-01-2023',
-      deliveryTime: '29 min',
-      destination: 'Rafah',
-    },
-    // Duplicate data to simulate more entries for pagination
-    ...Array(15).fill(null).map((_, i) => ({
-      orderId: `#Order${11 + i}`,
-      customerName: `Customer ${11 + i}`,
-      date: '01-01-2023',
-      deliveryTime: `${30 + i} min`,
-      destination: `City ${Math.floor(i / 3) + 1}`,
-    })),
-  ];
+  const [allDeliveries, setAllDeliveries] = useState([]);
 
-  // Helper function for Lucide-like icons using inline SVGs
-  const Icon = ({ name, size = 20, color = 'currentColor', className = '' }) => {
-    switch (name) {
-      case 'Search':
-        return (
-          <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-        );
-      case 'ChevronLeft':
-        return (
-          <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-        );
-      case 'ChevronRight':
-        return (
-          <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        );
-      default:
-        return null;
-    }
-  };
+useEffect(() => {
+  axios
+    .get('http://localhost:8000/api/get_delivered_orders', {
+      params: { delivery_person_id: 5 },
+    })
+    .then(res => {
+      const transformed = res.data
+        .filter(order => order.status === 'Delivered')
+        .map(order => {
+          const date = new Date(order.updated_at);
+          const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
 
-  // Filtered and paginated data
-  const filteredDeliveries = allDeliveries.filter(delivery =>
-    delivery.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    delivery.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    delivery.destination.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+          return {
+            orderId: `#Order${order.id}`,
+            customerName: order.user.full_name,
+            date: formattedDate,
+            deliveryTime: 'N/A',
+            destination: order.user.address,
+          };
+        });
+
+      // ✅ Moved this inside .then()
+      setAllDeliveries(transformed);
+    })
+    .catch(err => console.error('Failed to fetch delivered orders', err));
+}, []);
+const totalCount = allDeliveries.length;
+const byDateCount = allDeliveries.filter(d => filterDate && d.date === filterDate).length;
+const byAreaCount = allDeliveries.filter(d => filterArea && d.destination.toLowerCase().includes(filterArea.toLowerCase())).length;
+
+const tabs = [
+  `All order (${totalCount})`,
+  `By Date (${filterDate ? byDateCount : 0})`,
+  `By Area (${filterArea ? byAreaCount : 0})`,
+];
+  // Filtered data based on search term, date, and area
+  const filteredDeliveries = allDeliveries.filter(delivery => {
+    const matchesSearch =
+      delivery.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      delivery.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      delivery.destination.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesDate = filterDate ? delivery.date === filterDate : true;
+    const matchesArea = filterArea ? delivery.destination.toLowerCase().includes(filterArea.toLowerCase()) : true;
+
+    return matchesSearch && matchesDate && matchesArea;
+  });
 
   const totalPages = Math.ceil(filteredDeliveries.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -128,6 +74,40 @@ const App = () => {
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+  };
+
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    setFilterDate(''); // Reset date filter when changing tabs
+    setFilterArea(''); // Reset area filter when changing tabs
+    setCurrentPage(1); // Reset to first page
+    if (tab === 'By Date') {
+      setShowDateModal(true);
+    } else if (tab === 'By Area') {
+      setShowAreaModal(true);
+    }
+  };
+
+  const handleDateFilterSubmit = () => {
+    setShowDateModal(false);
+    // Filtering is handled by filteredDeliveries
+  };
+
+  const handleAreaFilterSubmit = () => {
+    setShowAreaModal(false);
+    // Filtering is handled by filteredDeliveries
+  };
+
+  // Function to open the order details modal
+  const handleViewDetails = (order) => {
+    setSelectedOrder(order);
+    setShowOrderDetailsModal(true);
+  };
+
+  // Function to close the order details modal
+  const handleCloseOrderDetailsModal = () => {
+    setShowOrderDetailsModal(false);
+    setSelectedOrder(null);
   };
 
   return (
@@ -138,7 +118,7 @@ const App = () => {
         {/* Filters and Search */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 space-y-4 md:space-y-0 md:space-x-4">
           <div className="flex flex-wrap gap-2">
-            {['All order (240)', 'By Date', 'By Area', 'By Delivery Time'].map(tab => (
+            {tabs.map(tab => (
               <button
                 key={tab}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
@@ -147,10 +127,10 @@ const App = () => {
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
                 style={{
-                  backgroundColor: activeTab === tab ? '#065F46' : '#F7FAFC', // Blue for active, very light gray for inactive
+                  backgroundColor: activeTab === tab ? '#065F46' : '#F7FAFC', // Green for active, very light gray for inactive
                   color: activeTab === tab ? '#FFFFFF' : '#4A5568', // White for active, gray for inactive
                 }}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => handleTabClick(tab)}
               >
                 {tab}
               </button>
@@ -165,13 +145,13 @@ const App = () => {
                 borderColor: '#E2E8F0', // Light gray border
                 backgroundColor: '#F7FAFC', // Very light gray background
                 color: '#2D3748', // Dark gray text
-                outlineColor: '#065F46', // Blue ring on focus
+                outlineColor: '#065F46', // Green ring on focus
               }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-              <Icon name="Search" size={18} style={{ color: '#A0AEC0' }} /> {/* Gray icon */}
+              <FiSearch size={18} style={{ color: '#A0AEC0' }} /> {/* React Icon: FiSearch */}
             </div>
           </div>
         </div>
@@ -183,7 +163,7 @@ const App = () => {
             <thead style={{ backgroundColor: '#F0FDF4' }}> {/* Very light gray header background */}
               <tr>
                 {['Order ID','Customer Name' ,'Date','Delivery Time','Destination','Action'].map(header=>(
-                  <th  key={header}
+                  <th  key={header}
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
                   style={{ color: '#065F46' }}
@@ -191,22 +171,34 @@ const App = () => {
                   {header}
                 </th>
                 ))}
-                
+
               </tr>
             </thead>
             <tbody className="bg-white divide-y" style={{ borderColor: '#E2E8F0' }}> {/* Light gray divider */}
-              {currentDeliveries.map((delivery, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#2D3748' }}>{delivery.orderId}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#4A5568' }}>{delivery.customerName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#4A5568' }}>{delivery.date}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#4A5568' }}>{delivery.deliveryTime}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#4A5568' }}>{delivery.destination}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button className="text-blue-600 hover:text-blue-800" style={{ color: '#065F46' }}>View Details</button>
-                  </td>
+              {currentDeliveries.length > 0 ? (
+                currentDeliveries.map((delivery, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#2D3748' }}>{delivery.orderId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#4A5568' }}>{delivery.customerName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#4A5568' }}>{delivery.date}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#4A5568' }}>{delivery.deliveryTime}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#4A5568' }}>{delivery.destination}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        className="text-blue-600 hover:text-blue-800"
+                        style={{ color: '#065F46' }}
+                        onClick={() => handleViewDetails(delivery)} // Call handler on click
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500">No deliveries found.</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
           </div>
@@ -218,9 +210,11 @@ const App = () => {
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
             className="flex items-center space-x-1 rtl:space-x-reverse px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed mb-2 sm:mb-0"
-            style={{ color: '#4A5568', backgroundColor: 'transparent',  hover: {backgroundColor: '#EDF2F7'} }} // Gray text, transparent bg, light gray on hover
+            style={{ color: '#4A5568', backgroundColor: 'transparent',  }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#EDF2F7'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
-            <Icon name="ChevronLeft" size={16} />
+            <FiChevronLeft size={16} /> {/* React Icon: FiChevronLeft */}
             <span>Previous</span>
           </button>
           <div className="flex space-x-2">
@@ -232,43 +226,149 @@ const App = () => {
                   currentPage === page ? 'text-white' : 'text-gray-700 hover:bg-gray-100'
                 }`}
                 style={{
-                  backgroundColor: currentPage === page ? '#065F46' : '#F7FAFC', // Blue for active, very light gray for inactive
+                  backgroundColor: currentPage === page ? '#065F46' : '#F7FAFC', // Green for active, very light gray for inactive
                   color: currentPage === page ? '#FFFFFF' : '#4A5568', // White for active, gray for inactive
                 }}
               >
                 {page}
               </button>
             ))}
-            {/* Adding "..." and "34" button if totalPages is large, similar to the image */}
+            {/* Adding "..." and "Last Page" button if totalPages is large */}
             {totalPages > 5 && currentPage < totalPages - 2 && (
-              <span className="w-9 h-9 flex items-center justify-center text-sm" style={{ color: '#4A5568' }}>...</span>
-            )}
-            {totalPages > 5 && currentPage < totalPages - 2 && (
-              <button
-                onClick={() => handlePageChange(totalPages)}
-                className={`w-9 h-9 flex items-center justify-center rounded-full text-sm font-medium ${
-                  currentPage === totalPages ? 'text-white' : 'text-gray-700 hover:bg-gray-100'
-                }`}
-                style={{
-                  backgroundColor: currentPage === totalPages ? '#065F46' : '#F7FAFC',
-                  color: currentPage === totalPages ? '#FFFFFF' : '#4A5568',
-                }}
-              >
-                {totalPages}
-              </button>
+              <>
+                <span className="w-9 h-9 flex items-center justify-center text-sm" style={{ color: '#4A5568' }}>...</span>
+                <button
+                  onClick={() => handlePageChange(totalPages)}
+                  className={`w-9 h-9 flex items-center justify-center rounded-full text-sm font-medium ${
+                    currentPage === totalPages ? 'text-white' : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                  style={{
+                    backgroundColor: currentPage === totalPages ? '#065F46' : '#F7FAFC',
+                    color: currentPage === totalPages ? '#FFFFFF' : '#4A5568',
+                  }}
+                >
+                  {totalPages}
+                </button>
+              </>
             )}
           </div>
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
             className="flex items-center space-x-1 rtl:space-x-reverse px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed mt-2 sm:mt-0"
-            style={{ color: '#4A5568', backgroundColor: 'transparent', hover: {backgroundColor: '#EDF2F7'} }} // Gray text, transparent bg, light gray on hover
+            style={{ color: '#4A5568', backgroundColor: 'transparent' }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#EDF2F7'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             <span>Next</span>
-            <Icon name="ChevronRight" size={16} />
+            <FiChevronRight size={16} /> {/* React Icon: FiChevronRight */}
           </button>
         </div>
       </div>
+
+      {/* Date Filter Modal */}
+      {showDateModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm mx-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold" style={{ color: '#2D3748' }}>Filter by Date</h2>
+              <button onClick={() => setShowDateModal(false)} className="text-gray-500 hover:text-gray-700">
+                <FiX size={24} /> {/* React Icon: FiX */}
+              </button>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">Please enter the date in DD-MM-YYYY format.</p>
+            <input
+              type="text" // Using text for simpler input validation for DD-MM-YYYY
+              placeholder="e.g., 01-01-2023"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 mb-4"
+              style={{
+                borderColor: '#E2E8F0',
+                backgroundColor: '#F7FAFC',
+                color: '#2D3748',
+                outlineColor: '#065F46',
+              }}
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+            />
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => {
+                  setFilterDate('');
+                  setShowDateModal(false);
+                }}
+                className="px-4 py-2 rounded-lg text-gray-700 border border-gray-300 hover:bg-gray-100"
+              >
+                Clear
+              </button>
+              <button
+                onClick={handleDateFilterSubmit}
+                className="px-4 py-2 rounded-lg text-white"
+                style={{ backgroundColor: '#065F46', }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#059669'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#065F46'}
+              >
+                Apply Filter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Area Filter Modal */}
+      {showAreaModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm mx-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold" style={{ color: '#2D3748' }}>Filter by Area</h2>
+              <button onClick={() => setShowAreaModal(false)} className="text-gray-500 hover:text-gray-700">
+                <FiX size={24} /> {/* React Icon: FiX */}
+              </button>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">Please enter the destination city or area.</p>
+            <input
+              type="text"
+              placeholder="e.g., Gaza"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 mb-4"
+              style={{
+                borderColor: '#E2E8F0',
+                backgroundColor: '#F7FAFC',
+                color: '#2D3748',
+                outlineColor: '#065F46',
+              }}
+              value={filterArea}
+              onChange={(e) => setFilterArea(e.target.value)}
+            />
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => {
+                  setFilterArea('');
+                  setShowAreaModal(false);
+                }}
+                className="px-4 py-2 rounded-lg text-gray-700 border border-gray-300 hover:bg-gray-100"
+              >
+                Clear
+              </button>
+              <button
+                onClick={handleAreaFilterSubmit}
+                className="px-4 py-2 rounded-lg text-white"
+                style={{ backgroundColor: '#065F46', }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#059669'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#065F46'}
+              >
+                Apply Filter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Order Details Modal */}
+      {showOrderDetailsModal && (
+        <OrderDetailsModal
+          order={selectedOrder}
+          onClose={handleCloseOrderDetailsModal}
+        />
+      )}
     </div>
   );
 };

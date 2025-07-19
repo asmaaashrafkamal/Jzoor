@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
-  protected $fillable = ['user_id', 'total_price', 'status'];
+  protected $fillable = ['user_id', 'total_price', 'status','delivery_person_id','shipping_price'];
 
     public function user()
     {
@@ -24,4 +24,8 @@ class Order extends Model
     {
         return $this->hasOne(Payment::class);
     }
+public function deliveryPerson()
+{
+    return $this->belongsTo(Admin::class, 'delivery_person_id')->where('type', 'D');
+}
 }

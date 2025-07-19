@@ -27,5 +27,8 @@ public function sizes()
 {
     return $this->hasMany(Product_Size::class);
 }
-
+public function creator()
+{
+    return $this->belongsTo(Admin::class, 'created_by');
+}
 }

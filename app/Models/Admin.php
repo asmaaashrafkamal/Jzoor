@@ -17,7 +17,7 @@ class Admin extends Authenticatable
     const SELLER_TYPE = "S";
     const DELIVERY_TYPE = "D";
     protected $fillable=['id','full_name',
-    'email','password','image','state','status','address','gender',
+    'email','password','image','state','status','address','gender','phone','Birth_date',
     'type'];
 
 //relations
@@ -29,7 +29,10 @@ class Admin extends Authenticatable
         return $this->type === 'seller';
     }
    public function products(){
-        return $this->hasMany('App\Models\Product','category_id','id');
+        return $this->hasMany('App\Models\Product','created_by','id');
+    }
+   public function orders(){
+        return $this->hasMany('App\Models\Order','delivery_person_id','id');
     }
    public function articles(){
         return $this->hasMany('App\Models\Article','created_by','id');

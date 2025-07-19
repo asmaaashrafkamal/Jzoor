@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Chart from 'chart.js/auto'; // Import Chart.js
+import axios from 'axios';
 import {
   HiOutlineSearch,     // For the search icon
   HiOutlinePencil,      // For the edit/pencil icon
@@ -19,7 +20,7 @@ const DashboardCard = ({ title, value, change, isPositive }) => (
         style={{ color: '#9CA3AF' }} // text-icon-light
         size={20}
       /> */}
-      
+
     </div>
     <div className="flex items-end justify-between">
       <span className="text-3xl font-semibold" style={{ color: '#1F2937' }}>{value}</span> {/* text-header-text */}
@@ -37,9 +38,18 @@ const DashboardCard = ({ title, value, change, isPositive }) => (
 const ReportChart = () => {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    if (chartRef.current) {
+    axios.get('http://localhost:8000/api/monthly-customers')
+      .then(res => {
+        setData(res.data);
+      })
+      .catch(err => console.error('Failed to fetch chart data:', err));
+  }, []);
+
+  useEffect(() => {
+    if (chartRef.current && data.length === 12) {
       if (chartInstance.current) {
         chartInstance.current.destroy();
       }
@@ -52,9 +62,9 @@ const ReportChart = () => {
           datasets: [
             {
               label: 'New Customers',
-              data: [65, 59, 80, 81, 56, 55, 40, 45, 60, 70, 75, 82],
-              borderColor: '#2563EB', // A shade of blue
-              backgroundColor: 'rgba(37, 99, 235, 0.1)', // Light blue fill
+              data: data,
+              borderColor: '#2563EB',
+              backgroundColor: 'rgba(37, 99, 235, 0.1)',
               tension: 0.4,
               fill: true,
               pointRadius: 3,
@@ -67,22 +77,13 @@ const ReportChart = () => {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              display: false,
-            },
-            tooltip: {
-              mode: 'index',
-              intersect: false,
-            },
+            legend: { display: false },
+            tooltip: { mode: 'index', intersect: false },
           },
           scales: {
             x: {
-              grid: {
-                display: false,
-              },
-              ticks: {
-                color: '#6B7280',
-              },
+              grid: { display: false },
+              ticks: { color: '#6B7280' },
             },
             y: {
               beginAtZero: true,
@@ -90,24 +91,13 @@ const ReportChart = () => {
                 color: '#E5E7EB',
                 borderDash: [5, 5],
               },
-              ticks: {
-                callback: function (value) {
-                  return value;
-                },
-                color: '#6B7280',
-              },
+              ticks: { color: '#6B7280' },
             },
           },
         },
       });
     }
-
-    return () => {
-      if (chartInstance.current) {
-        chartInstance.current.destroy();
-      }
-    };
-  }, []);
+  }, [data]);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 h-full flex flex-col">
@@ -129,9 +119,14 @@ const EditCustomerModal = ({ customer, onSave, onClose }) => {
     setEditedCustomer(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    onSave(editedCustomer);
-  };
+const handleSave = () => {
+  onSave({
+    ...editedCustomer,
+    orderCount: parseInt(editedCustomer.orderCount, 10),
+    totalSpend: parseFloat(editedCustomer.totalSpend.toString().replace(/,/g, '')),
+  });
+};
+
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -266,30 +261,72 @@ const DeleteConfirmationModal = ({ customerName, onConfirm, onCancel }) => {
 // Main Customer Dashboard Component
 const CustomerDashboard = () => {
   // Dummy data for customer dashboard cards
-  const [customerStats, setCustomerStats] = useState({
-    totalCustomers: { value: '11,040', change: '14.4%', isPositive: true },
-    newCustomers: { value: '2,370', change: '20%', isPositive: true },
-    visitors: { value: '250k', change: '20%', isPositive: true },
-  });
+  const [customerStats, setCustomerStats] = useState(null);
+
+useEffect(() => {
+  axios.get('http://localhost:8000/api/customer-stats')
+    .then(res => {
+      setCustomerStats(res.data);
+    })
+    .catch(err => {
+      console.error('Failed to fetch customer stats:', err);
+    });
+}, []);
+
 
   // Dummy data for customer table
-  const [customers, setCustomers] = useState([
-    { id: '#CUST001', name: 'John Doe', phone: '+1234567890', orderCount: 35, totalSpend: '3,450.00', status: 'Active' },
-    { id: '#CUST002', name: 'Jane Smith', phone: '+1234567891', orderCount: 5, totalSpend: '250.00', status: 'VIP' },
-    { id: '#CUST003', name: 'Emily Davis', phone: '+1234567892', orderCount: 30, totalSpend: '4,600.00', status: 'Active' },
-    { id: '#CUST004', name: 'Michael Brown', phone: '+1234567893', orderCount: 10, totalSpend: '1,200.00', status: 'Inactive' },
-    { id: '#CUST005', name: 'Sarah Wilson', phone: '+1234567894', orderCount: 12, totalSpend: '900.00', status: 'Active' },
-    { id: '#CUST006', name: 'David Lee', phone: '+1234567895', orderCount: 8, totalSpend: '2,100.00', status: 'VIP' },
-    { id: '#CUST007', name: 'Laura Garcia', phone: '+1234567896', orderCount: 18, totalSpend: '1,200.00', status: 'Inactive' },
-    { id: '#CUST008', name: 'James Martinez', phone: '+1234567897', orderCount: 7, totalSpend: '500.00', status: 'Active' },
-    { id: '#CUST009', name: 'Olivia Rodriguez', phone: '+1234567898', orderCount: 22, totalSpend: '2,500.00', status: 'VIP' },
-    { id: '#CUST010', name: 'William Hernandez', phone: '+1234567899', orderCount: 3, totalSpend: '700.00', status: 'Inactive' },
-    { id: '#CUST011', name: 'Sophia Lopez', phone: '+1234567800', orderCount: 15, totalSpend: '1,900.00', status: 'Active' },
-    { id: '#CUST012', name: 'Daniel Gonzalez', phone: '+1234567801', orderCount: 28, totalSpend: '3,200.00', status: 'VIP' },
-    { id: '#CUST013', name: 'Ava Perez', phone: '+1234567802', orderCount: 6, totalSpend: '1,000.00', status: 'Inactive' },
-    { id: '#CUST014', name: 'Matthew Sanchez', phone: '+1234567803', orderCount: 19, totalSpend: '2,300.00', status: 'Active' },
-    { id: '#CUST015', name: 'Isabella Rivera', phone: '+1234567804', orderCount: 9, totalSpend: '1,100.00', status: 'VIP' },
-  ]);
+  const [customers, setCustomers] = useState([]);
+useEffect(() => {
+  axios
+    .get('http://localhost:8000/api/get_customer')
+    .then(res => {
+      const users = res.data;
+
+      const transformed = users.map(user => {
+        let totalSpend = 0;
+        let orderCount = 0;
+        let latestDate = null;
+
+        // Loop over orders
+        user.orders.forEach(order => {
+        totalSpend += parseFloat(order.total_price) || 0;
+        orderCount += 1;
+
+          const orderDate = new Date(order.updated_at);
+          if (!latestDate || orderDate > new Date(latestDate)) {
+            latestDate = order.updated_at;
+          }
+        });
+
+        // Format latest date
+        const formattedDate = latestDate
+          ? new Date(latestDate).toLocaleDateString('en-GB') // dd/mm/yyyy
+          : 'N/A';
+
+        return {
+          id: `#CUST${user.id}`,
+          name: user.full_name,
+          phone: user.phone,
+          orderCount,
+          totalSpend: totalSpend.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          }),
+          status: totalSpend >= 3000
+            ? 'VIP'
+            : totalSpend > 0
+            ? 'Active'
+            : 'Inactive',
+          date: formattedDate,
+        };
+      });
+
+      setCustomers(transformed);
+    })
+    .catch(err => console.error('Failed to fetch users with orders:', err));
+}, []);
+
+
 
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -372,19 +409,43 @@ const CustomerDashboard = () => {
     setShowDeleteModal(true);
   };
 
-  const handleSaveCustomer = (updatedCustomer) => {
-    setCustomers(customers.map(cust =>
-      cust.id === updatedCustomer.id ? updatedCustomer : cust
-    ));
-    setShowEditModal(false);
-    setSelectedCustomer(null);
-  };
+ const handleSaveCustomer = (updatedCustomer) => {
+  const id = updatedCustomer.id.replace('#CUST', '');
 
-  const handleConfirmDelete = () => {
-    setCustomers(customers.filter(cust => cust.id !== selectedCustomer.id));
-    setShowDeleteModal(false);
-    setSelectedCustomer(null);
-  };
+  axios
+    .put(`http://localhost:8000/api/customers/${id}`, {
+      full_name: updatedCustomer.name,
+      phone: updatedCustomer.phone,
+      status: updatedCustomer.status,
+    })
+    .then(() => {
+      setCustomers(customers.map(cust =>
+        cust.id === updatedCustomer.id ? updatedCustomer : cust
+      ));
+      setShowEditModal(false);
+      setSelectedCustomer(null);
+    })
+    .catch(err => {
+      console.error('Failed to update customer', err);
+    });
+};
+
+
+const handleConfirmDelete = () => {
+  const id = selectedCustomer.id.replace('#CUST', '');
+
+  axios
+    .delete(`http://localhost:8000/api/customers/${id}`)
+    .then(() => {
+      setCustomers(customers.filter(cust => cust.id !== selectedCustomer.id));
+      setShowDeleteModal(false);
+      setSelectedCustomer(null);
+    })
+    .catch(err => {
+      console.error('Failed to delete customer', err);
+    });
+};
+
 
 
   return (
@@ -395,26 +456,29 @@ const CustomerDashboard = () => {
       </header>
       <div className="flex flex-col max-w-full lg:flex-row gap-4 pb-2" >
         {/* Top Customer Stats Cards */}
-        <div className="w-full md:w-[400px] grid grid-cols-1 gap-4 mb-6">
-          <DashboardCard
-            title="Total Customers"
-            value={customerStats.totalCustomers.value}
-            change={customerStats.totalCustomers.change}
-            isPositive={customerStats.totalCustomers.isPositive}
-          />
-          <DashboardCard
-            title="New Customers"
-            value={customerStats.newCustomers.value}
-            change={customerStats.newCustomers.change}
-            isPositive={customerStats.newCustomers.isPositive}
-          />
-          <DashboardCard
-            title="Visitors"
-            value={customerStats.visitors.value}
-            change={customerStats.visitors.change}
-            isPositive={customerStats.visitors.isPositive}
-          />
-        </div>
+      {customerStats && (
+  <div className="w-full md:w-[400px] grid grid-cols-1 gap-4 mb-6">
+    <DashboardCard
+      title="Total Customers"
+      value={customerStats.totalCustomers.value}
+      change={customerStats.totalCustomers.change}
+      isPositive={customerStats.totalCustomers.isPositive}
+    />
+    <DashboardCard
+      title="New Customers"
+      value={customerStats.newCustomers.value}
+      change={customerStats.newCustomers.change}
+      isPositive={customerStats.newCustomers.isPositive}
+    />
+    <DashboardCard
+      title="Visitors"
+      value={customerStats.visitors.value}
+      change={customerStats.visitors.change}
+      isPositive={customerStats.visitors.isPositive}
+    />
+  </div>
+)}
+
 
         {/* Customer Overview Chart Section */}
         <div className="flex-1">

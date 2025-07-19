@@ -1,5 +1,4 @@
 import React,{useContext, useEffect} from 'react';
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProductContext, ProductProvider } from './context/ProductContext';
 import Navbar from './components/Navbar';
