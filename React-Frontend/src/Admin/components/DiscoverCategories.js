@@ -233,7 +233,7 @@ const res = await fetch(url, {
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">{cat.description}</td>
                 <td className="px-6 py-4 text-sm text-gray-700">{cat.productNo}</td>
-                <td className="px-6 py-4 text-sm text-gray-700 flex space-x-2">
+                <td className="px-6 py-4 text-sm text-gray-700">
                   <button onClick={() => openCategoryModal(cat)} className="text-blue-600 hover:text-blue-800">
                     <FaEdit />
                   </button>

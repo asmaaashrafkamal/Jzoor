@@ -8,9 +8,10 @@ use App\Http\Controllers\site\ProductController;
 use App\Http\Controllers\site\ArticleController;
 use App\Http\Controllers\site\OrderController;
 use App\Http\Controllers\Home\LandingPageController;
-use App\Http\Controllers\Home\StripeController;
+use App\Http\Controllers\Home\ProfileController;
 use App\Http\Controllers\site\DeliveryController;
 use App\Http\Controllers\site\SellerController;
+
 
 /*
 |--------------------------------------------------------------------------

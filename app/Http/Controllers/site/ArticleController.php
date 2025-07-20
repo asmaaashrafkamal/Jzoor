@@ -15,7 +15,7 @@ try{
         'title' => 'required|string|max:255',
         'body' => 'required|string',
         'status' => 'required|in:Published,Drafted,Status',
-        'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:10240', // 10MB max
+        'image' => 'required|image|mimes:jpg,jpeg,png,gif|max:10240', // 10MB max
     ]);
 
     // 2. Handle image upload if present

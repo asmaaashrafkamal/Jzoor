@@ -16,29 +16,29 @@ const MyAccount = () => {
     const [address, setAdressName] = useState('');
     const [Birth_date, setBirthDate] = useState('');
     const [phone, setPhone] = useState('');
+    const formatDateToInput = (dateString) => {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "";
+    return date.toISOString().split("T")[0]; // returns YYYY-MM-DD
+  };
+
 const handleSubmit = async (e) => {
   e.preventDefault();
-//
-//   if (!agree) {
-//     alert("You must agree to the terms and conditions.");
-//     return;
-//   }
-//
-//   if (password !== confirmPassword) {
-//     alert("Passwords do not match.");
-//     return;
-//   }
-
   const formData = new FormData();
+
   formData.append("name", fullName);
   formData.append("email", email);
-  formData.append("password", password);
-  formData.append("password_confirmation", confirmPassword);
   formData.append("gender", gender);
   formData.append("state", state);
   formData.append("address", address);
   formData.append("Birth_date", Birth_date);
   formData.append("phone", phone);
+
+  if (password) {
+    formData.append("password", password);
+    formData.append("password_confirmation", confirmPassword);
+  }
+
   if (image) {
     formData.append("image", image);
   }
@@ -53,13 +53,23 @@ const handleSubmit = async (e) => {
         },
       }
     );
+if (response.status === 200 || response.status === 201) {
+  const u = response.data.session;
+  setUser(u);
+  setFullName(u.customer_name || '');
+  setEmail(u.customer_email || '');
+  setPhone(u.customer_phone || '');
+  setBirthDate(u.customer_date || '');
+  setGender(u.customer_gender || '');
+  setState(u.customer_state || '');
+  setAdressName(u.customer_address || '');
+  alert("Update successful!");
+  console.log(response.data.user);
+}
 
-    if (response.status === 201) {
-      alert("Update successful!");
-    //   navigate(accountType === "Seller" ? "/SellerLogin" : "/Login");
-    }
+
   } catch (error) {
-    if (error.response && error.response.data.errors) {
+    if (error.response?.data?.errors) {
       const errors = error.response.data.errors;
       alert(Object.values(errors).flat().join("\n"));
     } else {
@@ -67,6 +77,7 @@ const handleSubmit = async (e) => {
     }
   }
 };
+
   useEffect(() => {
     axios.get("http://localhost:8000/check-login", { withCredentials: true })
       .then(res => {
@@ -105,26 +116,32 @@ const handleSubmit = async (e) => {
 
         {/* <p className="text-sm text-gray-500">You can update your information here</p> */}
         <div className="flex items-center  space-x-4 mt-4">
-          <img
-            src={`http://localhost:8000/storage/${image}`}
-            alt="Profile"
-            id="image"
-            accept="image/*"
-            onChange={(e) => setImage(e.target.files[0])}
-            className="w-20 h-20 rounded-full object-cover"
-          />
-          <div>
-            <div className="flex gap-2">
-          <button className="bg-green text-white text-sm px-2 py-2 rounded hover:bg-green-hover">
-            + Change Image
-          </button>
-          <button className="bg-green-hover text-sm text-white px-2 py-2 rounded hover:bg-green">
-            Remove Image
-          </button>
-          </div>
+       {image && (
+      <img
+        src={
+          typeof image === 'string'
+            ? `http://localhost:8000/storage/${image}`
+            : URL.createObjectURL(image)
+        }
+        alt="Profile Preview"
+        className="w-20 h-20 rounded-full object-cover"
+      />
+    )}
+
+
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          id="imageUpload"
+          onChange={(e) => setImage(e.target.files[0])}
+        />
+
+        <label htmlFor="imageUpload" className="bg-green text-white text-sm px-2 py-2 rounded hover:bg-green-hover cursor-pointer">
+          + Change Image
+        </label>
           <p className="text-sm text-gray-500 pt-2">We Support PENGs, JPGs and GIFs Under 2MB</p>
 
-          </div>
         </div>
       </div>
 
@@ -140,8 +157,7 @@ const handleSubmit = async (e) => {
           value={phone}   onChange={(e) => setPhone(e.target.value)}/>
           <input className="border p-2 rounded" placeholder="Date of Birth" type="date"
           value={Birth_date}  onChange={(e) => setBirthDate(e.target.value)}/>
-          <input className="border p-2 rounded" placeholder="Gender"
-          value={gender}   onChange={(e) => setGender(e.target.value)}/>
+         <input className="border p-2 rounded" placeholder="Gender" value={gender} readOnly/>
         </div>
       </div>
 

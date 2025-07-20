@@ -64,6 +64,7 @@ Route::get('/check-login', function () {
     Route::put('/{id}', [ArticleController::class, 'update']);
     Route::delete('/{id}', [ArticleController::class, 'destroy']);
 });
+Route::get('/get_user', [ProfileController::class, 'getUser']);
 
     //end
 
@@ -73,6 +74,7 @@ Route::get('/{any}', action: function () {
 
 Route::middleware(['auth.session'])->group(function () {
 Route::post('/StoreProfile', [ProfileController::class, 'store']);
+
 Route::post( '/place-order', [StripeController::class, 'checkout']);
 Route::post( '/create-payment-intent', [StripeController::class, 'createPaymentIntent']);
 

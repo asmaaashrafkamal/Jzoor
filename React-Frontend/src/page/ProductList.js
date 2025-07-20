@@ -5,6 +5,7 @@ import { FaHeart } from "react-icons/fa";
 import Title from "../components/Title";
 import SearchComponent from "../components/SearchComponent";
 import ScrollReveal from "scrollreveal";
+import axios from "axios";
 
 const ProductList = () => {
 const [products, setProducts] = useState([]);
@@ -13,8 +14,8 @@ const [products, setProducts] = useState([]);
     handleAddToCart,
     handleAddToFavorite,
     handleRemoveFromFavorite,
-    isFavorite,
     setSelectedProduct,
+    isFavorite,
   } = useContext(ProductContext);
 
   const { id } = useParams(); // Get category ID from URL
@@ -41,6 +42,32 @@ useEffect(() => {
       window.scrollRevealInitialized = true;
     }
   }, [products.length]);
+
+const AddToCart = async (product) => {
+  try {
+    const res = await axios.get("http://localhost:8000/check-login", {
+      withCredentials: true,
+    });
+
+    if (res.data.role !== "C") {
+      navigate("/login");
+      return;
+    }
+
+    const productWithOptions = {
+      ...product,
+      quantity: 1,
+      size: "", // You can add logic for selected size if needed
+      color: "", // Likewise for color
+    };
+
+    handleAddToCart(productWithOptions);
+    setShowToast("Added to cart!");
+    setTimeout(() => setShowToast(false), 1000);
+  } catch (error) {
+    navigate("/login");
+  }
+};
 
   const handleAddToCartWithToast = (product) => {
     handleAddToCart(product);
@@ -110,17 +137,26 @@ console.log(filteredProducts);
                 <div className="p-4">
                   <div className="flex justify-between items-center mb-1 text-sm md:text-[16px] text-gray-600">
                     <span className="line-through text-gray-400">${product.price}</span>
-                    <span className="text-[#af926a] font-bold text-[18px]">
-                      ${ (product.price * ((product.discounted_price *100)/100)) }
-                    </span>
+                   <span className="text-[#af926a] font-bold text-[18px]">
+                  ${(
+                    parseFloat(product.price) *
+                    (1 - parseFloat(product.discounted_price || 0) / 100)
+                  ).toFixed(2)}
+                </span>
+
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-all duration-300 p-4 flex flex-col items-center gap-2 bg-white/90">
-                    <button
-                      onClick={() => handleAddToCartWithToast(product)}
-                      className="bg-[#af926a] text-white w-full text-center py-2 rounded-full hover:bg-[#8B6F47] transition"
-                    >
-                      Add To Cart
-                    </button>
+                      <button
+                        onClick={() => AddToCart(product)}
+                        disabled={product.stock_status !== "In Stock"}
+                        className={`mt-5 w-full md:w-auto px-6 py-3 rounded-md transition font-semibold ${
+                          product.stock_status !== "In Stock"
+                            ? "bg-[#4B5929] text-white hover:bg-[#2f3a1c] cursor-not-allowed"
+                            : "bg-[#4B5929] text-white hover:bg-[#2f3a1c]"
+                        }`}
+                      >
+                        {product.stock_status !== "In Stock" ? "Add To Cart" : "Add To Cart"}
+                      </button>
                     <Link
                       to={`/product/${product.id}`}
                       className="bg-[#333]/10 no-underline text-[#8B6F47] w-full text-center py-2 rounded-full border hover:bg-[#8B6F47] hover:text-white transition"

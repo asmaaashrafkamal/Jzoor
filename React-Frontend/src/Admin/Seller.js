@@ -91,7 +91,8 @@ const SellerModal = ({ isOpen, onClose, seller, mode, onSave, onDeleteConfirm })
     }
   };
 
-  const statusOptions = ['Active', 'Waiting', 'Suspended'];
+//   const statusOptions = ['Active', 'Waiting', 'Suspended'];
+  const statusOptions = ['active', 'inactive'];
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">

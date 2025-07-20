@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate ,Link } from "react-router-dom";
 import React, { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { ProductContext } from "../context/ProductContext";
@@ -13,13 +13,40 @@ const ToolsSection = () => {
   const [loading, setLoading] = useState(true);
   const [showToast, setShowToast] = useState(false);
 
+
   const {
     handleAddToCart,
     isFavorite,
     handleAddToFavorite,
+    setSelectedProduct,
     handleRemoveFromFavorite,
-  }= useContext(ProductContext);
 
+  }= useContext(ProductContext);
+const AddToCart = async (product) => {
+  try {
+    const res = await axios.get("http://localhost:8000/check-login", {
+      withCredentials: true,
+    });
+
+    if (res.data.role !== "C") {
+      navigate("/login");
+      return;
+    }
+
+    const productWithOptions = {
+      ...product,
+      quantity: 1,
+      size: "", // You can add logic for selected size if needed
+      color: "", // Likewise for color
+    };
+
+    handleAddToCart(productWithOptions);
+    setShowToast("Added to cart!");
+    setTimeout(() => setShowToast(false), 1000);
+  } catch (error) {
+    navigate("/login");
+  }
+};
   const handleAddToCartWithToast = (product) => {
     handleAddToCart(product);
     setShowToast(true);
@@ -123,18 +150,25 @@ const ToolsSection = () => {
                       </span>
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-all duration-300 p-4 flex flex-col items-center gap-2 bg-white/90">
-                      <button
-                        onClick={() => handleAddToCartWithToast(product)}
-                        className="bg-[#af926a] no-underline text-white w-full text-center py-2 rounded-full hover:bg-[#8B6F47] transition"
-                      >
-                        Add To Cart
-                      </button>
-                      <button
-                        onClick={() => handleProductClick(product)}
-                        className="bg-[#333]/10 no-underline text-[#8B6F47] w-full text-center py-2 rounded-full border-[#8B6F47] hover:bg-[#8B6F47] hover:text-white transition"
-                      >
-                        More Details
-                      </button>
+                      {/* Add To Cart */}
+                                       <button
+onClick={() => AddToCart(product)}
+                                         disabled={product.stock_status !== "In Stock"}
+                                         className={`mt-5 w-full md:w-auto px-6 py-3 rounded-md transition font-semibold ${
+                                           product.stock_status !== "In Stock"
+                                             ? "bg-[#4B5929] text-white hover:bg-[#2f3a1c] cursor-not-allowed"
+                                             : "bg-[#4B5929] text-white hover:bg-[#2f3a1c]"
+                                         }`}
+                                       >
+                                         {product.stock_status !== "In Stock" ? "Add To Cart" : "Add To Cart"}
+                                       </button>
+                                      <Link
+                                          to={`/product/${product.id}`}
+                                          className="bg-[#333]/10 no-underline text-[#8B6F47] w-full text-center py-2 rounded-full border hover:bg-[#8B6F47] hover:text-white transition"
+                                          onClick={() => setSelectedProduct(product)}
+                                      >
+                                           More Details
+                                       </Link>
                     </div>
                   </div>
                 </div>

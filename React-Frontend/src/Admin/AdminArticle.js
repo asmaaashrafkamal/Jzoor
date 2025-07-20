@@ -21,7 +21,6 @@ const Title = ({ title }) => (
 const statusColors = {
   Published: '#10B981',
   Drafted: '#F59E0B',
-  Canceled: '#EF4444',
 };
 
 const ArticlesOverview = () => {
@@ -133,7 +132,7 @@ const [user, setUser] = useState(null);
           className="border border-gray-300 rounded px-4 py-2 w-full sm:max-w-xs"
         />
         <div className="flex gap-2">
-          {['all', 'Published', 'Drafted', 'Canceled'].map(status => (
+          {['all', 'Published', 'Drafted'].map(status => (
             <button
               key={status}
               className={`px-3 py-1 rounded-full text-sm font-medium border ${statusFilter === status ? 'bg-emerald-700 text-white' : 'bg-gray-100 text-gray-700'}`}
@@ -235,7 +234,6 @@ const [user, setUser] = useState(null);
               <select value={newStatus} onChange={e => setNewStatus(e.target.value)} className="w-full border border-gray-300 rounded px-4 py-2">
                 <option value="Published">Published</option>
                 <option value="Drafted">Drafted</option>
-                <option value="Canceled">Canceled</option>
               </select>
               <div className="mt-6 flex justify-end space-x-3">
                 <button onClick={() => setShowEdit(false)} className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-100">Cancel</button>

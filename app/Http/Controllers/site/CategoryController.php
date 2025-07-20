@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Validator; // ✅ This is required
-
+use App\Models\Order;
+use App\Models\Order_Item;
+use App\Models\Product;
+use Illuminate\Support\Facades\DB;
 class CategoryController extends Controller
 {
 public function store(Request $request)
@@ -47,8 +50,36 @@ public function update(Request $request, $id) {
         return response()->json($category);
     }
 
-    public function destroy($id) {
-        Category::findOrFail($id)->delete();
-        return response()->json(null, 204);
+public function destroy($id)
+{
+    DB::beginTransaction();
+
+    try {
+        $category = Category::findOrFail($id);
+
+        // Get all product IDs in this category
+        $productIds = Product::where('category_id', $id)->pluck('id');
+
+        // Find all order items with these product IDs
+        $orderItemIds = Order_Item::whereIn('product_id', $productIds)->pluck('order_id');
+
+        // Cancel the affected orders (e.g., set status to 'cancelled')
+        Order::whereIn('id', $orderItemIds)->update(['status' => 'Canceled']);
+
+        // Delete all products in the category
+        Product::whereIn('id', $productIds)->delete();
+
+        // Delete the category
+        $category->delete();
+
+        DB::commit();
+
+        return response()->json(['message' => 'Category, its products, and related orders were handled successfully.'], 200);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json(['error' => 'Failed to delete category: ' . $e->getMessage()], 500);
     }
+}
+
 }

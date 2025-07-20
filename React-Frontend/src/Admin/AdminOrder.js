@@ -181,9 +181,11 @@ useEffect(() => {
   };
 
   const handleEditStatus = (order) => {
+   if(order.status !="Canceled"){
     setSelectedOrder(order);
     setNewStatus(order.status); // Pre-fill modal with current status
     setShowEditStatusModal(true);
+    }
   };
 
   const handleDeleteOrder = (order) => {
@@ -382,7 +384,7 @@ const saveStatus = async () => {
             </thead>
           <tbody className="bg-white divide-y divide-[#E5E7EB]">
               {currentOrders.length > 0 ? (
-                currentOrders.map((order) => {
+                currentOrders.map((order,index) => {
                   const statusColors = getStatusColor(order.status);
                   const firstItem = order.items?.[0]; // Get first item (if exists)
                   const productName = firstItem?.product?.name || 'No Product';
@@ -394,8 +396,9 @@ const productImage = firstItem?.product?.image
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
                         <input type="checkbox" className="h-4 w-4 border-gray-300 rounded focus:ring-2 focus:ring-[#047857] text-[#047857]" />
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">{order.id}.</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#111827]">{order.orderId}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">{index + 1}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#111827]">{order.id}</td>
+                      {/* <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#111827]">{order.id}</td> */}
 
                       {/* ✅ Correct Product Cell using order.items[0].product */}
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#6B7280]">
@@ -701,14 +704,33 @@ const selectDeliveryPerson = async (person) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-[#F9FAFB] p-4 rounded-lg shadow-sm">
               <h3 className="font-semibold mb-3 text-[#1F2937]">Order Items</h3>
-              {localOrder.items.map((item, index) => (
-                <div key={index} className="mb-3">
-                  <p className="text-sm text-gray-700">{item.product.name}</p>
-                  <p className="text-sm text-gray-500">
-                    Seller: {item.product?.creator?.full_name || 'N/A'} (ID: {item.product.created_by})
-                  </p>
-                </div>
-              ))}
+           {localOrder.items.map((item, index) => (
+          <div key={index} className="flex items-center mb-4 space-x-3">
+            {/* Product Image */}
+            <img
+              src={
+                item?.product?.image
+                  ? `http://localhost:8000/storage/${item.product.image}`
+                  : 'https://placehold.co/40x40/E0E0E0/FFFFFF?text=P'
+              }
+              alt={item?.product?.name || 'Product'}
+              className="w-10 h-10 rounded-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'https://placehold.co/40x40/E0E0E0/FFFFFF?text=P';
+              }}
+            />
+
+            {/* Product Info */}
+            <div>
+              <p className="text-sm font-medium text-gray-800">{item.product?.name || 'Unnamed Product'}</p>
+              <p className="text-xs text-gray-500">
+                Seller: {item.product?.creator?.full_name || 'N/A'} (ID: {item.product?.created_by || 'N/A'})
+              </p>
+            </div>
+          </div>
+        ))}
+
             </div>
 
             <div className="bg-[#F9FAFB] p-4 rounded-lg shadow-sm">
@@ -753,7 +775,7 @@ const selectDeliveryPerson = async (person) => {
               <div className="mt-6 border-t pt-4">
                 <h3 className="font-semibold mb-2 text-[#1F2937]">Delivery Person</h3>
                 <p className="text-sm text-[#4B5563]">
-                  {localOrder.deliveryPerson.name} (ID: <span className="text-gray-500">{localOrder.deliveryPerson.id}</span>)
+                  {localOrder.deliveryPerson.full_name} (ID: <span className="text-gray-500">{localOrder.deliveryPerson.id}</span>)
                 </p>
                 <p className="text-sm text-[#4B5563]">
                   Phone: <span className="text-gray-500">{localOrder.deliveryPerson.phone}</span>

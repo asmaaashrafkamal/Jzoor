@@ -52,6 +52,7 @@ public function seller_update(Request $request, $id)
     $user = Admin::findOrFail($id);
     $user->full_name = $request->full_name;
     $user->phone = $request->phone;
+    $user->status = $request->status;
     $user->save();
 
     return response()->json(['message' => 'Seller updated successfully']);

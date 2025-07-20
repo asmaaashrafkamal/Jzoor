@@ -51,24 +51,46 @@ const AddNewArticle = () => {
 
   // ✅ Submit form
   const handleSubmit = async () => {
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("body", body);
-    formData.append("status", status);
-    if (imageFile) formData.append("image", imageFile);
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("body", body);
+  formData.append("status", status);
+  if (imageFile) formData.append("image", imageFile);
 
-    try {
-      const res = await axios.post("http://localhost:8000/articles", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-        withCredentials: true,
-      });
-      alert("Article created successfully!");
-      console.log(res.data);
-    } catch (err) {
-      console.error("Error:", err.response?.data || err.message);
-      alert("Failed to publish article. See console.");
+  try {
+    const res = await axios.post("http://localhost:8000/articles", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Accept: "application/json", // forces Laravel to return JSON errors
+      },
+      withCredentials: true, // if you're using cookie/session-based auth
+    });
+
+    alert("✅ Article created successfully!");
+    console.log("Response:", res.data);
+  } catch (error) {
+    // Laravel validation error (422)
+    if (error.response?.status === 422) {
+      const errors = error.response.data.errors;
+      let message = "⚠️ Validation failed:\n";
+      for (const key in errors) {
+        message += `- ${key}: ${errors[key].join(", ")}\n`;
+      }
+      alert(message);
+      console.error("Validation Errors:", errors);
+
+    // Laravel unauthenticated (401)
+    } else if (error.response?.status === 401) {
+      alert("🚫 You must be logged in as admin.");
+      console.error("Auth Error:", error.response.data);
+
+    // Laravel server or other error
+    } else {
+      alert("❌ Something went wrong. Check the console for details.");
+      console.error("Unexpected Error:", error.response?.data || error.message);
     }
-  };
+  }
+};
 
   return (
     <div className="bg-gray-100 min-h-screen p-6">
@@ -78,7 +100,7 @@ const AddNewArticle = () => {
         {/* Status Selection */}
         <div className="mb-4 flex items-center space-x-2">
           <label className="text-sm text-gray-700">Status:</label>
-          {["Published", "Drafted", "Status"].map((s) => (
+          {["Published", "Drafted"].map((s) => (
             <button
               key={s}
               type="button"
