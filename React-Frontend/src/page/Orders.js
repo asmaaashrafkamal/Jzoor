@@ -71,7 +71,7 @@ const fetchOrders = async () => {
       status: order.status, // e.g., 'Delivered'
       statusClass:
         order.status === 'Delivered' ? 'bg-green text-white'
-        : order.status === 'Cancelled' ? 'bg-red text-white'
+        : order.status === 'Canceled' ? 'bg-red text-white'
         : order.status === 'Shipped' ? 'bg-yellow-500 text-white'
         : order.status === 'Returned' ? 'bg-gray-500 text-white'
         : 'bg-blue-500 text-white',
@@ -87,7 +87,7 @@ const fetchOrders = async () => {
       items: order.items.map((item) => ({
         image: item.product?.image || '/imges/default.jpg',
         name: item.product?.name || 'Unnamed Product',
-        price: item.price || '0'
+        price: item.product?.price || '0'
       }))
     }));
 
@@ -117,7 +117,7 @@ useEffect(() => {
 
         {/* Filters */}
         <div className="flex space-x-4 mb-8 text-sm text-gray-600">
-          {['All', 'Shipped', 'Delivered', 'Cancelled', 'Returned'].map(filter => (
+          {['All', 'Shipped', 'Delivered', 'Canceled', 'Returned'].map(filter => (
             <button
               key={filter}
               className={`pb-1 ${activeFilter === filter ? 'font-semibold text-gray-900 border-b-2 border-green-700' : 'hover:text-gray-900'}`}
@@ -141,24 +141,54 @@ useEffect(() => {
                   <p className="text-lg font-semibold text-gray-900">Total: ${order.total}</p>
                 </div>
               </div>
-
-              {order.items.map((item, itemIndex) => (
-                <div key={itemIndex} className="flex items-center justify-between py-3 border-t border-gray-200 first:border-t-0">
+            {Array.isArray(order.items) && order.items.length > 0 ? (
+              order.items.map((item, itemIndex) => (
+                <div
+                  key={itemIndex}
+                  className="flex items-center justify-between py-3 border-t border-gray-200 first:border-t-0"
+                >
                   <div className="flex items-center">
                     <img
-                      src={`http://localhost:8000/storage/${item.image}`}
-                      alt={item.name}
+                      src={`http://localhost:8000/storage/${item.image || 'NoProduct.png'}`}
+                      alt={item.name || "Product image"}
                       className="w-16 h-16 rounded-lg object-cover mr-4"
                     />
                     <div>
-                      <p className="text-base font-medium text-gray-900">{item.name}</p>
-                      <p className="text-sm text-gray-700">${item.unit_price}</p>
+                      <p className="text-base font-medium text-gray-900">
+                        {item.name || "Product Not Found"}
+                      </p>
+                      <p className="text-sm text-gray-700">
+                        ${item.price != null ? item.price : "0.00"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-500 italic mt-2">No items in this order.</p>
+            )}
+
+              {/* {order.items.map((item, itemIndex) => (
+                <div key={itemIndex} className="flex items-center justify-between py-3 border-t border-gray-200 first:border-t-0">
+                  <div className="flex items-center">
+                   <img
+                      src={`http://localhost:8000/storage/${item.image || 'NoProduct.png'}`}
+                      alt={item.name || "Product image"}
+                      className="w-16 h-16 rounded-lg object-cover mr-4"
+                    />
+                    <div>
+                      <p className="text-base font-medium text-gray-900">
+                      {item.name || "Product Not Found"}
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      ${item.price != null ? item.price : "0.00"}
+                    </p>
                     </div>
                   </div>
                   </div>
 
-    ))}
-                <div className="flex items-center justify-between py-3 border-t border-gray-200 first:border-t-0">555888888888866350+
+                   ))} */}
+                <div className="flex items-center justify-between py-3 border-t border-gray-200 first:border-t-0">
                  <Link
                   to={`/orderDetails/${order.orderId}`}
                   className="px-4 py-2 no-underline border border-gray-300 rounded-md text-green-700 text-sm font-medium hover:bg-green-50 transition-colors"

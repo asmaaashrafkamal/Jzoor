@@ -41,6 +41,7 @@ Route::middleware(['auth.session'])->group(function () {
 //-------------------------------------------------------------------------------------------
 //--------------------------------------admin dashboard orders----------------------------------
 Route::get('/orders', [OrderController::class, 'index']);
+Route::get('/order/{orderId}', [OrderController::class, 'show']);
 Route::put('/orders/{id}/status', [OrderController::class, 'updateStatus']);
 Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
 Route::get('/delivery-people', [OrderController::class, 'getDelivery']);

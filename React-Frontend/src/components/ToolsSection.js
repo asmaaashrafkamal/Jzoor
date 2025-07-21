@@ -146,22 +146,25 @@ const AddToCart = async (product) => {
                         ${product.price}
                       </span>
                       <span className="text-[#af926a] font-bold text-[18px]">
-                        ${(product.price * (1 - product.discounted_price / 100)).toFixed(2)}
-                      </span>
+                   ${(
+                    parseFloat(product.price) *
+                    (1 - parseFloat(product.discounted_price || 0) / 100)
+                  ).toFixed(2)}                      </span>
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-all duration-300 p-4 flex flex-col items-center gap-2 bg-white/90">
                       {/* Add To Cart */}
-                                       <button
-onClick={() => AddToCart(product)}
-                                         disabled={product.stock_status !== "In Stock"}
-                                         className={`mt-5 w-full md:w-auto px-6 py-3 rounded-md transition font-semibold ${
-                                           product.stock_status !== "In Stock"
-                                             ? "bg-[#4B5929] text-white hover:bg-[#2f3a1c] cursor-not-allowed"
-                                             : "bg-[#4B5929] text-white hover:bg-[#2f3a1c]"
-                                         }`}
-                                       >
-                                         {product.stock_status !== "In Stock" ? "Add To Cart" : "Add To Cart"}
-                                       </button>
+                                      <button
+                                          onClick={() => AddToCart(product)}
+                                          disabled={product.stock_status !== "In Stock"}
+                                          className={`w-full text-center py-2 rounded-full border font-semibold transition
+                                            ${
+                                              product.stock_status !== "In Stock"
+                                                ? "bg-[#4B5929] text-white hover:bg-[#2f3a1c] cursor-not-allowed"
+                                                : "bg-[#4B5929] text-white hover:bg-[#2f3a1c]"
+                                          }`}
+                                        >
+                                        {product.stock_status !== "In Stock" ? "Add To Cart" : "Add To Cart"}
+                                        </button>
                                       <Link
                                           to={`/product/${product.id}`}
                                           className="bg-[#333]/10 no-underline text-[#8B6F47] w-full text-center py-2 rounded-full border hover:bg-[#8B6F47] hover:text-white transition"
@@ -172,16 +175,25 @@ onClick={() => AddToCart(product)}
                     </div>
                   </div>
                 </div>
-  ))
-): (
-  <p className="col-span-full text-center text-gray-500 text-lg py-10">
-    No products found in this category.
-  </p>
-)}
+              ))
+            ): (
+              <p className="col-span-full text-center text-gray-500 text-lg py-10">
+                No products found in this category.
+              </p>
+            )}
             </div>
           </div>
 </div>
-      </section></div>
+  <div className="flex justify-center mt-8">
+          <Link
+   to={`/productList/${category3?.id}`}
+   className="bg-[#4B5929] text-white px-4 py-3 rounded-[10px] hover:bg-[#A8C686] transition-all duration-300 transform hover:scale-105 shadow-md no-underline"
+          >
+            See More Tools
+          </Link>
+        </div>
+      </section>
+      </div>
   );
 };
 

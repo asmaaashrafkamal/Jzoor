@@ -62,6 +62,7 @@ if (response.status === 200 || response.status === 201) {
   setBirthDate(u.customer_date || '');
   setGender(u.customer_gender || '');
   setState(u.customer_state || '');
+  setImage(u.customer_image || '');
   setAdressName(u.customer_address || '');
   alert("Update successful!");
   console.log(response.data.user);

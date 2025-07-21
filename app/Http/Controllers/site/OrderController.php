@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Order_Item;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -23,6 +24,46 @@ public function index(Request $request)
 
     return response()->json($orders);
 }
+// In your OrderController.php
+
+public function show($orderId)
+{
+    $order = Order::with(['user', 'items.product.creator', 'payment', 'deliveryPerson'])->find($orderId);
+    if (!$order) {
+        return response()->json([], 404);
+    }
+    $order->status_text = $this->getStatusText($order->status);
+    $order->estimated_delivery_date = $this->getEstimatedDate($order->updated_at);
+    $created = Carbon::parse($order->created_at);
+    $order->waiting_pickup_at = $created;
+    $order->picked_up_at = ($order->status !== 'Waiting Picked Up'||$order->status === 'Picked Up') ? $created->copy()->addDays(1) : null;
+    $order->out_for_delivery_at = ($order->status === 'out_for_delivery' || $order->status === 'Delivered') ? $created->copy()->addDays(1) : null;
+    $order->delivered_at = ($order->status === 'Delivered') ? $created->copy()->addDays(2) : null;
+    $order->canceled_at = ($order->status === 'Canceled') ? $created->copy()->addMinutes(10) : null;
+
+    return response()->json($order);
+}
+private function getStatusText($status)
+{
+    return match ($status) {
+        'waiting_pickup', 'Waiting Picked Up' => 'On Time',
+        'picked_up', 'Picked Up' => 'Out For Delivery',
+        'out_for_delivery', 'Out For Delivery' => 'Out For Delivery',
+        'delivered', 'Delivered' => 'Delivered',
+        'canceled', 'Canceled' => 'Canceled',
+        default => 'Pending',
+    };
+}
+
+
+public function getEstimatedDate($updatedAt)
+{
+    return Carbon::parse($updatedAt)->addWeeks(2);
+}
+
+
+
+
 
 public function updateStatus(Request $request, $id)
 {
