@@ -18,6 +18,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->decimal('total_price', 10, 2);
             $table->string('status')->default( 'new'); // new, processing, shipped, delivered, cancelled
+            $table->foreignId('delivery_person_id')
+            ->constrained('admins')
+             ->onDelete('cascade');
+            $table->decimal('shipping_price', 10, 2);
             $table->timestamps();
         });
     }
