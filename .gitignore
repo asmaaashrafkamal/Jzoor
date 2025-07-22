@@ -1,12 +1,10 @@
+# SAFE TO IGNORE
 /node_modules
 /public/build
 /public/hot
 /public/storage
 /storage/*.key
 /vendor
-.env
-.env.backup
-.env.production
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -16,3 +14,8 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# DO NOT IGNORE THESE
+# !/storage/
+# !.env
+# !*.sql
