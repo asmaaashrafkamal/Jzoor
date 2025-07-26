@@ -24,8 +24,8 @@ try{
     }
 
     // 3. Set created_by from authenticated admin
-    $validated['created_by'] = Auth::guard('Admin')->id(); // ensure 'admin' guard is set in auth config
-if (!Auth::guard('Admin')->id()) {
+    $validated['created_by'] = Auth::guard('admin')->id(); // ensure 'admin' guard is set in auth config
+if (!Auth::guard('admin')->id()) {
     return response()->json(['error' => 'Admin not authenticated'], 401);
 }
     // 4. Create the article

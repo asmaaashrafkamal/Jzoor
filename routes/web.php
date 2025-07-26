@@ -46,6 +46,7 @@ Route::get('/check-login', function () {
 //route category of landing page
     Route::get('/getAllCategory', [LandingPageController::class, 'getCat']);
     Route::get('/getAllCategoryProduct', [LandingPageController::class, 'getAllCategoriesWithProducts']);
+    Route::get('/getAllProduct', [ProductController::class, 'getAllProducts']);
     Route::get('/category/{id}/products', [LandingPageController::class, 'getSpecificCategory']);
     Route::get('/products/{id}', [LandingPageController::class, 'getSpecificProduct']);
     Route::get('/products_sizes/{id}', [LandingPageController::class, 'getSpecificProductSizes']);

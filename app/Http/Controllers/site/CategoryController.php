@@ -49,7 +49,11 @@ public function update(Request $request, $id) {
         $category->update($request->all());
         return response()->json($category);
     }
-
+public function getAllCategoriesWithProducts(){
+$categories = Category::with('products')
+    ->get();
+    return response()->json($categories);
+}
 public function destroy($id)
 {
     DB::beginTransaction();

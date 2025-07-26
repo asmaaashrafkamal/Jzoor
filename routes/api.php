@@ -25,6 +25,9 @@ Route::post('/register', [CustomerController::class, 'register']);
 Route::middleware(['auth.session'])->group(function () {
 //----------------------------------start products---------------------------------------------
     Route::get('/sellerProducts', [ProductController::class, 'getAllSellerProducts']);//in landing page
+    Route::get('/AdminsellerProducts', [ProductController::class, 'getAllAdminSellerProducts']);//in admin product list
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    Route::put('/products/{id}', [ProductController::class, 'update']);
     Route::post('/products', [ProductController::class, 'store']);
 //-----------------------------------end products------------------------------------------------
 //------------------------------------start landingPage-------------------------------------------

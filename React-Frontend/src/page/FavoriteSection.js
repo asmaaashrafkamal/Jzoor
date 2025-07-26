@@ -1,7 +1,8 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
+import axios from "axios";
 import { ProductContext } from "../context/ProductContext";
 import { FaHeart } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Title from "../components/Title";
 
 const FavoriteSection = () => {
@@ -13,16 +14,47 @@ const FavoriteSection = () => {
     isFavorite,
     setSelectedProduct,
   } = useContext(ProductContext);
+  const navigate = useNavigate();
 
-  const [showToast, setShowToast] = useState(false);
+const [showToast, setShowToast] = useState(false);
 
-  const handleAddToCartWithToast = (product) => {
-    handleAddToCart(product);
-    setShowToast(true);
-    setTimeout(() => {
-      setShowToast(false);
-    }, 1000);
-  };
+const AddToCart = async (product) => {
+  try {
+    const res = await axios.get("http://localhost:8000/check-login", {
+      withCredentials: true,
+    });
+
+    if (res.data.role !== "C") {
+      navigate("/login");
+      return;
+    }
+
+    // Add to cart after login check
+    const productWithOptions = {
+      ...product,
+      quantity: 1,
+      size: "",
+      color: "",
+    };
+
+ handleAddToCart(productWithOptions);
+    setShowToast("Added to cart!");
+    setTimeout(() => setShowToast(false), 1000);
+  } catch (error) {
+    navigate("/login");
+  }
+};
+
+const handleAddToCartWithToast = (product) => {
+  // Your actual cart logic here (e.g., update context or state)
+  // Example: addToCart(product);
+  console.log("Product added:", product); // replace with actual logic
+
+  setShowToast(true);
+  setTimeout(() => {
+    setShowToast(false);
+  }, 1000);
+};
 
   const handleProductClick = (product) => {
     setSelectedProduct(product);
@@ -50,7 +82,7 @@ const FavoriteSection = () => {
               >
                 <div className="relative w-full h-60 overflow-hidden">
                   <img
-                    src={product.img}
+                    src={`http://localhost:8000/storage/${product.image}`}
                     alt={product.name}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                   />
@@ -71,19 +103,19 @@ const FavoriteSection = () => {
                     />
                   </button>
 
-                 
+
                 </div>
                 <div className="p-3">
                 <p className=" text-black text-lg font-semibold    rounded ">
                     {product.name}
                   </p>
                   <div className="flex justify-between items-center  text-sm md:text-[16px] text-gray-600">
-                   
+
                     <span className="text-black font-bold text-[18px]">
-                      ${product.new_price}
+                      ${product.price}
                     </span>
                     <button
-                      onClick={() => handleAddToCartWithToast(product)}
+                      onClick={() => AddToCart(product)}
                       className="bg-[#B22222] hover-bg-red no-underline shadow-md w-auto px-3 py-2 font-bold text-white w-full text-center  rounded-md hover:bg-[#8B6F47] transition"
                     >
                       Buy

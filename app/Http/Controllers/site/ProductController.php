@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Admin;
+use App\Models\Order_Item;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -79,9 +81,13 @@ $adminId = Auth::guard('admin')->id();
         'product' => $product
     ], 201);
 }
+public function getAllProducts(){
+   $products = Product::where('status', 'accepted')->get();
+    return response()->json( $products);
+}
 public function getProductsBySeller()
 {
-    $sellerId = Auth::guard('Admin')->id();
+    $sellerId = Auth::guard('admin')->id();
     $products = Product::where('created_by', $sellerId)->get();
     return response()->json( $products);
 }
@@ -107,5 +113,107 @@ public function getAllSellerProducts()
         ], 500);
     }
 }
+public function getAllAdminSellerProducts()
+{
+    try {
+      $products = Admin::where('type', 'S')->with('products')->get()
+    ->flatMap(function ($seller) {
+        return $seller->products
+            ->whereIn('status', ['pending', 'rejected'])
+            ->map(function ($product, $index) use ($seller) {
+                return [
+                    'no' => $index + 1,
+                    'id' => '#DRD' . str_pad($product->id, 4, '0', STR_PAD_LEFT),
+                    'product' => $product->name,
+                    'date' => \Carbon\Carbon::parse($product->created_at)->format('m-d-Y'),
+                    'price' => number_format($product->price, 2),
+                    'qty' => $product->stock_quantity,
+                    'status' => ucfirst($product->status),
+                    'seller_name' => $seller->full_name, // or $seller->admin_name
+                ];
+            });
+    })
+    ->values(); // Reset collection keys
+
+return response()->json($products);
+
+
+    } catch (\Exception $e) {
+        Log::error('Error fetching seller products: ' . $e->getMessage());
+
+        return response()->json([
+            'error' => true,
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+}
+public function destroy($id)
+{
+    $product = Product::find($id);
+
+    if (!$product) {
+        return response()->json(['message' => 'Product not found'], 404);
+    }
+
+    // Check for active orders
+    $hasActiveOrders = Order_Item::where('product_id', $id)
+        ->whereHas('order', function ($query) {
+            $query->whereIn('status', ['pending', 'shipped', 'waiting to pickup']);
+        })
+        ->exists();
+
+    if ($hasActiveOrders) {
+        // Cancel related orders
+        $orderIds = Order_Item::where('product_id', $id)
+            ->pluck('order_id')
+            ->unique();
+
+        \App\Models\Order::whereIn('id', $orderIds)
+            ->update(['status' => 'canceled']);
+    }
+
+    $product->delete(); // This now performs a soft delete
+
+    return response()->json(['message' => 'Product soft-deleted and related orders (if any) were cancelled']);
+}
+
+
+
+public function update(Request $request, $id)
+{
+    $product = Product::findOrFail($id);
+
+    $product->name = $request->input('product');
+    $product->price = $request->input('price');
+    $product->stock_quantity = $request->input('qty');
+
+    if ($request->has('status')) {
+        $product->status = Str::lower($request->input('status')); // store as lowercase
+    }
+
+    if ($request->has('stock_status')) {
+        $stockStatus = strtolower($request->input('stock_status'));
+        if ($stockStatus === 'out of stock') {
+            $product->stock_status = 'Out of Stock';
+        } else {
+            $product->stock_status = 'In Stock';
+        }
+    }
+
+    $product->save();
+
+    return response()->json([
+        'product' => [
+            'id' => $product->id,
+            'product' => $product->name,
+            'qty' => $product->stock_quantity,
+            'price' => $product->price,
+            'status' => Str::ucfirst($product->status),         // e.g. "Pending"
+            'stock_status' => $product->stock_status,           // formatted correctly
+            'date' => $product->updated_at->toDateTimeString()
+        ],
+    ]);
+}
+
 
 }
