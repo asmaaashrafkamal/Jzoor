@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const TransactionTable = ({
-  transactions,
+transactions,
   searchTerm,
   setSearchTerm,
   currentPage,
@@ -9,12 +11,14 @@ const TransactionTable = ({
   handlePrevious,
   handleNext,
   renderPageNumbers,
-  paginate, // تم إضافة paginate كخاصية هنا
+  paginate,
   activeTab,
   setActiveTab,
   indexOfFirstItem,
   totalFilteredItems
 }) => {
+
+
   return (
     <div className="p-6 rounded-lg shadow-md bg-white">
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">

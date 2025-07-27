@@ -20,7 +20,7 @@ class User extends Authenticatable
     protected $fillable = [
         'full_name',
         'email',
-        'password','image','type','state', 'gender','address','Birth_date','phone','status'
+        'password','image','type','state', 'gender','address','Birth_date','phone','status',
     ];
   public function orders(){
         return $this->hasMany('App\Models\Order','user_id','id');

@@ -11,6 +11,7 @@ use App\Http\Controllers\Home\LandingPageController;
 use App\Http\Controllers\Home\ProfileController;
 use App\Http\Controllers\site\DeliveryController;
 use App\Http\Controllers\site\SellerController;
+use App\Http\Controllers\site\TransactionController;
 
 
 /*
@@ -69,5 +70,14 @@ Route::delete('/delivery/{id}', [DeliveryController::class, 'delivery_destroy'])
 Route::get('/active-orders', [OrderController::class, 'getActiveOrders']);
 Route::get('/get_delivered_orders', [OrderController::class, 'getDeliveredOrders']);
 //---------------------------------------end orders delivery dashboard--------------------------------
+//----------------------------------------start seller dashboard-----------------------------------------
+Route::get('/Sget_customer/{sellerId}', [SellerController::class, 'get_customer']);
+Route::put('/Scustomers/{id}', [SellerController::class, 'customer_update']);
+Route::delete('/Scustomers/{id}', [SellerController::class, 'customer_destroy']);
+Route::get('/Smonthly-customers', [SellerController::class, 'monthlyCustomers']);
+Route::get('/Scustomer-stats', [SellerController::class, 'Cstats']);
+//----------------------------------------end seller dashboard-----------------------------------------
+Route::get('/Tget_customer', [TransactionController::class, 'get_customer']);
+Route::get('/payment-summary', [TransactionController::class, 'getAllTransactionsStats']);
 
 });

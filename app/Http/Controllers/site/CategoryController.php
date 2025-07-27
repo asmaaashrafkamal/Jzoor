@@ -45,10 +45,26 @@ public function getCat() {
     }
 
 public function update(Request $request, $id) {
-        $category = Category::findOrFail($id);
-        $category->update($request->all());
-        return response()->json($category);
-    }
+    $category = Category::findOrFail($id);
+
+    $validated = $request->validate([
+        'cat_name' => [
+            'required',
+            'string',
+            'max:255',
+            'unique:categories,cat_name,' . $id, // Allow same name for current record
+        ],
+        'description' => 'required|string',
+        'productNo' => 'required|integer|min:0',
+        'image' => 'nullable|url',
+        'created_by' => 'required|exists:admins,id',
+    ]);
+
+    $category->update($validated);
+
+    return response()->json(['message' => 'Category updated successfully', 'category' => $category]);
+}
+
 public function getAllCategoriesWithProducts(){
 $categories = Category::with('products')
     ->get();

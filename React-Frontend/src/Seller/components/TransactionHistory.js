@@ -3,13 +3,13 @@ import React from 'react';
 export function TransactionHistory() {
   const transactions = [
     { no: 1, idCustomer: '#6545', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$64' },
-    { no: 2, idCustomer: '#5412', orderDate: '01 Oct | 11:29 am', status: 'Pendle', amount: '$55' },
+    { no: 2, idCustomer: '#5412', orderDate: '01 Oct | 11:29 am', status: 'Pending', amount: '$55' },
     { no: 3, idCustomer: '#6622', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$15' },
     { no: 4, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
     { no: 5, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
     // { no: 6, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
     // { no: 7, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
- 
+
 
   ];
 
@@ -24,7 +24,7 @@ export function TransactionHistory() {
           </svg>
         </button>
       </div>
-      
+
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
