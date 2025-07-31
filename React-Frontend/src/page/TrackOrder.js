@@ -62,8 +62,21 @@ const TrackOrder = () => {
     const fetchOrder = async () => {
       try {
         const res = await axios.get(`http://localhost:8000/api/order/${orderId}`);
-        setOrder(res.data);
-        if (res.data.status === 'Canceled') setIsCanceled(true);
+        const normalizedStatus = res.data.status?.toLowerCase().replace(/\s+/g, '_');
+
+        setOrder({
+          ...res.data,
+          status: normalizedStatus,
+          status_text:normalizedStatus,
+        });
+  
+        console.log('Order:', res.data);
+        console.log('Normalized Status:', normalizedStatus);
+  
+        if (normalizedStatus === 'canceled') setIsCanceled(true);
+        console.log(order);
+        console.log(order.status);
+
       } catch (error) {
         console.error("Failed to fetch order", error);
       }
@@ -72,47 +85,69 @@ const TrackOrder = () => {
     fetchOrder();
   }, [orderId]);
 
+  const isCompleted = (phase) => {
+    if (!order || !order.status) return false;
+  
+    const phasesOrder = [
+      'waiting_pickup',
+      'picked_up',
+      'out_for_delivery',
+      'in_transit',
+      'delivered',
+    ];
+  
+    const currentIndex = phasesOrder.indexOf(order.status.toLowerCase());
+    const checkIndex = phasesOrder.indexOf(phase);
+  
+    return checkIndex < currentIndex;
+  };
+
+  
   const getSteps = () => {
     if (!order) return [];
-
+  
     const steps = [
-      { id: 1, label: 'Waiting Picked up', date: order.waiting_pickup_at, phase: 'Waiting Picked Up' },
-      { id: 2, label: 'Picked up', date: order.picked_up_at, phase: 'Picked Up' },
-    //   { id: 3, label: 'Order Processed', date: 'Waiting for driver to pick up', phase: 'pickup_done', showDriverInfo: false },
-      { id: 3, label: 'Out For Delivery', date: order.out_for_delivery_at, phase: 'out_for_delivery', showDriverInfo: true },
-      { id: 4, label: 'Order Delivered', date: order.delivered_at, phase: 'Delivered' },
+      { id: 1, label: 'Waiting Picked up', date: order.waiting_pickup_at, phase: 'waiting_pickup' },
+      { id: 2, label: 'Picked up', date: order.picked_up_at, phase: 'picked_up' },
+      { id: 3, label: 'In Transit', date: order.in_transit_at, phase: 'in_transit', showDriverInfo: true },
+      { id: 4, label: 'Out For Delivery', date: order.out_for_delivery_at, phase: 'out_for_delivery', showDriverInfo: true },
+      { id: 5, label: 'Order Delivered', date: order.delivered_at, phase: 'delivered' },
     ];
-
-    const currentPhase = order.status;
+  
+    const currentPhase = order.status?.toLowerCase();
     const currentIndex = steps.findIndex(s => s.phase === currentPhase);
-
+  
     const updatedSteps = steps.map((step, index) => ({
       ...step,
-      completed: index <= currentIndex,
+      completed: index < currentIndex,
+      active: index === currentIndex,
     }));
-
     if (isCanceled) {
       updatedSteps.push({
         id: 6,
         label: 'Order Canceled',
         date: order.canceled_at,
-        phase: 'Canceled',
+        phase: 'canceled',
         completed: true,
         isCanceledStatus: true
       });
     }
-
+  
     return updatedSteps;
   };
-
+  
+  
   const getIllustrationImage = () => {
     if (isCanceled) return '/imges/cansle.webp';
-    switch (order?.status) {
+  
+    switch (order?.status?.toLowerCase()) {
+      case 'in_transit': return '/imges/map.png';
       case 'out_for_delivery': return '/imges/map.png';
-      case 'Delivered': return '/imges/delivery.png';
+      case 'delivered': return '/imges/delivery.png';
       default: return '/imges/amico.png';
     }
   };
+  
 
   const orderStatusSteps = getSteps();
 
@@ -160,10 +195,12 @@ const TrackOrder = () => {
               isCanceled ? 'bg-[#F8D7DA] text-[#DC3545]' :
               order.status_text === 'On Time' || order.status_text === 'Delivered' ? 'bg-[#D4EDDA] text-[#28A745]' :
               order.status_text === 'Out For Delivery' ? 'bg-[#CCE5FF] text-[#007BFF]' :
+              order.status_text === 'In Transit' ? 'bg-[#E2E3FF] text-[#5A54CF]' :
               'bg-[#FFF3CD] text-[#FFC107]'
             }`}>
               {isCanceled ? 'Canceled' : order.status_text}
             </span>
+
           </div>
 
           <div className="relative border-l-2 border-[#E9ECEF] ml-2 pl-4 space-y-2">
@@ -175,21 +212,27 @@ const TrackOrder = () => {
                   </div>
                 ) : (
                   <div className={`absolute -left-3.5 md:-left-4 top-0 w-7 h-7 rounded-full flex items-center justify-center ${
-                    step.completed ? 'bg-[#4B5929] text-white' : 'bg-[#E9ECEF] text-[#6C757D]'
+                    (step.completed || step.active) ? 'bg-[#4B5929] text-white' : 'bg-[#E9ECEF] text-[#6C757D]'
                   }`}>
-                    {step.completed ? <BsCheckCircleFill size={16} /> : <div className="w-3 h-3 rounded-full bg-[#ADB5BD]"></div>}
-                  </div>
+                {(step.completed || step.active)
+                  ? <BsCheckCircleFill size={16} />
+                  : <div className="w-3 h-3 rounded-full bg-[#ADB5BD]"></div>}
+
+                </div>
                 )}
 
                 <div>
-                  <p className={`font-semibold pl-5 ${step.completed ? 'text-[#4B5929]' : step.isCanceledStatus ? 'text-[#DC3545]' : 'text-[#6C757D]'}`}>
+                <p className={`font-semibold pl-5 ${
+                  step.completed || step.active ? 'text-[#4B5929]' :
+                  step.isCanceledStatus ? 'text-[#DC3545]' : 'text-[#6C757D]'
+                }`}>
                     {step.label}
                   </p>
                   <p className="text-sm text-[#6C757D] pl-5">
                     {step.date ? new Date(step.date).toLocaleDateString() : step.date}
                   </p>
 
-                  {step.showDriverInfo && step.completed && !isCanceled && (
+                  {step.showDriverInfo  && !isCanceled && (
                     <div className="flex items-center space-x-2 rtl:space-x-reverse mt-2 pl-5">
                       <MdOutlineLocalShipping size={20} className="text-[#4B5929]" />
                       <BiTimeFive size={20} className="text-[#4B5929]" />
@@ -199,15 +242,16 @@ const TrackOrder = () => {
                       <FiPhone size={20} className="text-[#4B5929] cursor-pointer" onClick={() => setShowCallModal(true)} />
                     </div>
                   )}
-                  {step.phase === 'out_for_delivery' && step.completed && !isCanceled && (
+                  {(step.phase === 'out_for_delivery' || step.phase === 'in_transit') && step.completed && !isCanceled && (
                     <p className="text-[#007BFF] font-medium mt-2 pl-5">Stay Nearby</p>
                   )}
+              
                 </div>
               </div>
             ))}
           </div>
 
-          {!isCanceled && order.status !== 'Delivered' && (
+          {!isCanceled && order.status.toLowerCase() !== 'delivered' && (
             <div className="flex justify-end mt-8">
               <button onClick={handleCancelOrder} className="px-6 py-2 bg-[#DC3545] text-white font-semibold rounded-md hover:bg-[#C82333] transition">
                 Cancel
@@ -226,7 +270,7 @@ const TrackOrder = () => {
         <PhoneCallModal
           isOpen={showCallModal}
           onClose={() => setShowCallModal(false)}
-          phoneNumber={order?.deliveryPerson?.phone || '123-456-7890'}
+          phoneNumber={order?.delivery_person?.phone || '123-456-7890'}
         />
       )}
     </div>

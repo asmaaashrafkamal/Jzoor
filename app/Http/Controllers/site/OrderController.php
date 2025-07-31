@@ -32,28 +32,41 @@ public function show($orderId)
     if (!$order) {
         return response()->json([], 404);
     }
-    $order->status_text = $this->getStatusText($order->status);
+
+    // Normalize status (e.g. "picked up" → "picked_up")
+    $status = strtolower(str_replace(' ', '_', $order->status));
+    $order->status_text = $this->getStatusText($status);
     $order->estimated_delivery_date = $this->getEstimatedDate($order->updated_at);
+
     $created = Carbon::parse($order->created_at);
+    $pickupDate = $created->copy()->addDay();
+    $deliveredDate = $created->copy()->addDays(2);
+    $canceledDate = $created->copy()->addMinutes(10);
+
     $order->waiting_pickup_at = $created;
-    $order->picked_up_at = ($order->status !== 'Waiting Picked Up'||$order->status === 'Picked Up') ? $created->copy()->addDays(1) : null;
-    $order->out_for_delivery_at = ($order->status === 'out_for_delivery' || $order->status === 'Delivered') ? $created->copy()->addDays(1) : null;
-    $order->delivered_at = ($order->status === 'Delivered') ? $created->copy()->addDays(2) : null;
-    $order->canceled_at = ($order->status === 'Canceled') ? $created->copy()->addMinutes(10) : null;
+    $order->picked_up_at = in_array($status, ['picked_up', 'in_transit', 'out_for_delivery', 'delivered']) ? $pickupDate : null;
+    $order->in_transit_at = in_array($status, ['in_transit', 'out_for_delivery', 'delivered']) ? $pickupDate : null;
+    $order->out_for_delivery_at = in_array($status, ['out_for_delivery', 'delivered']) ? $pickupDate : null;
+    $order->delivered_at = $status === 'delivered' ? $deliveredDate : null;
+    $order->canceled_at = $status === 'canceled' ? $canceledDate : null;
 
     return response()->json($order);
 }
+
+
 private function getStatusText($status)
 {
     return match ($status) {
-        'waiting_pickup', 'Waiting Picked Up' => 'On Time',
-        'picked_up', 'Picked Up' => 'Out For Delivery',
-        'out_for_delivery', 'Out For Delivery' => 'Out For Delivery',
-        'delivered', 'Delivered' => 'Delivered',
-        'canceled', 'Canceled' => 'Canceled',
+        'waiting_pickup' => 'On Time',
+        'picked_up' => 'Picked Up',
+        'in_transit' => 'In Transit',
+        'out_for_delivery' => 'Out For Delivery',
+        'delivered' => 'Delivered',
+        'canceled' => 'Canceled',
         default => 'Pending',
     };
 }
+
 
 
 public function getEstimatedDate($updatedAt)
