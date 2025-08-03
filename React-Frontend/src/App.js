@@ -1,4 +1,4 @@
-import React,{useContext, useEffect} from 'react';
+import React,{useContext, useEffect,useState} from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProductContext, ProductProvider } from './context/ProductContext';
 import Navbar from './components/Navbar';
@@ -78,7 +78,10 @@ import Payment from './page/Payment';
 // import ScrollRevealWrapper from './assets/ScrollRevealWrapper'; // مكون لتفعيل scrollReveal
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import axios from 'axios'; // تأكد من استيراد axios
+
 const stripePromise = loadStripe("pk_test_51RiFVWRRBaAXkxC7o48Q4UQwMwY8ZMpYBBVWdG8V2sggNjz7gLVgU9ebLAsQQtREtP2WZND9WsBCxGsx2ZOQ814200hzPxDzxH");
+axios.defaults.withCredentials = true;
 
 const Layout = () => (
 

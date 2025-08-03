@@ -84,7 +84,7 @@ const clearCart = () => {
         clearCart();
         localStorage.removeItem("cart");
         setShowPaymentStatusModal(false);
-        navigate("/trackOrder");
+        navigate("/profile/orders");
       }, 1000);
       return;
     }
@@ -128,7 +128,7 @@ const clearCart = () => {
         localStorage.removeItem("cart");
         setTimeout(() => {
           setShowPaymentStatusModal(false);
-          navigate("/trackOrder");
+          navigate("/profile/orders");
         }, 2000);
       }
     } catch (err) {
@@ -232,6 +232,21 @@ const clearCart = () => {
                   </div>
                 </div>
               )}
+              {paymentMethod === "cash" && (
+              <div className="mt-4 text-green-600 font-semibold">
+                Cash on Delivery – no additional steps needed.
+              </div>
+            )}
+
+            {paymentMethod === "apple" && (
+              <div className="mt-4">
+                <label className="block mb-2 font-medium text-gray-700">Apple Pay</label>
+                <div className="p-3 border rounded bg-white">
+                  {/* Replace this with actual Apple Pay integration component or placeholder */}
+                  <p>Apple Pay will open on supported devices.</p>
+                </div>
+              </div>
+            )}
             </div>
 
             <div className="border-t pt-4 space-y-2 text-sm">

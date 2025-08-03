@@ -66,7 +66,7 @@ const TrackOrder = () => {
 
         setOrder({
           ...res.data,
-          status: normalizedStatus,
+          // status: normalizedStatus,
           status_text:normalizedStatus,
         });
   
@@ -236,7 +236,10 @@ const TrackOrder = () => {
                     <div className="flex items-center space-x-2 rtl:space-x-reverse mt-2 pl-5">
                       <MdOutlineLocalShipping size={20} className="text-[#4B5929]" />
                       <BiTimeFive size={20} className="text-[#4B5929]" />
-                      <Link to="/profile/chat">
+                      <Link
+                        to="/profile/chat"
+                        state={{ driverId: order?.delivery_person?.id }}
+                      >
                         <LuMessageCircle size={20} className="text-[#4B5929]" />
                       </Link>
                       <FiPhone size={20} className="text-[#4B5929] cursor-pointer" onClick={() => setShowCallModal(true)} />

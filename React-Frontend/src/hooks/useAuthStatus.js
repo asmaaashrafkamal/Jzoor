@@ -11,7 +11,7 @@ const useAuthStatus = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/api/check-login", {
+      .get("http://localhost:8000/check-login", {
         withCredentials: true, // Required for cookies
       })
       .then((res) => {

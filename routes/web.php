@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Home\LandingPageController;
 use App\Http\Controllers\Home\StripeController;
 use App\Http\Controllers\Home\ProfileController;
+use App\Http\Controllers\Home\ChatController;
 
 
 /*
@@ -69,9 +70,7 @@ Route::get('/get_user', [ProfileController::class, 'getUser']);
 
     //end
 
-Route::get('/{any}', action: function () {
-    return file_get_contents(public_path('index.html'));
-})->where('any', '.*');
+
 
 Route::middleware(['auth.session'])->group(function () {
 Route::post('/StoreProfile', [ProfileController::class, 'store']);
@@ -88,3 +87,15 @@ Route::post( '/create-payment-intent', [StripeController::class, 'createPaymentI
     Route::get('/seller/products', [ProductController::class, 'getProductsBySeller']);//in seller dashboard
 
 });
+Route::middleware(['web'])->group(function () {
+
+        Route::get('/chat/admin/{adminId}', [ChatController::class, 'adminChat']);
+        Route::get('/driver/messages', [ChatController::class, 'getReceivedMessages']);
+        Route::post('/chat/send', [ChatController::class, 'sendMessage']);
+
+    });
+
+    Route::get('/{any}', function () {
+        return file_get_contents(public_path('index.html'));
+    })->where('any', '.*');
+    

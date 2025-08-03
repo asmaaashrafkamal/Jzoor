@@ -12,7 +12,7 @@ use App\Http\Controllers\Home\ProfileController;
 use App\Http\Controllers\site\DeliveryController;
 use App\Http\Controllers\site\SellerController;
 use App\Http\Controllers\site\TransactionController;
-
+use App\Http\Controllers\Home\ChatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,4 +80,8 @@ Route::get('/Scustomer-stats', [SellerController::class, 'Cstats']);
 Route::get('/Tget_customer', [TransactionController::class, 'get_customer']);
 Route::get('/payment-summary', [TransactionController::class, 'getAllTransactionsStats']);
 
+// Route::get('/chat/admin/{adminId}', [ChatController::class, 'getMessagesFromDriver']);
+// Route::post('/chat/send', [ChatController::class, 'sendMessage']);
+
 });
+

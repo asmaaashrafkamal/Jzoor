@@ -48,6 +48,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'api' => [
+        'driver' => 'token', // or 'jwt' if using tymon/jwt-auth
+        'provider' => 'users', // or 'drivers', if you have a Driver model
+        'hash' => false,
+    ],
     ],
 
     /*

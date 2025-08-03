@@ -260,7 +260,9 @@ const totalItemsCount = Array.isArray(orderDetails.items)
               <p className="text-base text-gray-500 font-semibold">Payment will be collected upon delivery.</p>
             )}
               {/* <p className="text-base text-gray-700 font-semibold">Payment Status :{orderDetails.paymentDetails.status}</p> */}
-              <p className="text-base text-gray-700 font-semibold">Paid At :{orderDetails.paymentDetails.paid_at}</p>
+              <p className="text-base text-gray-700 font-semibold">
+              Paid At: {orderDetails.paymentDetails?.paid_at ?? 'Not Paid'}
+            </p>
           </div>
 
           {/* Track Order Button */}
