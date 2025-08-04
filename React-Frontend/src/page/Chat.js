@@ -580,8 +580,8 @@ const SendMessage = async (message, userId, driverId) => {
         >
           {showOnLeft && (
             <img
-              src={avatar}
-              alt="Sender Avatar"
+            src={'https://placehold.co/30x30/E2E8F0/A0AEC0?text=D'}
+            alt="Sender Avatar"
               className="w-7 h-7 rounded-full mr-1.5 rtl:mr-0 rtl:ml-1.5 flex-shrink-0"
             />
           )}
