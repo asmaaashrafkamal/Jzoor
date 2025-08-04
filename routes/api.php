@@ -30,6 +30,10 @@ Route::middleware(['auth.session'])->group(function () {
     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
     Route::put('/products/{id}', [ProductController::class, 'update']);
     Route::post('/products', [ProductController::class, 'store']);
+    Route::get('/top-products', [ProductController::class, 'getTopProducts']);
+    Route::get('/best-sellers', [ProductController::class, 'getBestSellers']);
+    Route::get('/catalog', [ProductController::class, 'getAllCatalog']);
+
 //-----------------------------------end products------------------------------------------------
 //------------------------------------start landingPage-------------------------------------------
     Route::get('/category/name1', [LandingPageController::class, 'getCategoryByName1']);
@@ -82,6 +86,7 @@ Route::get('/payment-summary', [TransactionController::class, 'getAllTransaction
 
 // Route::get('/chat/admin/{adminId}', [ChatController::class, 'getMessagesFromDriver']);
 // Route::post('/chat/send', [ChatController::class, 'sendMessage']);
+Route::get('/transactions', [TransactionController::class, 'getAllTransactions']);
 
 });
 

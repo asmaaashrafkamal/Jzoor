@@ -5,15 +5,91 @@ namespace App\Http\Controllers\site;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Admin;
 use App\Models\Order_Item;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\DB;
 class ProductController extends Controller
 {
+    
+public function getAllCatalog()
+{
+    $categories = Category::all()->map(function ($cat) {
+        return [
+            'name' => $cat->cat_name,
+            'image' => $cat->image
+                ? asset('storage/' . $cat->image)
+                : 'https://placehold.co/100x100/E2E8F0/64748B?text=' . strtoupper(substr($cat->cat_name, 0, 2)),
+        ];
+    });
+
+    $products = Product::whereNull('deleted_at')->get()->map(function ($product) {
+        return [
+            'name'  => $product->name,
+            'price' => '$' . number_format($product->price ?? 0, 2),
+            'image' => asset('storage/' . ($product->image ?? 'default.webp')),
+        ];
+    });
+
+    return response()->json([
+        'status'    => true,
+        'categories' => $categories,
+        'products'   => $products,
+    ]);
+}
+
+    public function getBestSellers()
+{
+    $bestSellers = Order_Item::select('product_id', DB::raw('SUM(quantity) as totalOrder'))
+        ->groupBy('product_id')
+        ->orderByDesc('totalOrder')
+        ->with('product')
+        ->take(10)
+        ->get()
+        ->filter(fn($item) => $item->product) // skip missing products
+        ->map(function ($item) {
+            $product = $item->product;
+            return [
+                'name'       => $product->name,
+                'totalOrder' => (int) $item->totalOrder,
+                'status'     => ($product->stock ?? 0) > 0 ? 'Stock' : 'Stock out',
+                'price'      => '$' . number_format($product->price ?? 0, 2),
+                'image'      => asset('storage/' . ($product->image ?? 'default.webp')),
+            ];
+        })
+        ->values(); // reindex
+
+    return response()->json([
+        'status' => true,
+        'data'   => $bestSellers,
+    ]);
+}
+    public function getTopProducts()
+{
+    $topProducts = Order_Item::select('product_id', DB::raw('SUM(quantity) as total_sold'))
+        ->groupBy('product_id')
+        ->orderByDesc('total_sold')
+        ->take(5)
+        ->with('product') // eager load product details
+        ->get()
+        ->map(function ($item) {
+            return [
+                'name'  => $item->product->name ?? 'Unknown',
+                'item'  => $item->product->sku ?? 'N/A',
+                'price' => '$' . number_format($item->product->price ?? 0, 2),
+                'image' => asset('storage/' . ($item->product->image ?? 'default.webp')),
+            ];
+        });
+
+    return response()->json([
+        'status' => true,
+        'data'   => $topProducts,
+    ]);
+}
 public function store(Request $request)
 {
    $validator = Validator::make($request->all(), [

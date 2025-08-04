@@ -1,19 +1,34 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-
+import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 export function TransactionHistory() {
-  const transactions = [
-    { no: 1, idCustomer: '#6545', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$64' },
-    { no: 2, idCustomer: '#5412', orderDate: '01 Oct | 11:29 am', status: 'Pendle', amount: '$55' },
-    { no: 3, idCustomer: '#6622', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$15' },
-    { no: 4, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
-    { no: 5, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
-    // { no: 6, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
-    // { no: 7, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
+  // const transactions = [
+  //   { no: 1, idCustomer: '#6545', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$64' },
+  //   { no: 2, idCustomer: '#5412', orderDate: '01 Oct | 11:29 am', status: 'Pendle', amount: '$55' },
+  //   { no: 3, idCustomer: '#6622', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$15' },
+  //   { no: 4, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
+  //   { no: 5, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
+  //   // { no: 6, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
+  //   // { no: 7, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
  
 
-  ];
-
+  // ];
+  const [transactions, setTransactions] = useState([]); // ✅ safe for .map()
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const res = await axios.get("http://localhost:8000/api/transactions");
+        const data = Array.isArray(res.data.data) ? res.data.data : [];
+        setTransactions(data);
+      } catch (err) {
+        console.error("Failed to load transactions", err);
+      }
+    };
+  
+    fetchTransactions();
+  }, []);
+  
   return (
     <div className="border border-gray-200 rounded-2xl p-4 shadow-md bg-white  font-sans">
       <div className="flex justify-between items-center mb-4">

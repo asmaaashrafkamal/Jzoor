@@ -75,6 +75,27 @@ public function getEstimatedDate($updatedAt)
 }
 
 
+public function getOrdersForDelivery()
+{
+    $deliveryId = Auth::guard('admin')->id();
+
+    // Optional: check if admin is type D
+    $admin = Auth::guard('admin')->user();
+    if (!$admin || $admin->type !== 'D') {
+        return response()->json(['status' => false, 'message' => 'Unauthorized'], 403);
+    }
+
+    $orders = Order::with(['user', 'items', 'payment']) // eager load related data
+        ->where('delivery_person_id', $deliveryId)
+        ->latest()
+        ->get();
+
+    return response()->json([
+        'status' => true,
+        'data' => $orders
+    ]);
+}
+
 
 
 

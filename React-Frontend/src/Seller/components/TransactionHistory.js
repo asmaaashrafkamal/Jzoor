@@ -1,18 +1,34 @@
-import React from 'react';
-
+import { Link } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 export function TransactionHistory() {
-  const transactions = [
-    { no: 1, idCustomer: '#6545', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$64' },
-    { no: 2, idCustomer: '#5412', orderDate: '01 Oct | 11:29 am', status: 'Pending', amount: '$55' },
-    { no: 3, idCustomer: '#6622', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$15' },
-    { no: 4, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
-    { no: 5, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
-    // { no: 6, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
-    // { no: 7, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
+  // const transactions = [
+  //   { no: 1, idCustomer: '#6545', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$64' },
+  //   { no: 2, idCustomer: '#5412', orderDate: '01 Oct | 11:29 am', status: 'Pendle', amount: '$55' },
+  //   { no: 3, idCustomer: '#6622', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$15' },
+  //   { no: 4, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
+  //   { no: 5, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
+  //   // { no: 6, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
+  //   // { no: 7, idCustomer: '#6462', orderDate: '01 Oct | 11:29 am', status: 'Paid', amount: '$26' },
+ 
 
-
-  ];
-
+  // ];
+  const [transactions, setTransactions] = useState([]); // ✅ safe for .map()
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const res = await axios.get("http://localhost:8000/api/transactions");
+        const data = Array.isArray(res.data.data) ? res.data.data : [];
+        setTransactions(data);
+      } catch (err) {
+        console.error("Failed to load transactions", err);
+      }
+    };
+  
+    fetchTransactions();
+  }, []);
+  
   return (
     <div className="border border-gray-200 rounded-2xl p-4 shadow-md bg-white  font-sans">
       <div className="flex justify-between items-center mb-4">
@@ -24,7 +40,7 @@ export function TransactionHistory() {
           </svg>
         </button>
       </div>
-
+      
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
@@ -54,7 +70,7 @@ export function TransactionHistory() {
         </tbody>
       </table>
       <div className="flex justify-end mt-4">
-        <button className="px-4 py-2 border border-gray-300 rounded-md text-blue-600 hover:bg-gray-50">Details</button>
+        <Link to="transaction" className="px-4 py-2 no-underline border border-gray-300 rounded-md text-blue-600 hover:bg-gray-100">Details</Link>
       </div>
     </div>
   );

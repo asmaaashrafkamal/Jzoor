@@ -10,14 +10,47 @@ const DeliveryDash = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [recentOrders, setRecentOrders] = useState([
-    { orderId: '#ORD001', clientName: 'Rawan Ahmad', date: '10Oct2025', address: 'Rafah, Talahwton', status: 'In Transit' },
-    { orderId: '#ORD002', clientName: 'Alaa Algarny', date: '10Oct2025', address: 'Gaza, Alremail', status: 'Picked Up' },
-    { orderId: '#ORD003', clientName: 'Marym Eqith', date: '10Oct2025', address: 'Gaza, Alnasr', status: 'Picked Up' },
-    { orderId: '#ORD004', clientName: 'Amina Emad', date: '10Oct2025', address: 'Almaghad,Alshouka', status: 'Canceled' },
-    { orderId: '#ORD005', clientName: 'Dana Ismael', date: '10Oct2025', address: 'Jabalial,alBalad', status: 'In Transit' },
-  ]);
-
+  // const [recentOrders, setRecentOrders] = useState([
+  //   { orderId: '#ORD001', clientName: 'Rawan Ahmad', date: '10Oct2025', address: 'Rafah, Talahwton', status: 'In Transit' },
+  //   { orderId: '#ORD002', clientName: 'Alaa Algarny', date: '10Oct2025', address: 'Gaza, Alremail', status: 'Picked Up' },
+  //   { orderId: '#ORD003', clientName: 'Marym Eqith', date: '10Oct2025', address: 'Gaza, Alnasr', status: 'Picked Up' },
+  //   { orderId: '#ORD004', clientName: 'Amina Emad', date: '10Oct2025', address: 'Almaghad,Alshouka', status: 'Canceled' },
+  //   { orderId: '#ORD005', clientName: 'Dana Ismael', date: '10Oct2025', address: 'Jabalial,alBalad', status: 'In Transit' },
+  // ]);
+  const [recentOrders, setRecentOrders] = useState([]);
+  const driverToken = localStorage.getItem('driverToken'); // adjust as needed
+  const formatDate = (iso) => {
+    const date = new Date(iso);
+    return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+  };
+  
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8000/delivery/orders`, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${driverToken}`,
+          },
+        });
+  
+        const data = Array.isArray(res.data.data) ? res.data.data : [];
+        const formatted = data.map((order) => ({
+          orderId: `#ORD${String(order.id).padStart(3, '0')}`,
+          clientName: order.user.full_name,
+          date: formatDate(order.created_at),
+          address: order.user.address,
+          status: order.status,
+        }));
+        setRecentOrders(formatted);
+      } catch (err) {
+        console.error("Failed to fetch delivery orders:", err);
+      }
+    };
+  
+    fetchOrders();
+  }, []);
+  
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
 

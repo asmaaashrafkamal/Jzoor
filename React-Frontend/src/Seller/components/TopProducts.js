@@ -1,19 +1,32 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 
 export function TopProducts() {
-  const products = [
-    { name: 'Chamomile', item: 'FFXZ-4567', price: '$15.00', image: 'imges/Rectangle 41.webp' },
-    { name: 'Olive Tree', item: 'FFXZ-4567', price: '$50.40', image: 'imges/Rectangle 43.webp' },
-    { name: 'Lavender', item: 'FFXZ-4567', price: '$35.40', image: 'imges/66858fac-be77-4de0-a1d0-2e2806295950.webp' },
-    { name: 'Marigold', item: 'FFXZ-4567', price: '$80.00', image: 'imges/Rectangle 43.webp' },
-  ];
+  // const products = [
+  //   { name: 'Chamomile', item: 'FFXZ-4567', price: '$15.00', image: 'imges/Rectangle 41.webp' },
+  //   { name: 'Olive Tree', item: 'FFXZ-4567', price: '$50.40', image: 'imges/Rectangle 43.webp' },
+  //   { name: 'Lavender', item: 'FFXZ-4567', price: '$35.40', image: 'imges/66858fac-be77-4de0-a1d0-2e2806295950.webp' },
+  //   { name: 'Marigold', item: 'FFXZ-4567', price: '$80.00', image: 'imges/Rectangle 43.webp' },
+  // ];
+  const [products, setTopProducts] = useState([]);
 
+  useEffect(() => {
+    axios.get("http://localhost:8000/api/top-products")
+      .then(res => {
+        setTopProducts(res.data.data || []);
+      })
+      .catch(err => {
+        console.error("Error loading top products", err);
+      });
+  }, []);
+  
   return (
     <div className="border border-gray-200 rounded-2xl p-4 shadow-md bg-white  font-sans">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Top Products</h2>
-        <Link to="/seller/productList"  className="text-blue-600 text-sm">All product</Link>
+        <Link to="/admin/productList" className="text-blue-600 text-sm">All product</Link>
       </div>
       <div className="relative mb-4">
         <input

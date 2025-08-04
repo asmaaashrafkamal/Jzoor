@@ -306,19 +306,18 @@ const SendMessage = async (message, userId, driverId) => {
         })
         .then((res) => {
           const allMessages = Array.isArray(res.data.data) ? res.data.data : [];
-      
           console.log("All Messages:", allMessages); // Debug
       
           const uniqueSenders = {};
           allMessages.forEach((msg) => {
-            const senderId = msg.receiver_id;
+            const senderId = msg.id;
             if (!uniqueSenders[senderId]) {
               uniqueSenders[senderId] = {
                 id: senderId,
-                name: msg.receiver_name,
-                avatar: msg.receiver_avatar,
-                lastMessage: msg.message,
-                time: formatTime(msg.created_at),
+                name: msg.name,
+                avatar: msg.avatar,
+                lastMessage: msg.lastMessage,
+                time: formatTime(msg.time),
                 unread: 0,  // or use real count if you have it
                 status: 'online', // fake status for now if needed
               };
@@ -335,41 +334,53 @@ const SendMessage = async (message, userId, driverId) => {
         });
       };
       useEffect(() => {
-        axios.get(`http://localhost:8000/driver/messages`,{withCredentials:true}, {
-          headers: {
-            Authorization: `Bearer ${driverToken}`,
-          }
-        })
-        .then((res) => {
-          const allMessages = Array.isArray(res.data.data) ? res.data.data : [];
+        // Fetch messages immediately on mount
+        getAllMessages();
       
-          console.log("All Messages:", allMessages); // Debug
+        // Set interval to fetch messages every 5 seconds
+        const interval = setInterval(() => {
+          getAllMessages();
+        }, 5000); // adjust the time (in ms) as needed
       
-          const uniqueSenders = {};
-          allMessages.forEach((msg) => {
-            const senderId = msg.receiver_id;
-            if (!uniqueSenders[senderId]) {
-              uniqueSenders[senderId] = {
-                id: senderId,
-                name: msg.receiver_name,
-                avatar: msg.receiver_avatar,
-                lastMessage: msg.message,
-                time: formatTime(msg.created_at),
-                unread: 0,  // or use real count if you have it
-                status: 'online', // fake status for now if needed
-              };
-            }
-          });
-      
-          const contactsList = Object.values(uniqueSenders);
-          console.log("Contacts:", contactsList);
-      
-          setContacts(contactsList);
-        })
-        .catch((err) => {
-          console.error("Failed to fetch messages:", err);
-        });
+        // Clear interval on unmount
+        return () => clearInterval(interval);
       }, []);
+      // useEffect(() => {
+      //   axios.get(`http://localhost:8000/driver/messages`,{withCredentials:true}, {
+      //     headers: {
+      //       Authorization: `Bearer ${driverToken}`,
+      //     }
+      //   })
+      //   .then((res) => {
+      //     const allMessages = Array.isArray(res.data.data) ? res.data.data : [];
+      
+      //     console.log("All Messages:", allMessages); // Debug
+      
+      //     const uniqueSenders = {};
+      //     allMessages.forEach((msg) => {
+      //       const senderId = msg.receiver_id;
+      //       if (!uniqueSenders[senderId]) {
+      //         uniqueSenders[senderId] = {
+      //           id: senderId,
+      //           name: msg.receiver_name,
+      //           avatar: msg.receiver_avatar,
+      //           lastMessage: msg.message,
+      //           time: formatTime(msg.created_at),
+      //           unread: 0,  // or use real count if you have it
+      //           status: 'online', // fake status for now if needed
+      //         };
+      //       }
+      //     });
+      
+      //     const contactsList = Object.values(uniqueSenders);
+      //     console.log("Contacts:", contactsList);
+      
+      //     setContacts(contactsList);
+      //   })
+      //   .catch((err) => {
+      //     console.error("Failed to fetch messages:", err);
+      //   });
+      // }, []);
       
       const handleContactClick = async (contactId) => {
         setSelectedContactId(contactId);
@@ -480,41 +491,47 @@ const SendMessage = async (message, userId, driverId) => {
                     </div>
                 </div>
 
-                {/* Contacts List */}
-                <div className="flex-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 110px)' }}> {/* Adjusted max-height based on header/search input */}
-                {contacts.map((contact) => (
-   <div
-   key={contact.id}
-   onClick={() => handleContactClick(contact.id)}
-   className="cursor-pointer hover:bg-gray-100 transition flex items-center justify-between p-2 border-b"
- >
-    <div className="flex items-center space-x-2 rtl:space-x-reverse min-w-0 flex-1">
-      <div className="relative flex-shrink-0">
-        <img src={contact.avatar} alt={contact.name} className="w-9 h-9 rounded-full" />
-        {contact.status === 'online' && (
-          <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full"
-            style={{ backgroundColor: '#38A169', border: '1px solid #FFFFFF' }}></span>
+             {/* Contacts List */}
+             <div className="flex-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 120px)' }}> {/* Adjust based on actual header/footer height on mobile */}
+              {[...contacts]
+  .sort((a, b) => new Date(b.time) - new Date(a.time)) // Sort latest first
+  .map((contact) => (
+    <div
+      key={contact.id}
+      onClick={() => handleContactClick(contact.id)}
+      className="cursor-pointer hover:bg-gray-100 transition flex items-center justify-between p-2 border-b"
+    >
+      <div className="flex items-center space-x-2 rtl:space-x-reverse min-w-0 flex-1">
+        <div className="relative flex-shrink-0">
+          <img src={contact.avatar} alt={contact.name} className="w-9 h-9 rounded-full" />
+          {contact.status === 'online' && (
+            <span
+              className="absolute bottom-0 right-0 w-2 h-2 rounded-full"
+              style={{ backgroundColor: '#38A169', border: '1px solid #FFFFFF' }}
+            />
+          )}
+        </div>
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <p className="font-medium truncate text-sm" style={{ color: '#1A202C' }}>{contact.name}</p>
+          <p className="text-xs truncate" style={{ color: '#6B7280' }}>{contact.lastMessage}</p>
+        </div>
+      </div>
+      <div className="text-right flex-shrink-0 ml-1">
+        <p className="text-xs" style={{ color: '#A0AEC0' }}>{contact.time}</p>
+        {contact.unread > 0 && (
+          <span
+            className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-xs font-bold mt-0.5"
+            style={{ backgroundColor: '#38A169', color: '#FFFFFF' }}
+          >
+            {contact.unread}
+          </span>
         )}
       </div>
-      <div className="flex-1 min-w-0 overflow-hidden">
-        <p className="font-medium truncate text-sm" style={{ color: '#1A202C' }}>{contact.name}</p>
-        <p className="text-xs truncate" style={{ color: '#6B7280' }}>{contact.lastMessage}</p>
-      </div>
     </div>
-    <div className="text-right flex-shrink-0 ml-1">
-      <p className="text-xs" style={{ color: '#A0AEC0' }}>{contact.time}</p>
-      {contact.unread > 0 && (
-        <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-xs font-bold mt-0.5"
-          style={{ backgroundColor: '#38A169', color: '#FFFFFF' }}>
-          {contact.unread}
-        </span>
-      )}
-    </div>
-  </div>
 ))}
 
 
-                </div>
+              </div>
             </div>
 
             {/* Chat Area Section */}

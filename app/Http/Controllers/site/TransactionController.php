@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Order;
+use App\Models\Payment;
+use Carbon\Carbon;
+
 class TransactionController extends Controller
 {
 public function get_customer()
@@ -36,6 +39,25 @@ $totalRevenue = $orders->sum('total_price');
         'transactions' => $totalTransactions,
         'revenue' => $totalRevenue,
         'deliveredCashTransactions'=>$deliveredCashTransactions,
+    ]);
+}
+public function getAllTransactions()
+{
+    $payments = Payment::with('order.user') // make sure Order has user() relationship
+        ->latest()
+        ->get();
+
+    return response()->json([
+        'status' => true,
+        'data' => $payments->map(function ($payment, $index) {
+            return [
+                'no'         => $index + 1,
+                'idCustomer' => '#'.($payment->order->user->id ?? '----'),
+                'orderDate'  => Carbon::parse($payment->created_at)->format('d M | h:i a'),
+                'status'     => $payment->payment_status ?? 'Unknown',
+                'amount'     => '$' . number_format($payment->order->total_price ?? 0, 2),
+            ];
+        }),
     ]);
 }
 }

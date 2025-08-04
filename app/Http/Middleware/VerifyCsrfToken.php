@@ -16,5 +16,6 @@ class VerifyCsrfToken extends Middleware
     '/AdminStoreproducts',
     '/categories',
     'chat/send',
+    'delivery/chat/send',
     ];
 }

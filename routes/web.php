@@ -88,12 +88,21 @@ Route::post( '/create-payment-intent', [StripeController::class, 'createPaymentI
 
 });
 Route::middleware(['web'])->group(function () {
-
+//------------------------------for customer--------------------------------------------
         Route::get('/chat/admin/{adminId}', [ChatController::class, 'adminChat']);
         Route::get('/driver/messages', [ChatController::class, 'getReceivedMessages']);
         Route::post('/chat/send', [ChatController::class, 'sendMessage']);
+ //------------------------------------end customer----------------------------------
+//------------------------------for delivery--------------------------------------------
+    Route::get('/delivery/chat/admin/{userId}', [ChatController::class, 'adminChatDelivery']);
+    Route::get('/delivery/driver/messages', [ChatController::class, 'getReceivedMessagesDelivery']);
+    Route::post('/delivery/chat/send', [ChatController::class, 'sendMessageDelivery']);
+//------------------------------------end delivery----------------------------------
+   Route::get('/delivery/orders', [OrderController::class, 'getOrdersForDelivery']);
+
 
     });
+
 
     Route::get('/{any}', function () {
         return file_get_contents(public_path('index.html'));

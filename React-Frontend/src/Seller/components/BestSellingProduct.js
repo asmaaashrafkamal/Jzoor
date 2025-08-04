@@ -1,13 +1,28 @@
-import React from 'react';
+import { Link } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 
 export function BestSellingProduct() {
-  const products = [
-    { name: 'Mint', totalOrder: 104, status: 'Stock', price: '$999.00', image: 'imges/Rectangle 41.webp' },
-    { name: 'Taste Of Palestine', totalOrder: 56, status: 'Stock out', price: '$999.00', image: 'imges/roberta-sorge-uOBApnN_K7w-unsplash.webp' },
-    { name: 'Hand-Painted Tatreez Mug', totalOrder: 266, status: 'Stock', price: '$999.00', image: 'imges/f769ad49-1fc1-4c9c-b61e-6f8308e2897d.webp' },
-    { name: 'Loquat', totalOrder: 506, status: 'Stock', price: '$999.00', image: 'imges/loquats-7228865_1280 (1).webp' },
-  ];
+  // const products = [
+  //   { name: 'Mint', totalOrder: 104, status: 'Stock', price: '$999.00', image: 'imges/Rectangle 41.webp' },
+  //   { name: 'Taste Of Palestine', totalOrder: 56, status: 'Stock out', price: '$999.00', image: 'imges/roberta-sorge-uOBApnN_K7w-unsplash.webp' },
+  //   { name: 'Hand-Painted Tatreez Mug', totalOrder: 266, status: 'Stock', price: '$999.00', image: 'imges/f769ad49-1fc1-4c9c-b61e-6f8308e2897d.webp' },
+  //   { name: 'Loquat', totalOrder: 506, status: 'Stock', price: '$999.00', image: 'imges/loquats-7228865_1280 (1).webp' },
+  // ];
+  const [products, setProducts] = useState([]);
 
+  useEffect(() => {
+    axios.get("http://localhost:8000/api/best-sellers")
+      .then(res => {
+        const data = Array.isArray(res.data.data) ? res.data.data : [];
+        setProducts(data);
+      })
+      .catch(err => {
+        console.error("Failed to fetch best sellers", err);
+      });
+  }, []);
+  
   return (
     <div className="border border-gray-200 rounded-2xl p-4 shadow-md bg-white  font-sans">
       <div className="flex justify-between items-center mb-4">
