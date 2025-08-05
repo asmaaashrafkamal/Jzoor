@@ -35,4 +35,20 @@ public function creator()
 {
     return $this->belongsTo(Admin::class, 'created_by');
 }
+public function reviews()
+{
+    return $this->hasMany(Product_Review::class);
+}
+
+
+public function averageRating()
+{
+    return $this->reviews()->avg('rating');
+}
+
+public function totalReviews()
+{
+    return $this->reviews()->count();
+}
+
 }

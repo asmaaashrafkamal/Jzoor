@@ -85,7 +85,7 @@ Route::post( '/create-payment-intent', [StripeController::class, 'createPaymentI
     // Route::put('/categories/{id}', [CategoryController::class, 'update']);
     // Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
     Route::get('/seller/products', [ProductController::class, 'getProductsBySeller']);//in seller dashboard
-
+   
 });
 Route::middleware(['web'])->group(function () {
 //------------------------------for customer--------------------------------------------
@@ -99,7 +99,14 @@ Route::middleware(['web'])->group(function () {
     Route::post('/delivery/chat/send', [ChatController::class, 'sendMessageDelivery']);
 //------------------------------------end delivery----------------------------------
    Route::get('/delivery/orders', [OrderController::class, 'getOrdersForDelivery']);
+// Store a new review (requires auth)
+Route::post('/product-reviews', [ProductController::class, 'storeReview']);
 
+// Get reviews for a specific product
+Route::get('/product-reviews/{productId}', [ProductController::class, 'getProductReviews']);
+Route::get('/all-reviews', [ProductController::class, 'getAllReviews']);
+Route::get('/top-product', [ProductController::class, 'getTopProduct']);
+Route::delete('/destroy/{id}', [ProductController::class, 'destroyReview']);
 
     });
 

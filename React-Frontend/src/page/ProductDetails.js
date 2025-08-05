@@ -23,9 +23,64 @@ const sellerName = state?.sellerName || localStorage.getItem("sellerName");
   const [selectedColor, setSelectedColor] = useState(0);
   const { id } = useParams();
   const [showToast, setShowToast] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
+  const [loading, setLoading] = useState(true);
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState('');
+  const [success, setSuccess] = useState(false); // optional success flag
+  const [reviews, setReviews] = useState([]);
+  const fetchReviews = () => {
+    axios.get(`http://localhost:8000/product-reviews/${product.id}`)
+      .then(res => setReviews(res.data))
+      .catch(err => console.error(err));
+  };
+  
+useEffect(() => {
+  if (product?.id) {
+    axios.get(`http://localhost:8000/product-reviews/${product.id}`)
+      .then(res => {
+        setReviews(res.data);
+      })
+      .catch(err => console.error('Failed to fetch reviews', err));
+  }
+}, [product]);
+  const handleSubmitReview = async () => {
+    try {
+      setLoading(true);
+      setSuccess(false);
+  
+      const token = localStorage.getItem('token'); // or from your auth context
+  
+      const response = await axios.post(
+        'http://localhost:8000/product-reviews',
+        {
+          product_id: product.id,
+          rating: rating,
+          review: review,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      setSuccess(true);
+      setReview('');
+      setRating(0);
+      fetchReviews(); // <-- Call this again
+
+      // Optional: refresh product rating/review count after submit
+      // fetchProduct(); // if you want to reload product data
+    } catch (error) {
+      console.error('Failed to submit review:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
   useEffect(() => {
     fetch(`http://localhost:8000/products/${id}`)
       .then((res) => res.json())
@@ -79,6 +134,7 @@ const AddToCart = async () => {
 //     return;
 //   }
 
+  
   try {
     const res = await axios.get("http://localhost:8000/check-login", {
       withCredentials: true,
@@ -88,6 +144,9 @@ console.log(res.data);
       navigate("/login", { state: { id }}
 );
       return;
+    }else{
+      const u = res.data.user;
+      setUser(u);
     }
 
     const productWithOptions = {
@@ -128,6 +187,79 @@ console.log(res.data);
             alt={product.name}
             className="w-full h-[420px] object-cover rounded-xl shadow"
           />
+      
+
+          {/* Review Form */}
+          <div className="mt-6 p-4 border rounded bg-white shadow-sm">
+            <h3 className="text-lg font-semibold mb-4">Leave a Review</h3>
+
+            {/* Star Rating Input */}
+            <label className="block mb-2 font-medium text-gray-700">Your Rating</label>
+            <div className="flex gap-1 mb-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <i
+                  key={star}
+                  className={`fas fa-star cursor-pointer text-xl transition-colors duration-200 ${
+                    rating >= star ? 'text-yellow-500' : 'text-gray-300'
+                  }`}
+                  onClick={() => setRating(star)}
+                  title={`${star} Star${star > 1 ? 's' : ''}`}
+                ></i>
+              ))}
+            </div>
+
+            {/* Textarea for Review */}
+            <textarea
+              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-200"
+              rows="4"
+              placeholder="Write your review here..."
+              value={review}
+              onChange={(e) => setReview(e.target.value)}
+            ></textarea>
+
+            {/* Submit Button */}
+            <button
+              className={`mt-4 px-5 py-2 rounded font-medium text-white transition ${
+                loading || rating === 0
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+              onClick={handleSubmitReview}
+              disabled={loading || rating === 0}
+            >
+              {loading ? 'Submitting...' : 'Submit Review'}
+            </button>
+
+            {/* Success Message */}
+            {success && <p className="text-green-600 mt-3">Review submitted successfully!</p>}
+          </div>
+          <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-3">All Reviews</h3>
+          {reviews.length === 0 ? (
+            <p className="text-gray-500">No reviews yet.</p>
+          ) : (
+            reviews.map((r, index) => (
+              <div key={index} className="mb-4 border-b pb-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-sm text-gray-800">
+                    {r.user?.full_name || 'Anonymous'}
+                  </span>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <i
+                        key={star}
+                        className={`fas fa-star ${
+                          r.rating >= star ? 'text-yellow-500' : 'text-gray-300'
+                        }`}
+                      ></i>
+                    ))}
+                  </div>
+                </div>
+                {r.review && <p className="text-sm mt-1 text-gray-700">{r.review}</p>}
+              </div>
+            ))
+          )}
+        </div>
         </div>
 
         <div className="flex flex-col gap-2 text-[#4B5929]">
@@ -138,15 +270,8 @@ console.log(res.data);
       ) : (
         <p className="text-red-500">Seller name not available</p>
       )}
-          <div className="flex items-center gap-2 text-yellow-500 mt-1">
-            <div className="flex text-lg">
-              {[...Array(5)].map((_, i) => (
-                <i key={i} className="fas fa-star"></i>
-              ))}
-            </div>
-            <span className="text-black font-semibold ml-1">4.2</span>
-            <span className="text-gray-500 text-sm">(210 Reviews)</span>
-          </div>
+
+
 
           <p className="text-2xl font-bold mt-2">
             ${ (product.price * (1 - product.discounted_price / 100)).toFixed(2) }

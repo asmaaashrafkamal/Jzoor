@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Http\Controllers\site;
-
+use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Product_Review;
 use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Admin;
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+
 class ProductController extends Controller
 {
     
@@ -291,5 +294,90 @@ public function update(Request $request, $id)
     ]);
 }
 
+// Get reviews for a product
+public function getProductReviews($productId)
+{
+    $reviews = Product_Review::with('user')->where('product_id', $productId)->latest()->get();
+    return response()->json($reviews);
+}
+
+// Store a review
+public function storeReview(Request $request)
+{
+    $validated = $request->validate([
+        'product_id' => 'required|exists:products,id',
+        'rating' => 'required|integer|min:1|max:5',
+        'review' => 'nullable|string',
+    ]);
+
+    $user = Auth::user();
+
+    $review = Product_Review::create([
+        'product_id' => $validated['product_id'],
+        'user_id' => $user->id,
+        'rating' => $validated['rating'],
+        'review' => $validated['review'],
+    ]);
+
+    return response()->json($review, 201);
+}
+
+public function getAllReviews()
+{
+    $reviews = Product_Review::with(['user', 'product'])
+        ->latest()
+        ->get();
+
+    $formatted = $reviews->map(function ($review, $index) {
+        return [
+            'no' => $index + 1,
+            'id' => $review->id,
+            'productId' => '#ORD0000' . $review->product->id ?? '#ORD0000',
+            'reviewer' => $review->user->full_name ?? 'Anonymous',
+            'rate' => $review->rating,
+            'date' => Carbon::parse($review->created_at)->format('d M Y'),
+            'status' => $review->rating >= 4 ? 'Positive' : 'Negative',
+            'comment' => $review->review,
+
+        ];
+    });
+
+    return response()->json($formatted);
+}
+public function getTopProduct()
+{
+    $reviews = Product_Review::with('product')
+        ->latest()
+        ->get()
+        ->unique('product_id') // Get unique products only
+        ->values(); // Reset keys
+
+    $topProducts = $reviews->map(function ($review) {
+        $product = $review->product;
+        if (!$product) return null; // in case product is soft-deleted or null
+
+        return [
+            'image'   => $product->image ? Storage::url($product->image) : asset('images/default.jpg'),
+            'name'    => $product->name,
+            'id'      => '#ORD0000' . $product->id, // Appending to ID
+            'rating'  => $product->averageRating(),
+            'reviews' => $product->totalReviews(),
+        ];
+    })->filter(); // remove nulls if any
+
+    return response()->json($topProducts);
+}
+public function destroyReview($id)
+{
+    $review = Product_Review::find($id);
+
+    if (!$review) {
+        return response()->json(['message' => 'Review not found'], 404);
+    }
+
+    $review->delete();
+
+    return response()->json(['message' => 'Review deleted successfully']);
+}
 
 }
