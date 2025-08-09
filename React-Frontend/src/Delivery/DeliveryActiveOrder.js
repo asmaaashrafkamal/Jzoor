@@ -130,7 +130,10 @@ const OrderDetailsModal = ({ isOpen, onClose, order, onStatusUpdate, currentLoca
           <div className="flex flex-col md:flex-row items-center justify-between mb-6 p-4 bg-white rounded-lg shadow-sm">
             <div className="flex items-center space-x-3 rtl:space-x-reverse mb-4 md:mb-0">
                 <img
-                  src={`http://localhost:8000/storage/${order.avatar || 'default.jpg'}`}
+                src={order?.avatar 
+                  ? `http://localhost:8000/storage/${order.avatar}` 
+                  : '/images/default.jpg'
+                }                 
                   alt={order.customerDetails.name}
                   className="w-16 h-16 rounded-full border-2"
                   style={{ borderColor: '#E5E7EB' }}
@@ -305,6 +308,41 @@ const OrderDashboard = () => {
   const [location, setLocation] = useState({ lat: null, lng: null });
   const [error, setError] = useState(null);
   const [currentLocation, setCurrentLocation] = useState(null);
+  const navigate = useNavigate();
+  const [userId, setId] = useState('');
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get("http://localhost:8000/check-login", { withCredentials: true })
+      .then(res => {
+         console.log(res.data);
+        if (res.data.role == "D") {
+        const u = res.data.user;
+        setUser(u);
+        setId(u.admin_id || '');
+        // setFullName(u.admin_name || '');
+        // setEmail(u.admin_email || '');
+        // setPhone(u.admin_phone || '');
+        // setBirthDate(u.admin_date || '');
+        // setGender(u.admin_gender || '');
+        // setState(u.admin_state || '');
+        // setAdressName(u.admin_address || '');
+        // setImage(u.admin_image || '');
+        // login(u);
+    } else {
+         // If no session, redirect to login page
+          navigate("/login");
+        }
+      })
+      .catch(() => {
+        // On any error, redirect to login page
+        navigate("/login");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [navigate]);
 useEffect(() => {
   const interval = setInterval(() => {
     navigator.geolocation.getCurrentPosition(
@@ -343,11 +381,13 @@ useEffect(() => {
     }
   );
 }, []);
+// const token = localStorage.getItem('token'); // or sessionStorage.getItem('token')
 
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/active-orders', {
-      params: { delivery_person_id: 5 },
+    axios.get('http://localhost:8000/active-orders', {
+      params: { delivery_person_id: userId },
+      // headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => {
         const transformed = res.data.map(order => ({
@@ -378,15 +418,16 @@ useEffect(() => {
               creditCard: order.payment?.card_last4 ? `**** **** **** ${order.payment.card_last4}` : 'Cash',
             },
             products: order.items.map(item => ({
-              name: item.product.name,
-              image: item.product.image,
-              price: item.product.price,
-              discount: item.product.discounted_price,
-              quantity: item.quantity,
+              name: item.product?.name || 'Unknown Product',
+              image: item.product?.image || 'default-image.jpg',
+              price: item.product?.price || 0,
+              discount: item.product?.discounted_price || 0,
+              quantity: item.quantity
             })),
             itemsCount: order.items.length
           }
         }));
+        console.log(transformed);
         setRecentOrders(transformed);
       })
       .catch(err => console.error('Failed to fetch active orders', err));
@@ -493,7 +534,7 @@ useEffect(() => {
           >
             <div className="flex items-center space-x-4">
                 <img
-                  src={`http://localhost:8000/storage/${order.customerDetails.products[0]?.image || 'default.jpg'}`}
+                  src={`http://localhost:8000/storage/${order.avatar || 'default.jpg'}`}
                   alt={order.clientName}
                   className="w-12 h-12 rounded-full border"
                 />

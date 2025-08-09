@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FiSearch, FiChevronLeft, FiChevronRight, FiX } from 'react-icons/fi'; // Import icons from Feather Icons
 import OrderDetailsModal from './OrderDetailsModal'; // Import the new modal component
+import { useNavigate } from 'react-router-dom';
 
 const App = () => {
   const [activeTab, setActiveTab] = useState('All order (240)');
@@ -19,12 +20,44 @@ const App = () => {
 
   // Dummy data for archived deliveries
   const [allDeliveries, setAllDeliveries] = useState([]);
+  const navigate = useNavigate();
+  const [userId, setId] = useState('');
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    axios.get("http://localhost:8000/check-login", { withCredentials: true })
+      .then(res => {
+         console.log(res.data);
+        if (res.data.role == "D") {
+        const u = res.data.user;
+        setUser(u);
+        setId(u.admin_id || '');
+        // setFullName(u.admin_name || '');
+        // setEmail(u.admin_email || '');
+        // setPhone(u.admin_phone || '');
+        // setBirthDate(u.admin_date || '');
+        // setGender(u.admin_gender || '');
+        // setState(u.admin_state || '');
+        // setAdressName(u.admin_address || '');
+        // setImage(u.admin_image || '');
+        // login(u);
+    } else {
+         // If no session, redirect to login page
+          navigate("/login");
+        }
+      })
+      .catch(() => {
+        // On any error, redirect to login page
+        navigate("/login");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [navigate]);
 useEffect(() => {
   axios
-    .get('http://localhost:8000/api/get_delivered_orders', {
-      params: { delivery_person_id: 5 },
-    })
+    .get('http://localhost:8000/get_delivered_orders')
     .then(res => {
       const transformed = res.data
         .filter(order => order.status === 'Delivered')

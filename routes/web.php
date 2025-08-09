@@ -48,6 +48,8 @@ Route::get('/check-login', function () {
     Route::get('/getAllCategory', [LandingPageController::class, 'getCat']);
     Route::get('/getAllCategoryProduct', [LandingPageController::class, 'getAllCategoriesWithProducts']);
     Route::get('/getAllProduct', [ProductController::class, 'getAllProducts']);
+    Route::get('/getAllProductSeller', [ProductController::class, 'getAllProductSeller']);
+    Route::get('/sellerProductsDashboard', [ProductController::class, 'getAllAdminSellerProductDashboard']);//in admin product list
     Route::get('/category/{id}/products', [LandingPageController::class, 'getSpecificCategory']);
     Route::get('/products/{id}', [LandingPageController::class, 'getSpecificProduct']);
     Route::get('/products_sizes/{id}', [LandingPageController::class, 'getSpecificProductSizes']);
@@ -69,7 +71,11 @@ Route::get('/check-login', function () {
 Route::get('/get_user', [ProfileController::class, 'getUser']);
 
     //end
+//--------------------------------------delivery dashboard orders----------------------------------
+Route::get('/get_delivered_orders', [OrderController::class, 'getDeliveredOrders']);
+Route::get('/active-orders', [OrderController::class, 'getActiveOrders']);
 
+//---------------------------------------end orders delivery dashboard--------------------------------
 
 
 Route::middleware(['auth.session'])->group(function () {
@@ -104,8 +110,10 @@ Route::post('/product-reviews', [ProductController::class, 'storeReview']);
 
 // Get reviews for a specific product
 Route::get('/product-reviews/{productId}', [ProductController::class, 'getProductReviews']);
-Route::get('/all-reviews', [ProductController::class, 'getAllReviews']);
-Route::get('/top-product', [ProductController::class, 'getTopProduct']);
+Route::get('/all-reviews', [ProductController::class, 'getAllReviews']);// admin
+Route::get('/top-product', [ProductController::class, 'getTopProduct']);//admin
+Route::get('/all-reviews-seller', [ProductController::class, 'getAllReviewSeller']);//seller
+Route::get('/top-product-seller', [ProductController::class, 'getTopProductSeller']);//seller
 Route::delete('/destroy/{id}', [ProductController::class, 'destroyReview']);
 
     });

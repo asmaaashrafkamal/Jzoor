@@ -157,10 +157,11 @@ public function assignDeliveryPerson(Request $request, $orderId)
 public function getActiveOrders(Request $request)
 {
 
-    $deliveryPersonId = Auth::guard('admin')->id(); // default to 5 if not provided
-
-    $orders = Order::with(['user', 'items.product.creator', 'payment', 'deliveryPerson'])
-        ->where('delivery_person_id', $deliveryPersonId)
+    // $deliveryPersonId = Auth::guard('admin')->id(); // default to 5 if not provided
+    // dd(session()->all()); // Dumps all session data
+    // dd($request->delivery_person_id);
+    $orders = Order::with(['user', 'items.product', 'payment', 'deliveryPerson'])
+        ->where('delivery_person_id',session('admin_id'))
         ->whereIn('status', ['Waiting Picked Up', 'Picked Up', 'In Transit'])
         ->get();
 
@@ -169,7 +170,7 @@ public function getActiveOrders(Request $request)
 public function getDeliveredOrders(Request $request)
 {
     return Order::with(['user', 'items.product', 'payment'])
-        ->where('delivery_person_id', $request->delivery_person_id)
+        ->where('delivery_person_id', session('admin_id'))
         ->where('status', 'Delivered') // <-- filter here
         ->get();
 }

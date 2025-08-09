@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
-
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 // Import React Icons
 import { FaEllipsisV, FaArrowUp, FaStar, FaRegStar } from 'react-icons/fa';
 import { MdOutlineRemoveRedEye, MdEdit, MdDelete, MdSearch } from 'react-icons/md';
@@ -18,7 +19,11 @@ export function ProductReview() {
   const [reviewsPerPage] = useState(5); // Number of reviews per page
   const [showModal, setShowModal] = useState(false);
   const [selectedReview, setSelectedReview] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [topRatedProducts, setTopRatedProducts] = useState([]);
 
+  
+  
   // Product review data
   const reviewsOverview = {
     ratings: [
@@ -138,25 +143,38 @@ export function ProductReview() {
   };
 
   // Top Rated Products data
-  const topRatedProducts = [
-    { image: '/imges/66858fac-be77-4de0-a1d0-2e2806295950.webp', name: 'Lavender', id: '#FXZ-4567', rating: 5.0, reviews: 218 },
-    { image: '/imges/ma2.webp', name: 'Chamomile', id: '#FXZ-4567', rating: 4.9, reviews: 318 },
-    { image: '/imges/ma1.webp', name: 'Olive Tree', id: '#FXZ-4567', rating: 4.8, reviews: 298 },
-    { image: '/imges/ma5.webp', name: 'Anemone', id: '#FXZ-4567', rating: 4.9, reviews: 309 },
-    { image: '/imges/Anise.webp', name: 'Azalea', id: '#FXZ-4567', rating: 4.7, reviews: 108 },
-  ];
+  // const topRatedProducts = [
+  //   { image: '/imges/66858fac-be77-4de0-a1d0-2e2806295950.webp', name: 'Lavender', id: '#FXZ-4567', rating: 5.0, reviews: 218 },
+  //   { image: '/imges/ma2.webp', name: 'Chamomile', id: '#FXZ-4567', rating: 4.9, reviews: 318 },
+  //   { image: '/imges/ma1.webp', name: 'Olive Tree', id: '#FXZ-4567', rating: 4.8, reviews: 298 },
+  //   { image: '/imges/ma5.webp', name: 'Anemone', id: '#FXZ-4567', rating: 4.9, reviews: 309 },
+  //   { image: '/imges/Anise.webp', name: 'Azalea', id: '#FXZ-4567', rating: 4.7, reviews: 108 },
+  // ];
 
   // Detailed review data (using useState to allow deletion)
-  const [reviews, setReviews] = useState([
-    { no: 1, productId: '#ORD0001', reviewer: 'RavenA', rate: 5, date: '09 Oct 2025', status: 'Positive', comment: 'Excellent product, highly recommend!' },
-    { no: 2, productId: '#ORD0001', reviewer: 'Mariantx', rate: 4, date: '09 Oct 2025', status: 'Positive', comment: 'Very good, just as described.' },
-    { no: 3, productId: '#ORD0001', reviewer: 'Ahmad22', rate: 2, date: '09 Oct 2025', status: 'Negative', comment: 'Disappointed with the quality.' },
-    { no: 4, productId: '#ORD0001', reviewer: 'ali_abiZID', rate: 1, date: '09 Oct 2025', status: 'Negative', comment: 'Awful experience, do not buy.' },
-    { no: 5, productId: '#ORD0002', reviewer: 'SaraM', rate: 4, date: '08 Oct 2025', status: 'Positive', comment: 'Good value for money.' },
-    { no: 6, productId: '#ORD0003', reviewer: 'JohnD', rate: 5, date: '07 Oct 2025', status: 'Positive', comment: 'Fantastic! Will buy again.' },
-    { no: 7, productId: '#ORD0004', reviewer: 'EmilyC', rate: 2, date: '06 Oct 2025', status: 'Negative', comment: 'Not what I expected.' },
-  ]);
-
+  // const [reviews, setReviews] = useState([
+  //   { no: 1, productId: '#ORD0001', reviewer: 'RavenA', rate: 5, date: '09 Oct 2025', status: 'Positive', comment: 'Excellent product, highly recommend!' },
+  //   { no: 2, productId: '#ORD0001', reviewer: 'Mariantx', rate: 4, date: '09 Oct 2025', status: 'Positive', comment: 'Very good, just as described.' },
+  //   { no: 3, productId: '#ORD0001', reviewer: 'Ahmad22', rate: 2, date: '09 Oct 2025', status: 'Negative', comment: 'Disappointed with the quality.' },
+  //   { no: 4, productId: '#ORD0001', reviewer: 'ali_abiZID', rate: 1, date: '09 Oct 2025', status: 'Negative', comment: 'Awful experience, do not buy.' },
+  //   { no: 5, productId: '#ORD0002', reviewer: 'SaraM', rate: 4, date: '08 Oct 2025', status: 'Positive', comment: 'Good value for money.' },
+  //   { no: 6, productId: '#ORD0003', reviewer: 'JohnD', rate: 5, date: '07 Oct 2025', status: 'Positive', comment: 'Fantastic! Will buy again.' },
+  //   { no: 7, productId: '#ORD0004', reviewer: 'EmilyC', rate: 2, date: '06 Oct 2025', status: 'Negative', comment: 'Not what I expected.' },
+  // ]);
+  useEffect(() => {
+    axios.get('http://localhost:8000/all-reviews-seller')
+      .then(res => {
+        setReviews(res.data); // Now matches your useState format
+      })
+      .catch(err => console.error(err));
+  }, []);
+  useEffect(() => {
+    axios.get('http://localhost:8000/top-product-seller')
+      .then(res => {
+        setTopRatedProducts(res.data);
+      })
+      .catch(err => console.error(err));
+  }, []);
   // Filter reviews based on active filter and search term
   const filteredAndSearchedReviews = reviews.filter(review => {
     const matchesFilter = () => {
@@ -220,14 +238,19 @@ export function ProductReview() {
     }
     return <div className="flex">{stars}</div>;
   };
-
-  // Handle delete review
-  const handleDeleteReview = (reviewNo) => {
-    if (window.confirm(`Are you sure you want to delete review No. ${reviewNo}?`)) {
-      setReviews(reviews.filter(review => review.no !== reviewNo));
+  const handleDeleteReview = async (reviewId) => {
+    if (window.confirm(`Are you sure you want to delete review No. ${reviewId}?`)) {
+      try {
+        await axios.delete(`http://localhost:8000/destroy/${reviewId}`);
+        
+        // Correct key here
+        setReviews(prev => prev.filter(review => review.id !== reviewId));
+      } catch (error) {
+        console.error("Error deleting review:", error);
+      }
     }
   };
-
+  
   // Handle view review
   const handleViewReview = (review) => {
     setSelectedReview(review);
@@ -425,6 +448,7 @@ export function ProductReview() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         {renderStars(review.rate)}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#374151' }}>{review.comment}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#6B7280' }}>{review.date}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full`} style={getStatusClasses(review.status)}>
@@ -438,7 +462,7 @@ export function ProductReview() {
                           </button>
                           {/* Delete button with hover effect */}
                           <button
-                            onClick={() => handleDeleteReview(review.no)}
+                            onClick={() => handleDeleteReview(review.id)}
                             className="text-gray-500 hover:text-red transition-colors duration-200"
                           >
                             <MdDelete className="w-5 h-5" />

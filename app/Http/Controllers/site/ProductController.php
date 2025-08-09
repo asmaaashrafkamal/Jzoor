@@ -95,6 +95,8 @@ public function getAllCatalog()
 }
 public function store(Request $request)
 {
+    // dd(session()->all());
+
    $validator = Validator::make($request->all(), [
         'name' => 'required|string',
         'description' => 'nullable|string',
@@ -133,7 +135,9 @@ $adminId = Auth::guard('admin')->id();
         $imagePath = $request->file('image')->store('products', 'public');
         $product->image = $imagePath;
     }
-
+    if (session('admin_type') === 'A') {
+        $product->status="accepted";
+    }
     // ❗ Save product first to get its ID
     $product->save();
 
@@ -164,6 +168,12 @@ public function getAllProducts(){
    $products = Product::where('status', 'accepted')->get();
     return response()->json( $products);
 }
+public function getAllProductSeller(){
+    $products = Product::where('status', 'accepted')
+    ->where('created_by', session('admin_id'))
+    ->get();
+     return response()->json( $products);
+ }
 public function getProductsBySeller()
 {
     $sellerId = Auth::guard('admin')->id();
@@ -225,6 +235,46 @@ return response()->json($products);
             'message' => $e->getMessage(),
         ], 500);
     }
+}
+public function getAllAdminSellerProductDashboard()
+{
+    try {
+        $adminId = session('admin_id');
+
+        $products = Admin::where('type', 'S')
+            ->with(['products' => function ($query) use ($adminId) {
+                $query->whereIn('status', ['pending', 'rejected'])
+                      ->where('created_by', $adminId); // ✅ Filter by creator
+            }])
+            ->get()
+            ->flatMap(function ($seller) {
+                return $seller->products
+                    ->map(function ($product, $index) use ($seller) {
+                        return [
+                            'no' => $index + 1,
+                            'id' => '#DRD' . str_pad($product->id, 4, '0', STR_PAD_LEFT),
+                            'product' => $product->name,
+                            'date' => \Carbon\Carbon::parse($product->created_at)->format('m-d-Y'),
+                            'price' => $product->price,
+                            'qty' => $product->stock_quantity,
+                            'status' => ucfirst($product->status),
+                            'seller_name' => $seller->full_name,
+                        ];
+                    });
+            })
+            ->values();
+
+        return response()->json($products);
+
+    } catch (\Exception $e) {
+        Log::error('Error fetching seller products: ' . $e->getMessage());
+
+        return response()->json([
+            'error' => true,
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+
 }
 public function destroy($id)
 {
@@ -379,5 +429,55 @@ public function destroyReview($id)
 
     return response()->json(['message' => 'Review deleted successfully']);
 }
+public function getAllReviewSeller()
+{
+    $reviews = Product_Review::with(['user', 'product'])
+    ->whereHas('product', function ($query) {
+        $query->where('created_by', session('admin_id'));
+    })
+    ->latest()
+    ->get();
 
+    $formatted = $reviews->map(function ($review, $index) {
+        return [
+            'no' => $index + 1,
+            'id' => $review->id,
+            'productId' => '#ORD0000' . $review->product->id ?? '#ORD0000',
+            'reviewer' => $review->user->full_name ?? 'Anonymous',
+            'rate' => $review->rating,
+            'date' => Carbon::parse($review->created_at)->format('d M Y'),
+            'status' => $review->rating >= 4 ? 'Positive' : 'Negative',
+            'comment' => $review->review,
+
+        ];
+    });
+
+    return response()->json($formatted);
+}
+public function getTopProductSeller()
+{
+    $reviews = Product_Review::with('product')
+    ->whereHas('product', function ($query) {
+        $query->where('created_by', session('admin_id'));
+    })
+    ->latest()
+    ->get()
+    ->unique('product_id') // Only one review per product
+    ->values(); // Reset array keys
+
+    $topProducts = $reviews->map(function ($review) {
+        $product = $review->product;
+        if (!$product) return null; // in case product is soft-deleted or null
+
+        return [
+            'image'   => $product->image ? Storage::url($product->image) : asset('images/default.jpg'),
+            'name'    => $product->name,
+            'id'      => '#ORD0000' . $product->id, // Appending to ID
+            'rating'  => $product->averageRating(),
+            'reviews' => $product->totalReviews(),
+        ];
+    })->filter(); // remove nulls if any
+
+    return response()->json($topProducts);
+}
 }

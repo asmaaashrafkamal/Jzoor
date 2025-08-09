@@ -63,24 +63,20 @@ const TrackOrder = () => {
       try {
         const res = await axios.get(`http://localhost:8000/api/order/${orderId}`);
         const normalizedStatus = res.data.status?.toLowerCase().replace(/\s+/g, '_');
-
+    
         setOrder({
           ...res.data,
-          // status: normalizedStatus,
-          status_text:normalizedStatus,
+          status: normalizedStatus,     // this will match step.phase
+          status_text: res.data.status, // original for UI labels
         });
-  
-        console.log('Order:', res.data);
-        console.log('Normalized Status:', normalizedStatus);
-  
+    
         if (normalizedStatus === 'canceled') setIsCanceled(true);
-        console.log(order);
-        console.log(order.status);
-
+    
       } catch (error) {
         console.error("Failed to fetch order", error);
       }
     };
+    
 
     fetchOrder();
   }, [orderId]);
@@ -105,14 +101,15 @@ const TrackOrder = () => {
   
   const getSteps = () => {
     if (!order) return [];
-  
+
     const steps = [
       { id: 1, label: 'Waiting Picked up', date: order.waiting_pickup_at, phase: 'waiting_pickup' },
       { id: 2, label: 'Picked up', date: order.picked_up_at, phase: 'picked_up' },
-      { id: 3, label: 'In Transit', date: order.in_transit_at, phase: 'in_transit', showDriverInfo: true },
-      { id: 4, label: 'Out For Delivery', date: order.out_for_delivery_at, phase: 'out_for_delivery', showDriverInfo: true },
+      { id: 3, label: 'In Transit', date: order.in_transit_at, phase: 'in_transit', showDriverInfo: !!order.in_transit_at },
+      { id: 4, label: 'Out For Delivery', date: order.out_for_delivery_at, phase: 'out_for_delivery', showDriverInfo: !!order.out_for_delivery_at },
       { id: 5, label: 'Order Delivered', date: order.delivered_at, phase: 'delivered' },
     ];
+    
   
     const currentPhase = order.status?.toLowerCase();
     const currentIndex = steps.findIndex(s => s.phase === currentPhase);

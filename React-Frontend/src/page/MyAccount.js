@@ -93,6 +93,7 @@ if (response.status === 200 || response.status === 201) {
         setGender(u.customer_gender || '');
         setState(u.customer_state || '');
         setAdressName(u.customer_address || '');
+        setImage(u.customer_image || '');
          console.log(res.data.user);
         } else {
          // If no session, redirect to login page

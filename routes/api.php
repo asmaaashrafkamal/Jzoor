@@ -71,10 +71,7 @@ Route::get('/delivery-stats', [DeliveryController::class, 'stats']);
 Route::put('/delivery/{id}', [DeliveryController::class, 'delivery_update']);
 Route::delete('/delivery/{id}', [DeliveryController::class, 'delivery_destroy']);
 //---------------------------------------end orders admin dashboard--------------------------------
-//--------------------------------------delivery dashboard orders----------------------------------
-Route::get('/active-orders', [OrderController::class, 'getActiveOrders']);
-Route::get('/get_delivered_orders', [OrderController::class, 'getDeliveredOrders']);
-//---------------------------------------end orders delivery dashboard--------------------------------
+
 //----------------------------------------start seller dashboard-----------------------------------------
 Route::get('/Sget_customer/{sellerId}', [SellerController::class, 'get_customer']);
 Route::put('/Scustomers/{id}', [SellerController::class, 'customer_update']);
