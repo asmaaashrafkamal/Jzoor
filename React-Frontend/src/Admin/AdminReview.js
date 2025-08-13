@@ -21,7 +21,29 @@ export function ProductReview() {
   const [selectedReview, setSelectedReview] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [topRatedProducts, setTopRatedProducts] = useState([]);
-
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+    useEffect(() => {
+      axios.get("http://localhost:8000/check-login", { withCredentials: true })
+        .then(res => {
+           console.log(res.data);
+          if (res.data.role == "A"||res.data.role == "D") {
+           console.log(res.data.user);
+            setUser(res.data.user); // session data from backend
+          } else {
+           // If no session, redirect to login page
+            navigate("/admin/login");
+          }
+        })
+        .catch(() => {
+          // On any error, redirect to login page
+          navigate("/admin/login");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, [navigate]);
   
   
   // Product review data
@@ -356,19 +378,42 @@ export function ProductReview() {
             <h2 style={{ color: '#1F2937' }} className="text-base sm:text-lg font-semibold mb-3 sm:mb-0">Top Rated Products</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {topRatedProducts.map((product, index) => (
-              <div key={index} className="flex flex-col items-center text-center p-2">
-                <img src={product.image} alt={product.name} className="w-16 h-16 rounded-full object-cover mb-2" />
-                <p style={{ color: '#111827' }} className="text-sm font-medium">{product.name}</p>
-                <p style={{ color: '#6B7280' }} className="text-xs mb-1">{product.id}</p>
-                <div style={{ color: '#374151' }} className="flex items-center text-xs mb-1">
-                  <span className="mr-1">{product.rating}</span>
-                  {renderStars(Math.round(product.rating))}
-                </div>
-                <p style={{ color: '#6B7280' }} className="text-xs">({product.reviews} Customer Review)</p>
-              </div>
-            ))}
-          </div>
+  {Array.isArray(topRatedProducts) && topRatedProducts.length > 0 ? (
+    topRatedProducts.map((product, index) => (
+      <div
+        key={index}
+        className="flex flex-col items-center text-center p-2"
+      >
+        <img
+          src={product.image}
+          alt={product.name}
+          className="w-16 h-16 rounded-full object-cover mb-2"
+        />
+        <p style={{ color: '#111827' }} className="text-sm font-medium">
+          {product.name}
+        </p>
+        <p style={{ color: '#6B7280' }} className="text-xs mb-1">
+          {product.id}
+        </p>
+        <div
+          style={{ color: '#374151' }}
+          className="flex items-center text-xs mb-1"
+        >
+          <span className="mr-1">{product.rating}</span>
+          {renderStars(Math.round(product.rating))}
+        </div>
+        <p style={{ color: '#6B7280' }} className="text-xs">
+          ({product.reviews} Customer Review)
+        </p>
+      </div>
+    ))
+  ) : (
+    <p className="col-span-full text-center text-gray-500">
+      No top-rated products found.
+    </p>
+  )}
+</div>
+
         </div>
 
         {/* Reviews Table Section */}
@@ -440,38 +485,56 @@ export function ProductReview() {
                   </tr>
                 </thead>
                 <tbody style={{ backgroundColor: '#FFFFFF', divideColor: '#E5E7EB' }}>
-                  {currentReviews.map((review) => (
-                    <tr key={review.no}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#374151' }}>{review.no}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#374151' }}>{review.productId}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#111827' }}>{review.reviewer}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {renderStars(review.rate)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#374151' }}>{review.comment}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#6B7280' }}>{review.date}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full`} style={getStatusClasses(review.status)}>
-                          {review.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex items-center space-x-3">
-                          <button onClick={() => handleViewReview(review)} style={{ color: '#6B7280' }} className="hover:text-gray-700">
-                            <MdOutlineRemoveRedEye className="w-5 h-5" />
-                          </button>
-                          {/* Delete button with hover effect */}
-                          <button
-                            onClick={() => handleDeleteReview(review.id)}
-                            className="text-gray-500 hover:text-red transition-colors duration-200"
-                          >
-                            <MdDelete className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+  {currentReviews.length > 0 ? (
+    currentReviews.map((review) => (
+      <tr key={review.no}>
+        <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#374151' }}>{review.no}</td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#374151' }}>{review.productId}</td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#111827' }}>{review.reviewer}</td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          {renderStars(review.rate)}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#374151' }}>{review.comment}</td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#6B7280' }}>{review.date}</td>
+        <td className="px-6 py-4 whitespace-nowrap">
+          <span
+            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full`}
+            style={getStatusClasses(review.status)}
+          >
+            {review.status}
+          </span>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => handleViewReview(review)}
+              style={{ color: '#6B7280' }}
+              className="hover:text-gray-700"
+            >
+              <MdOutlineRemoveRedEye className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => handleDeleteReview(review.id)}
+              className="text-gray-500 hover:text-red transition-colors duration-200"
+            >
+              <MdDelete className="w-5 h-5" />
+            </button>
+          </div>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td
+        colSpan="8"
+        className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500"
+      >
+        No reviews found.
+      </td>
+    </tr>
+  )}
+</tbody>
+
               </table>
             </div>
           </div>

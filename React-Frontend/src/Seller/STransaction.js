@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Title from './components/Title';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 // Dashboard Card Component (كما هو)
 const DashboardCard = ({ title, value, change, isPositive }) => (
   <div className="p-6 rounded-lg shadow-md flex flex-col justify-between" style={{ backgroundColor: '#FFFFFF' }}>
     <div className="flex justify-between items-start mb-4">
       <h3 className="text-sm font-medium" style={{ color: '#6B7280' }}>{title}</h3>
-      <svg
+      {/* <svg
         className="cursor-pointer"
         style={{ color: '#9CA3AF' }}
         width="20"
@@ -18,7 +20,7 @@ const DashboardCard = ({ title, value, change, isPositive }) => (
         <path
           d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
         ></path>
-      </svg>
+      </svg> */}
     </div>
     <div className="flex items-end justify-between">
       <span className="text-3xl font-semibold" style={{ color: '#111827' }}>{value}</span>
@@ -30,96 +32,179 @@ const DashboardCard = ({ title, value, change, isPositive }) => (
   </div>
 );
 
-// Payment Method Card Component (كما هو)
-const PaymentMethodCard = () => (
-  <div className="p-6 rounded-lg shadow-md" style={{ backgroundColor: '#FFFFFF' }}>
-    <div className="flex justify-between items-start mb-4">
-      <h3 className="text-sm font-medium" style={{ color: '#6B7280' }}>Payment Method</h3>
-      <svg
-        className="cursor-pointer"
-        style={{ color: '#9CA3AF' }}
-        width="20"
-        height="20"
-        fill="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-        ></path>
-      </svg>
-    </div>
+// // Payment Method Card Component (كما هو)
+// const PaymentMethodCard = () => {
+//   const [summary, setSummary] = useState({ transactions: 0, revenue: 0, status: 'Loading' });
 
-    <div className="flex flex-col md:flex-row items-center gap-4">
-      {/* Credit Card Mockup */}
-      <div className="relative w-full max-w-sm h-48 rounded-xl shadow-lg p-6 text-white flex flex-col justify-between overflow-hidden"
-           style={{ background: 'linear-gradient(to bottom right, #4ADE80, #16A34A)' }}>
-        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://placehold.co/600x400/ffffff/000000?text=Card+Pattern')] bg-repeat opacity-10"></div>
-        <div className="flex justify-between items-center z-10">
-          <span className="text-sm font-bold tracking-widest">VISA</span>
-          [Image of a credit card chip]
-        </div>
-        <div className="text-2xl tracking-widest font-mono z-10">
-          **** **** **** 2345
-        </div>
-        <div className="flex justify-between items-end z-10">
-          <div>
-            <div className="text-xs opacity-75">Card Holder</div>
-            <div className="text-sm font-semibold">Burhan Moraveh</div>
-          </div>
-          <div>
-            <div className="text-xs opacity-75">Expires</div>
-            <div className="text-sm font-semibold">02/30</div>
-          </div>
-        </div>
-      </div>
+//   useEffect(() => {
+//     axios.get('http://localhost:8000/api/payment-summary', { withCredentials: true })
+//       .then(res => {
+//         setSummary(res.data);
+//       })
+//       .catch(err => {
+//         console.error('Failed to fetch summary:', err);
+//       });
+//   }, []);
 
-      {/* Payment Details */}
-      <div className="flex-1 w-full mt-4 md:mt-0">
-        <div className="text-sm" style={{ color: '#4B5563' }}>
-          <p className="mb-2">
-            Status: <span className="font-semibold" style={{ color: '#059669' }}>Active</span>
-          </p>
-          <p className="mb-2">
-            Transactions: <span className="font-semibold">1,250</span>
-          </p>
-          <p className="mb-4">
-            Revenue: <span className="font-semibold">$50,000</span>
-          </p>
-          <a href="#" className="hover:underline text-sm font-medium" style={{ color: '#2563EB' }}>
-            View Transactions
-          </a>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3 mt-4">
-          <button className="flex items-center justify-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium"
-            style={{ color: '#4B5563', backgroundColor: '#FFFFFF', borderColor: '#D1D5DB' }}>
-            <svg className="mr-2 -ml-1 w-5 h-5" style={{ color: '#4B5563' }} fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd"></path></svg>
-            Add Card
-          </button>
-          <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
-            style={{ backgroundColor: '#EF4444' }}>
-            Deactivate
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-);
+//   return (
+//   <div className="p-6 rounded-lg shadow-md" style={{ backgroundColor: '#FFFFFF' }}>
+//     <div className="flex justify-between items-start mb-4">
+//       <h3 className="text-sm font-medium" style={{ color: '#6B7280' }}>Payment Method</h3>
+//       <svg
+//         className="cursor-pointer"
+//         style={{ color: '#9CA3AF' }}
+//         width="20"
+//         height="20"
+//         fill="currentColor"
+//         viewBox="0 0 24 24"
+//         xmlns="http://www.w3.org/2000/svg"
+//       >
+//         <path
+//           d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+//         ></path>
+//       </svg>
+//     </div>
 
+//     <div className="flex flex-col md:flex-row items-center gap-4">
+//       {/* Credit Card Mockup */}
+//       <div className="relative w-full max-w-sm h-48 rounded-xl shadow-lg p-6 text-white flex flex-col justify-between overflow-hidden"
+//            style={{ background: 'linear-gradient(to bottom right, #4ADE80, #16A34A)' }}>
+//         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://placehold.co/600x400/ffffff/000000?text=Card+Pattern')] bg-repeat opacity-10"></div>
+//         <div className="flex justify-between items-center z-10">
+//           <span className="text-sm font-bold tracking-widest">VISA</span>
+//           [Image of a credit card chip]
+//         </div>
+//         <div className="text-2xl tracking-widest font-mono z-10">
+//           **** **** **** 2345
+//         </div>
+//         <div className="flex justify-between items-end z-10">
+//           <div>
+//             <div className="text-xs opacity-75">Card Holder</div>
+//             <div className="text-sm font-semibold">Burhan Moraveh</div>
+//           </div>
+//           <div>
+//             <div className="text-xs opacity-75">Expires</div>
+//             <div className="text-sm font-semibold">02/30</div>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Payment Details */}
+//    <div className="flex-1 w-full mt-4 md:mt-0">
+//   <div className="text-sm" style={{ color: '#4B5563' }}>
+//     <p className="mb-2">
+//       Status: <span className="font-semibold" style={{ color: summary.status === 'VIP' ? '#D97706' : summary.status === 'Active' ? '#059669' : '#9CA3AF' }}>
+//         {summary.status}
+//       </span>
+//     </p>
+//     <p className="mb-2">
+//       Transactions: <span className="font-semibold">{summary.transactions.toLocaleString()}</span>
+//     </p>
+//     <p className="mb-4">
+//       Revenue: <span className="font-semibold">${summary.revenue.toLocaleString()}</span>
+//     </p>
+//     <a href="#" className="hover:underline text-sm font-medium" style={{ color: '#2563EB' }}>
+//       View Transactions
+//     </a>
+//   </div>
+
+//   <div className="flex flex-col sm:flex-row gap-3 mt-4">
+//     <button className="flex items-center justify-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium"
+//       style={{ color: '#4B5563', backgroundColor: '#FFFFFF', borderColor: '#D1D5DB' }}>
+//       <svg className="mr-2 -ml-1 w-5 h-5" style={{ color: '#4B5563' }} fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd"></path></svg>
+//       Add Card
+//     </button>
+//     <button className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white"
+//       style={{ backgroundColor: '#EF4444' }}>
+//       Deactivate
+//     </button>
+//   </div>
+// </div>
+
+//     </div>
+//   </div>
+//   );
+// };
 // Main App Component
 const AppTransaction = () => {
-  const [transactions, setTransactions] = useState([
-    { id: '#CUST001', customerName: 'John Doe', date: '01-01-2025', total: '$2,904', method: 'CC', status: 'Completed' }, // Changed 'Completo' to 'Completed'
-    { id: '#CUST002', customerName: 'John Doe', date: '01-01-2025', total: '$2,904', method: 'PayPal', status: 'Completed' }, // Changed 'Completo' to 'Completed'
-    { id: '#CUST003', customerName: 'John Doe', date: '01-01-2025', total: '$2,904', method: 'CC', status: 'Completed' }, // Changed 'Completo' to 'Completed'
-    { id: '#CUST004', customerName: 'John Doe', date: '01-01-2025', total: '$2,904', method: 'Bank', status: 'Completed' }, // Changed 'Completo' to 'Completed'
-    { id: '#CUST005', customerName: 'Jane Smith', date: '01-01-2025', total: '$2,904', method: 'CC', status: 'Canceled' },
-    { id: '#CUST006', customerName: 'Emily Davis', date: '01-01-2025', total: '$2,904', method: 'PayPal', status: 'Pending' },
-    { id: '#CUST007', customerName: 'Jane Smith', date: '01-01-2025', total: '$2,904', method: 'Bank', status: 'Canceled' },
-    { id: '#CUST008', customerName: 'John Doe', date: '01-01-2025', total: '$2,904', method: 'CC', status: 'Completed' },
-    { id: '#CUST009', customerName: 'Jane Smith', date: '01-01-2025', total: '$2,904', method: 'PayPal', status: 'Pending' },
-    { id: '#CUST010', customerName: 'Jane Smith', date: '01-01-2025', total: '$2,904', method: 'Bank', status: 'Canceled' },
-  ]);
+    const [transactions, setTransactions] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const [user, setUser] = useState(null);
+      useEffect(() => {
+        axios.get("http://localhost:8000/check-login", { withCredentials: true })
+          .then(res => {
+             console.log(res.data);
+            if (res.data.role == "S") {
+             console.log(res.data.user);
+              setUser(res.data.user); // session data from backend
+            } else {
+             // If no session, redirect to login page
+              navigate("/SellerLogin");
+            }
+          })
+          .catch(() => {
+            // On any error, redirect to login page
+            navigate("/SellerLogin");
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }, [navigate]);
+    
+      useEffect(() => {
+        if (!user || !user.admin_id) return; // Wait until user is loaded
+      
+        axios
+          .get(`http://localhost:8000/STget_customer/${user.admin_id}`)
+          .then(res => {
+            const users = res.data;
+            let counter = 1;
+            const merged = [];
+      
+            users.forEach(user => {
+              user.orders.forEach(order => {
+                const payment = order.payment || {};
+                const total = parseFloat(order.total_price || 0);
+      
+                const dateObj = new Date(order.updated_at || order.created_at);
+                const orderDate = `${dateObj.toLocaleDateString('en-GB', {
+                  day: '2-digit',
+                  month: 'short'
+                })} | ${dateObj.toLocaleTimeString('en-US', {
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}`;
+      
+                merged.push({
+                  id: `#TX${order.id}`,
+                  customerName: user.full_name,
+                  date: orderDate,
+                  total: `$${total.toFixed(2)}`,
+                  method: payment.payment_method || 'Unknown',
+                  status: payment.payment_status || 'Pending',
+                  transactionId: payment.transaction_id || 'Not Paid Yet'
+                });
+              });
+            });
+      
+            setTransactions(merged);
+          })
+          .catch(err => console.error('Failed to fetch transactions:', err));
+      }, [user]); // Run when user changes
+      
+//   const [transactions, setTransactions] = useState([
+//     { id: '#CUST001', customerName: 'John Doe', date: '01-01-2025', total: '$2,904', method: 'CC', status: 'Completed' }, // Changed 'Completo' to 'Completed'
+//     { id: '#CUST002', customerName: 'John Doe', date: '01-01-2025', total: '$2,904', method: 'PayPal', status: 'Completed' }, // Changed 'Completo' to 'Completed'
+//     { id: '#CUST003', customerName: 'John Doe', date: '01-01-2025', total: '$2,904', method: 'CC', status: 'Completed' }, // Changed 'Completo' to 'Completed'
+//     { id: '#CUST004', customerName: 'John Doe', date: '01-01-2025', total: '$2,904', method: 'Bank', status: 'Completed' }, // Changed 'Completo' to 'Completed'
+//     { id: '#CUST005', customerName: 'Jane Smith', date: '01-01-2025', total: '$2,904', method: 'CC', status: 'Canceled' },
+//     { id: '#CUST006', customerName: 'Emily Davis', date: '01-01-2025', total: '$2,904', method: 'PayPal', status: 'Pending' },
+//     { id: '#CUST007', customerName: 'Jane Smith', date: '01-01-2025', total: '$2,904', method: 'Bank', status: 'Canceled' },
+//     { id: '#CUST008', customerName: 'John Doe', date: '01-01-2025', total: '$2,904', method: 'CC', status: 'Completed' },
+//     { id: '#CUST009', customerName: 'Jane Smith', date: '01-01-2025', total: '$2,904', method: 'PayPal', status: 'Pending' },
+//     { id: '#CUST010', customerName: 'Jane Smith', date: '01-01-2025', total: '$2,904', method: 'Bank', status: 'Canceled' },
+//   ]);
 
   // Changed 'All order' to 'All' for simpler comparison
   const [activeTab, setActiveTab] = useState('All');
@@ -205,48 +290,53 @@ const AppTransaction = () => {
         return a - b;
     });
   };
+const [summary, setSummary] = useState({ transactions: 0, revenue: 0, status: 'Loading' });
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/api/payment-summary', { withCredentials: true })
+      .then(res => {
+        setSummary(res.data);
+      })
+      .catch(err => {
+        console.error('Failed to fetch summary:', err);
+      });
+  }, []);
 
 
   return (
-    <div className="min-h-screen p-4 font-inter" style={{ backgroundColor: '#F3F4F6' }}>
-   
+    <div className="min-h-screen p-6 font-inter" style={{ backgroundColor: '#F3F4F6' }}>
+      <header className="mb-4">
         <Title title="Transaction Overview" />
-      
+        {/* <h1 className="text-3xl font-bold" style={{ color: '#1F2937' }}>Transaction Overview</h1> */}
+      </header>
 
-      <div className="flex flex-col lg:flex-row gap-4">
-        {/* Dashboard Cards Section */}
-        <div className="grid grid-cols-1 w-full  md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <DashboardCard
-            title="Total Revenue"
-            value="$15,045"
-            change="14.4%"
-            isPositive={true}
-          />
-          <DashboardCard
-            title="Completed Transactions"
-            value="3,150"
-            change="20%"
-            isPositive={true}
-          />
-          <DashboardCard
-            title="Pending Transactions"
-            value="150"
-            change="05%"
-            isPositive={true}
-          />
-          <DashboardCard
-            title="Failed Transactions"
-            value="75"
-            change="15%"
-            isPositive={false}
-          />
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full mb-6">
+  <DashboardCard
+    title="Total Revenue"
+    value={summary.revenue.toLocaleString()}
+    change="14.4%"
+    isPositive={true}
+  />
+  <DashboardCard
+    title="Completed Transactions"
+    value={summary.transactions.toLocaleString()}
+    change="20%"
+    isPositive={true}
+  />
+  <DashboardCard
+    title="Pending Transactions"
+    value={summary.deliveredCashTransactions}
+    change="05%"
+    isPositive={true}
+  />
+  <DashboardCard
+    title="Failed Transactions"
+    value="75"
+    change="15%"
+    isPositive={false}
+  />
+</div>
 
-        {/* Payment Method Card */}
-        {/* <div className="mb-6 w-full lg:w-1/2 ">
-          <PaymentMethodCard />
-        </div> */}
-      </div>
 
       {/* Transactions Table Section */}
       <div className="p-6 rounded-lg shadow-md" style={{ backgroundColor: '#FFFFFF' }}>
@@ -307,7 +397,7 @@ const AppTransaction = () => {
             <table className="w-full divide-y" style={{ borderColor: '#E5E7EB' }}>
               <thead style={{ backgroundColor: '#F9FAFB' }}>
                 <tr>
-                  {['Transaction Id', 'Customer name', 'Date', 'Total', 'Method', 'Status', 'Action'].map(header => (
+                  {['Id','Transaction Id', 'Customer name', 'Date', 'Total', 'Method', 'Status', 'Action'].map(header => (
                     <th
                       key={header}
                       className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
@@ -323,6 +413,7 @@ const AppTransaction = () => {
                   currentItems.map((transaction, index) => (
                     <tr key={transaction.id}> {/* Using transaction.id as key for better performance */}
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#111827' }}>{transaction.id}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#111827' }}>{transaction.transactionId}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#6B7280' }}>{transaction.customerName}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#6B7280' }}>{transaction.date}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: '#6B7280' }}>{transaction.total}</td>
@@ -331,12 +422,12 @@ const AppTransaction = () => {
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full`}
                           style={{
                             backgroundColor:
-                              transaction.status === 'Completed' ? '#D1FAE5' : // Changed 'Completo' to 'Completed'
-                              transaction.status === 'Pending' ? '#FEF3C7' :
+                              transaction.status === 'paid'?'#D1FAE5' : // Changed 'Completo' to 'Completed'
+                              transaction.status === 'cash' ? '#FEF3C7' :
                               transaction.status === 'Canceled' ? '#FEE2E2' : '',
                             color:
-                              transaction.status === 'Completed' ? '#065F46' : // Changed 'Completo' to 'Completed'
-                              transaction.status === 'Pending' ? '#92400E' :
+                              transaction.status === 'paid' ? '#065F46' : // Changed 'Completo' to 'Completed'
+                              transaction.status === 'cash' ? '#92400E' :
                               transaction.status === 'Canceled' ? '#991B1B' : ''
                           }}
                         >
@@ -371,7 +462,7 @@ const AppTransaction = () => {
           <span className="text-sm" style={{ color: '#4B5563' }}>
             Showing <span className="font-semibold">{filteredTransactions.length > 0 ? indexOfFirstItem + 1 : 0}</span> to <span className="font-semibold">{indexOfFirstItem + currentItems.length}</span> of <span className="font-semibold">{filteredTransactions.length}</span> entries
           </span>
-          <nav className="flex flex-col md:flex-row justify-between items-center items-center space-x-2">
+          <nav className="flex flex-col md:flex-row items-center space-x-2">
             <button
               onClick={handlePrevious}
               disabled={currentPage === 1}
@@ -380,26 +471,31 @@ const AppTransaction = () => {
             >
               ← Previous
             </button>
-            <div className="flex space-x-1">
-              {renderPageNumbers().map((page, index) => (
-                <button
-                  key={index}
-                  onClick={() => typeof page === 'number' && paginate(page)}
-                  className={`px-4 py-2 text-sm font-medium rounded-md
-                    ${typeof page !== 'number' ? 'cursor-default border-transparent bg-transparent hover:bg-transparent' : ''}
-                  `}
-                  style={{
-                    backgroundColor: currentPage === page ? '#2563EB' : '#FFFFFF',
-                    color: currentPage === page ? '#FFFFFF' : '#4B5563',
-                    borderColor: currentPage === page ? '#2563EB' : '#D1D5DB',
-                    boxShadow: currentPage === page ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' : 'none'
-                  }}
-                  disabled={typeof page !== 'number'}
-                >
-                  {page}
-                </button>
-              ))}
-            </div>
+           <div className="flex space-x-1">
+  {renderPageNumbers().map((page, index) => (
+    <button
+      key={index}
+      onClick={() => typeof page === 'number' && paginate(page)}
+      className={`
+        px-4 py-2 text-sm font-medium rounded-md
+        ${typeof page !== 'number' ? 'cursor-default border-transparent bg-transparent hover:bg-transparent' : ''}
+        ${index > 1 && index < renderPageNumbers().length - 2 ? 'hidden md:inline-block' : 'inline-block'}
+      `}
+      style={{
+        backgroundColor: currentPage === page ? '#2563EB' : '#FFFFFF',
+        color: currentPage === page ? '#FFFFFF' : '#4B5563',
+        borderColor: currentPage === page ? '#2563EB' : '#D1D5DB',
+        boxShadow: currentPage === page
+          ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+          : 'none'
+      }}
+      disabled={typeof page !== 'number'}
+    >
+      {page}
+    </button>
+  ))}
+</div>
+
             <button
               onClick={handleNext}
               disabled={currentPage === totalPages}

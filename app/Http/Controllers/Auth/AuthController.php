@@ -49,7 +49,7 @@ public function register(Request $request)
     if ($validated['account_type'] === "Seller") {
         $data['type']="S";
         $user = Admin::create($data);
-        Auth::guard('Admin')->login($user);
+        Auth::guard('admin')->login($user);
     } else {
        $data['type']="C";
         $user = User::create($data);

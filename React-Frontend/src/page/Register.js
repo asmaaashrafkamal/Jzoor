@@ -55,7 +55,7 @@ const Register = () => {
       }
     );
 
-    if (response.status === 201) {
+    if (response.status === 201 || response.status ===200) {
       alert("Registration successful! Please log in.");
       navigate(accountType === "Seller" ? "/SellerLogin" : "/Login");
     }

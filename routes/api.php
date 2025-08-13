@@ -50,6 +50,7 @@ Route::middleware(['auth.session'])->group(function () {
 //-------------------------------------------------------------------------------------------
 //--------------------------------------admin dashboard orders----------------------------------
 Route::get('/orders', [OrderController::class, 'index']);
+Route::get('/SellerOrders/{id}', [OrderController::class, 'SellerOrders']);
 Route::get('/order/{orderId}', [OrderController::class, 'show']);
 Route::put('/orders/{id}/status', [OrderController::class, 'updateStatus']);
 Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
@@ -80,6 +81,7 @@ Route::get('/Smonthly-customers', [SellerController::class, 'monthlyCustomers'])
 Route::get('/Scustomer-stats', [SellerController::class, 'Cstats']);
 //----------------------------------------end seller dashboard-----------------------------------------
 Route::get('/Tget_customer', [TransactionController::class, 'get_customer']);
+
 Route::get('/payment-summary', [TransactionController::class, 'getAllTransactionsStats']);
 
 // Route::get('/chat/admin/{adminId}', [ChatController::class, 'getMessagesFromDriver']);

@@ -24,6 +24,23 @@ public function index(Request $request)
 
     return response()->json($orders);
 }
+public function SellerOrders(Request $request, $id)
+{
+    $orders = Order::with([
+        'user',
+        'items.product.creator',
+        'payment',
+        'deliveryPerson'
+    ])
+    ->whereHas('items.product.creator', function ($query) use ($id) {
+        $query->where('id', $id);
+    })
+    ->latest()
+    ->get();
+
+    return response()->json($orders);
+}
+
 // In your OrderController.php
 
 public function show($orderId)

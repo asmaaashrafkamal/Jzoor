@@ -10,6 +10,7 @@ use App\Http\Controllers\Home\LandingPageController;
 use App\Http\Controllers\Home\StripeController;
 use App\Http\Controllers\Home\ProfileController;
 use App\Http\Controllers\Home\ChatController;
+use App\Http\Controllers\site\TransactionController;
 
 
 /*
@@ -60,6 +61,7 @@ Route::get('/check-login', function () {
     Route::post( '/categories', [CategoryController::class, 'store']);
     Route::put('/categories/{id}', [CategoryController::class, 'update']);
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+    Route::get('/STget_customer/{id}', [TransactionController::class, 'Sget_customer']);
 
     Route::prefix('articles')->group(function () {
     Route::get('/', [ArticleController::class, 'index']);

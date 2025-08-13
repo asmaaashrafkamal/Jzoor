@@ -106,7 +106,7 @@ const TrackOrder = () => {
       { id: 1, label: 'Waiting Picked up', date: order.waiting_pickup_at, phase: 'waiting_pickup' },
       { id: 2, label: 'Picked up', date: order.picked_up_at, phase: 'picked_up' },
       { id: 3, label: 'In Transit', date: order.in_transit_at, phase: 'in_transit', showDriverInfo: !!order.in_transit_at },
-      { id: 4, label: 'Out For Delivery', date: order.out_for_delivery_at, phase: 'out_for_delivery', showDriverInfo: !!order.out_for_delivery_at },
+      // { id: 4, label: 'Out For Delivery', date: order.out_for_delivery_at, phase: 'out_for_delivery', showDriverInfo: !!order.out_for_delivery_at },
       { id: 5, label: 'Order Delivered', date: order.delivered_at, phase: 'delivered' },
     ];
     

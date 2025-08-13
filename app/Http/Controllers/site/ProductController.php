@@ -384,6 +384,7 @@ public function getAllReviews()
             'id' => $review->id,
             'productId' => '#ORD0000' . $review->product->id ?? '#ORD0000',
             'reviewer' => $review->user->full_name ?? 'Anonymous',
+            'image' => $review->user->image ?? 'Anonymous',
             'rate' => $review->rating,
             'date' => Carbon::parse($review->created_at)->format('d M Y'),
             'status' => $review->rating >= 4 ? 'Positive' : 'Negative',

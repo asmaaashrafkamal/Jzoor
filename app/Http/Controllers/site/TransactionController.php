@@ -15,7 +15,18 @@ public function get_customer()
 {
     return User::with('orders.payment')->get();
 }
-
+public function Sget_customer($id)
+{
+    return User::whereHas('orders.items.product', function ($q) use ($id) {
+        $q->where('created_by', $id);
+    })
+    ->with(['orders' => function ($orderQuery) use ($id) {
+        $orderQuery->whereHas('items.product', function ($productQuery) use ($id) {
+            $productQuery->where('created_by', $id);
+        })->with(['payment', 'items.product']);
+    }])
+    ->get();
+}
 public function getAllTransactionsStats()
 {
  $cardOrders = Order::whereHas('payment', function ($q) {

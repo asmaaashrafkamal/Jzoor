@@ -32,11 +32,29 @@ const clearCart = () => {
   const stripe = useStripe();
   const elements = useElements();
 
-  const total = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
+  const { total, discountTotal } = cart.reduce(
+    (acc, item) => {
+      const price = parseFloat(item.price);
+      const discountPercent = parseFloat(item.discounted_price) || 0; // e.g. 10 means 10%
+      const discountAmount = (price * discountPercent) / 100; // actual amount saved per item
+      const finalPrice = price - discountAmount;
+  
+      acc.total += finalPrice * item.quantity; // total after discount
+      acc.discountTotal += discountAmount * item.quantity; // total discount value
+      return acc;
+    },
+    { total: 0, discountTotal: 0 }
   );
-
+  
+  console.log("Total after discount:", total);
+  console.log("Total discount amount:", discountTotal);
+  
+  
+  console.log("Total after discount:", total);
+  console.log("Total discount amount:", discountTotal);
+  
+  
+console.log(cart);
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
     if (storedCart) {
@@ -249,23 +267,20 @@ const clearCart = () => {
             )}
             </div>
 
-            <div className="border-t pt-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span>${total.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Shipping</span>
-                <span>Free</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Discount</span>
-                <span>$0</span>
-              </div>
-              <div className="flex justify-between text-lg font-bold pt-2">
-                <span>Total</span>
-                <span>${total.toFixed(2)}</span>
-              </div>
+          <div className="border-t pt-4 space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span>Subtotal</span>
+              <span>${(total + discountTotal).toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Discount</span>
+              <span>-${discountTotal.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-lg font-bold pt-2">
+              <span>Total</span>
+              <span>${total.toFixed(2)}</span>
+            </div>
+
               <button onClick={handlePlaceOrder} className="bg-[#B22222] text-white w-full mt-4 py-2 rounded hover:bg-[#a61b1b]">Place Order</button>
             </div>
           </div>
