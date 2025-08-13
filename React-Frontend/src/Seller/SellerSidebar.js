@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FaChartLine, FaUsers, FaTags } from 'react-icons/fa';
 import { FaCartShopping } from "react-icons/fa6";
@@ -11,7 +11,8 @@ import { CiLogin } from "react-icons/ci";
 import { AiOutlineShop } from "react-icons/ai";
 import { LuSquareArrowOutUpRight } from "react-icons/lu";
 import { IoIosSettings } from "react-icons/io";
-
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 const SellerSidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const links = [
     { to: '/seller', label: 'Dashboard', icon: <FaChartLine />, end: true },
@@ -25,7 +26,29 @@ const SellerSidebar = ({ sidebarOpen, setSidebarOpen }) => {
     { to: '/seller/productList', label: 'Product List', icon: <CgList /> },
     { to: '/seller/productReview', label: 'Product Review', icon: <MdOutlineReviews /> },
   ];
-
+  const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const [user, setUser] = useState(null);
+      useEffect(() => {
+        axios.get("http://localhost:8000/check-login", { withCredentials: true })
+          .then(res => {
+             console.log(res.data);
+            if (res.data.role == "S") {
+             console.log(res.data.user);
+              setUser(res.data.user); // session data from backend
+            } else {
+             // If no session, redirect to login page
+              navigate("/SellerLogin");
+            }
+          })
+          .catch(() => {
+            // On any error, redirect to login page
+            navigate("/SellerLogin");
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }, [navigate]);
   return (
     <aside
       className={`bg-white text-black sm:min-h-screen md:h-auto p-4 shadow-md fixed h-screen overflow-y-auto custom-scroll-hide top-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out
@@ -87,12 +110,20 @@ const SellerSidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
       {/* بيانات المستخدم */}
       <div className="pt-8 flex items-center justify-between">
-        <img src="/imges/seller.webp" alt="user" className="w-[40px]" />
-        <div className="text-sm">
-          <span className="block">Ahmad Kanaan</span>
-        </div>
-        <CiLogin className="text-xl" />
-      </div>
+  <img
+     src={
+      user && user.admin_image
+        ? `http://localhost:8000/storage/${user.admin_image}`
+        : "/images/default-seller.png"
+    }
+    alt={user?.admin_name || "Seller"}
+    className="w-[40px] h-[40px] rounded-full object-cover"
+  />
+  <div className="text-sm">
+    <span className="block">{user?.admin_name || "Loading..."}</span>
+  </div>
+  <CiLogin className="text-xl" />
+</div>
 
       <div className="pt-4 flex items-center justify-between">
         <AiOutlineShop className="text-3xl" />

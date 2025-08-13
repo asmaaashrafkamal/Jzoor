@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FaChartLine, FaUsers, FaTags } from 'react-icons/fa';
 import { FaCartShopping } from "react-icons/fa6";
@@ -12,7 +12,8 @@ import { AiOutlineShop } from "react-icons/ai";
 import { LuSquareArrowOutUpRight } from "react-icons/lu";
 import { IoIosSettings } from "react-icons/io";
 import { Link } from 'react-router-dom';
-
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 const DeliverySidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const links = [
     { to: '/delivery', label: 'Dashboard', icon: <FaChartLine />, end: true },
@@ -20,7 +21,29 @@ const DeliverySidebar = ({ sidebarOpen, setSidebarOpen }) => {
     { to: '/delivery/archeived', label: 'Archeived Deliveries', icon: <FaUsers /> },
       { to: '/delivery/message', label: 'Message', icon: <GrTransaction /> },
   ];
-
+  const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const [user, setUser] = useState(null);
+      useEffect(() => {
+        axios.get("http://localhost:8000/check-login", { withCredentials: true })
+          .then(res => {
+             console.log(res.data);
+            if (res.data.role == "D") {
+             console.log(res.data.user);
+              setUser(res.data.user); // session data from backend
+            } else {
+             // If no session, redirect to login page
+              navigate("/admin/login");
+            }
+          })
+          .catch(() => {
+            // On any error, redirect to login page
+            navigate("/admin/login");
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }, [navigate]);
 
 
   return (
@@ -69,7 +92,13 @@ const DeliverySidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
       {/* بيانات المستخدم */}
       <Link to="/delivery/login" className="text-black pt-8 no-underline flex items-center justify-between">
-        <img src="/imges/deivery.webp" alt="user" className="w-[40px]" />
+         <img     src={
+            user && user.admin_image
+              ? `http://localhost:8000/storage/${user.admin_image}`
+              : "/images/default-seller.png"
+          }
+          alt={user?.admin_name || "Delivery"}
+          className="w-[40px]" />
         <div className="text-sm">
           <span className="block">Ahmad Kanaan</span>
         </div>

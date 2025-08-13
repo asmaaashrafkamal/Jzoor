@@ -23,6 +23,28 @@ const toggleDropdown = () => setDropdownOpen((prev) => !prev);
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+    useEffect(() => {
+      axios.get("http://localhost:8000/check-login", { withCredentials: true })
+        .then(res => {
+           console.log(res.data);
+          if (res.data.role == "D") {
+           console.log(res.data.user);
+            setUser(res.data.user); // session data from backend
+          } else {
+           // If no session, redirect to login page
+            navigate("/admin/login");
+          }
+        })
+        .catch(() => {
+          // On any error, redirect to login page
+          navigate("/admin/login");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, [navigate]);
 
   // Handle logout request
   const handleLogout = async () => {
@@ -88,8 +110,12 @@ const toggleDropdown = () => setDropdownOpen((prev) => !prev);
             onClick={toggleDropdown}
           >
             <img
-             src="/imges/deivery.webp"
-              alt="user"
+         src={
+          user && user.admin_image
+            ? `http://localhost:8000/storage/${user.admin_image}`
+            : "/images/default-seller.png"
+        }
+        alt={user?.admin_name || "Delivery"}
               className="w-[40px] rounded-full border"
             />
           </div>
