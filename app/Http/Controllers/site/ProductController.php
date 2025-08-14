@@ -382,7 +382,7 @@ public function getAllReviews()
         return [
             'no' => $index + 1,
             'id' => $review->id,
-            'productId' => '#ORD0000' . $review->product_id ?? '#ORD0000',
+            'productId' => '#ORD0000' . $review->product_id ,
             'reviewer' => $review->user->full_name ?? 'Anonymous',
             'image' => $review->user->image ?? 'Anonymous',
             'rate' => $review->rating,
