@@ -100,7 +100,7 @@ const DeliverySidebar = ({ sidebarOpen, setSidebarOpen }) => {
           alt={user?.admin_name || "Delivery"}
           className="w-[40px]" />
         <div className="text-sm">
-          <span className="block">Ahmad Kanaan</span>
+          <span className="block">{user?.admin_name || "Delivery"}</span>
         </div>
         <CiLogin className="text-xl" />
       </Link>

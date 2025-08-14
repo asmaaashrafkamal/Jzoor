@@ -115,13 +115,13 @@ Route::post('/product-reviews', [ProductController::class, 'storeReview']);
 
 // Get reviews for a specific product
 Route::get('/product-reviews/{productId}', [ProductController::class, 'getProductReviews']);
-Route::get('/all-reviews', [ProductController::class, 'getAllReviews']);// admin
 Route::get('/top-product', [ProductController::class, 'getTopProduct']);//admin
 Route::get('/all-reviews-seller', [ProductController::class, 'getAllReviewSeller']);//seller
 Route::get('/top-product-seller', [ProductController::class, 'getTopProductSeller']);//seller
 Route::delete('/destroy/{id}', [ProductController::class, 'destroyReview']);
 
     });
+    Route::get('/all-reviews', [ProductController::class, 'getAllReviews']);// admin
 
 
     Route::get('/{any}', function () {

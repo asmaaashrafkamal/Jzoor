@@ -9,7 +9,16 @@ const ProductDetails = () => {
   const [colors, setColors] = useState([]);
   const [sizes, setSizes] = useState([]);
   const navigate = useNavigate();
-  const { state } = useLocation();
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [image, setImage] = useState(null);
+  const [gender, setGender] = useState('');
+  const [state, setState] = useState('');
+  const [address, setAdressName] = useState('');
+  const [Birth_date, setBirthDate] = useState('');
+  const [phone, setPhone] = useState('');
 const sellerName = state?.sellerName || localStorage.getItem("sellerName");
 
   const {
@@ -30,6 +39,36 @@ const sellerName = state?.sellerName || localStorage.getItem("sellerName");
   const [review, setReview] = useState('');
   const [success, setSuccess] = useState(false); // optional success flag
   const [reviews, setReviews] = useState([]);
+  useEffect(() => {
+    axios.get("http://localhost:8000/check-login", { withCredentials: true })
+      .then(res => {
+         console.log(res.data);
+        if (res.data.role == "C") {
+        const u = res.data.user;
+        setUser(u);
+        setFullName(u.customer_name || '');
+        setEmail(u.customer_email || '');
+        setPhone(u.customer_phone || '');
+        setBirthDate(u.customer_date || '');
+        setGender(u.customer_gender || '');
+        setState(u.customer_state || '');
+        setAdressName(u.customer_address || '');
+        setImage(u.customer_image || '');
+         console.log(res.data.user);
+        } else {
+         // If no session, redirect to login page
+          navigate("/login");
+        }
+      })
+      .catch(() => {
+        // On any error, redirect to login page
+        navigate("/login");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [navigate]);
+
   const fetchReviews = () => {
     axios.get(`http://localhost:8000/product-reviews/${product.id}`)
       .then(res => setReviews(res.data))

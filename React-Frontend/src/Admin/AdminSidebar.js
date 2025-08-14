@@ -250,7 +250,7 @@ const toggleDropdown = () => setDropdownOpen((prev) => !prev);
       className="w-[40px] rounded-full"
     />
     <div className="text-sm mx-2">
-      <span className="block">Ahmad Kanaan</span>
+      <span className="block">{user?.admin_name || "Admin"}</span>
     </div>
     <CiLogin className="text-xl" />
   </div>

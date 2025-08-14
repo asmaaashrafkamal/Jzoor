@@ -120,7 +120,7 @@ const SellerSidebar = ({ sidebarOpen, setSidebarOpen }) => {
     className="w-[40px] h-[40px] rounded-full object-cover"
   />
   <div className="text-sm">
-    <span className="block">{user?.admin_name || "Loading..."}</span>
+    <span className="block">{user?.admin_name || "Seller"}</span>
   </div>
   <CiLogin className="text-xl" />
 </div>
