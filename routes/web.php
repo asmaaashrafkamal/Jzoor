@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Home\LandingPageController;
 use App\Http\Controllers\Home\StripeController;
 use App\Http\Controllers\Home\ProfileController;
+use App\Http\Controllers\site\ProfileController as Profile;
 use App\Http\Controllers\Home\ChatController;
 use App\Http\Controllers\site\TransactionController;
 
@@ -82,6 +83,8 @@ Route::get('/active-orders', [OrderController::class, 'getActiveOrders']);
 
 Route::middleware(['auth.session'])->group(function () {
 Route::post('/StoreProfile', [ProfileController::class, 'store']);
+Route::post('/DStoreProfile', [Profile::class, 'store']);
+Route::post('/DChangePassword', [Profile::class, 'changePass']);
 
 Route::post( '/place-order', [StripeController::class, 'checkout']);
 Route::post( '/create-payment-intent', [StripeController::class, 'createPaymentIntent']);

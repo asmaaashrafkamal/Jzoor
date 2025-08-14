@@ -112,7 +112,7 @@ const toggleDropdown = () => setDropdownOpen((prev) => !prev);
           src={
             user && user.admin_image
               ? `http://localhost:8000/storage/${user.admin_image}`
-              : "/images/default-seller.png"
+              : "/imges/seller.webp" 
           }
           alt={user?.admin_name || "Seller"}
               className="w-[40px] rounded-full border"

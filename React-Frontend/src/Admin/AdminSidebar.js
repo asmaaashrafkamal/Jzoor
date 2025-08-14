@@ -103,7 +103,7 @@ const toggleDropdown = () => setDropdownOpen((prev) => !prev);
     >
       {/* الشعار وزر الإغلاق للشاشات الصغيرة */}
       <div className="flex justify-between items-center mb-4 ">
-        <img src="imges/logo.webp" alt="logo" className="w-[70px]" />
+        <img src="/imges/logo.webp" alt="logo" className="w-[70px]" />
         <RiMenuFoldLine className="text-xl cursor-pointer" onClick={() => setSidebarOpen(false)} />
       </div>
 
@@ -244,7 +244,7 @@ const toggleDropdown = () => setDropdownOpen((prev) => !prev);
       src={
         user && user.admin_image
           ? `http://localhost:8000/storage/${user.admin_image}`
-          : "/images/default-seller.png"
+          : "/imges/17 Picture.webp"
       }
       alt={user?.admin_name || "Admin"}
       className="w-[40px] rounded-full"

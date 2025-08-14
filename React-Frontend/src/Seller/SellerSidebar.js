@@ -56,7 +56,7 @@ const SellerSidebar = ({ sidebarOpen, setSidebarOpen }) => {
     >
       {/* الشعار وزر الإغلاق للشاشات الصغيرة */}
       <div className="flex justify-between items-center mb-4 ">
-        <img src="imges/logo.webp" alt="logo" className="w-[70px]" />
+        <img src="/imges/logo.webp" alt="logo" className="w-[70px]" />
         <RiMenuFoldLine className="text-xl cursor-pointer" onClick={() => setSidebarOpen(false)} />
       </div>
 
@@ -114,7 +114,7 @@ const SellerSidebar = ({ sidebarOpen, setSidebarOpen }) => {
      src={
       user && user.admin_image
         ? `http://localhost:8000/storage/${user.admin_image}`
-        : "/images/default-seller.png"
+        : "/imges/seller.webp" 
     }
     alt={user?.admin_name || "Seller"}
     className="w-[40px] h-[40px] rounded-full object-cover"

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+// import React, { useState } from 'react';
 import {
   FaExternalLinkAlt, // For export/share icon
   FaCog, // For settings icon
@@ -12,9 +12,14 @@ import {
   FaPlus // For the add icon in biography, if applicable
 } from 'react-icons/fa'; // Importing necessary icons from react-icons/fa
 import { Link } from 'react-router-dom';
-
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 export function UserProfilePage() {
   // State for Profile Update section
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
   const [firstName, setFirstName] = useState('Ahmad');
   const [lastName, setLastName] = useState('Kanaan');
   const [password, setPassword] = useState('********'); // Placeholder for password
@@ -24,6 +29,42 @@ export function UserProfilePage() {
   const [location, setLocation] = useState('2972 Westheimer Rd. Santa Ana, Illinois 85486');
   const [creditCard, setCreditCard] = useState('843-4359-4444');
   const [biography, setBiography] = useState('Plant lover | E-commerce enthusiast | Committed to sustainable living\nI manage Juzoor, where I help connect people with beautiful, healthy plants and easy care tips—delivered locally with love.');
+  const [image, setImage] = useState(null);
+// const [profileImage, setProfileImage] = useState(null);
+const [imagePreview, setImagePreview] = useState(null);
+
+const handleImageUpload = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    setImagePreview(URL.createObjectURL(file)); // for preview
+    setImage(file); // for backend
+  }
+};
+
+const handleDeleteImage = () => {
+  setImagePreview(null);
+  setImage(null);
+};
+function formatDateForInput(dateStr) {
+  if (!dateStr) return '';
+
+  const parts = dateStr.split('/');
+  if (parts.length === 3) {
+    let [day, month, year] = parts;
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  }
+
+  return dateStr; // fallback if it's already in correct format
+}
+
+// When setting state from session
+
+// Usage
+// setDateOfBirth(formatDateForInput(u.admin_date) || '');
+
+
+// Example
+
 
   // State for Change Password section
   const [currentPassword, setCurrentPassword] = useState('');
@@ -34,7 +75,140 @@ export function UserProfilePage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showReEnterPassword, setShowReEnterPassword] = useState(false);
-
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+  
+    formData.append("name", `${firstName} ${lastName}`);
+    formData.append("email", email);
+    // formData.append("gender", gender);
+    formData.append("password", newPassword);
+    formData.append("address", location);
+    formData.append("Birth_date",formatDateForInput(dateOfBirth));
+    formData.append("phone", phoneNumber);
+  
+    if (password) {
+      formData.append("password", reEnterPassword);
+      formData.append("password_confirmation", newPassword);
+    }
+  
+    if (image instanceof File) {
+      formData.append("image", image);
+    }
+    
+  
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/DStoreProfile",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+  if (response.status === 200 || response.status === 201) {
+    const u = response.data.session;
+    setUser(u);
+    setFirstName(u.admin_name || '');
+    setEmail(u.admin_email || '');
+    setPhoneNumber(u.admin_phone || '');
+    setDateOfBirth(formatDateForInput(u.admin_date) || '');
+    // setGender(u.admin_gender || '');
+    // setState(u.admin_state || '');
+    setImage(u.admin_image || '');
+    setLocation(u.admin_address || '2972 Westheimer Rd. Santa Ana, Illinois 85486');
+    alert("Update successful!");
+    window.location.reload();
+    console.log(response.data.user);
+  }
+  
+  
+    } catch (error) {
+      if (error.response?.data?.errors) {
+        const errors = error.response.data.errors;
+        alert(Object.values(errors).flat().join("\n"));
+      } else {
+        alert("Update failed. Please try again.");
+      }
+    }
+  };
+  const handlePassword = async (e) => {
+    e.preventDefault();
+  
+    const formData = new FormData();
+    formData.append("password", newPassword);
+    formData.append("password_confirmation", reEnterPassword);
+  
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/DChangePassword",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+  
+      if (response.status === 200 || response.status === 201) {
+        const u = response.data.session;
+        setUser(u);
+        setFirstName(u.admin_name || '');
+        setEmail(u.admin_email || '');
+        setPhoneNumber(u.admin_phone || '');
+        setDateOfBirth(formatDateForInput(u.admin_date) || '');
+        setImage(u.admin_image || '');
+        setLocation(u.admin_address || '2972 Westheimer Rd. Santa Ana, Illinois 85486');
+  
+        alert("Password updated successfully!");
+        // window.location.reload();
+        setCurrentPassword('');
+        setNewPassword('');
+        setReEnterPassword('');
+      }
+    } catch (error) {
+      if (error.response?.data?.errors) {
+        const errors = error.response.data.errors;
+        alert(Object.values(errors).flat().join("\n"));
+      } else {
+        alert("Password update failed. Please try again.");
+      }
+    }
+  };
+  
+  
+    useEffect(() => {
+      axios.get("http://localhost:8000/check-login", { withCredentials: true })
+        .then(res => {
+           console.log(res.data);
+          if (res.data.role == "D") {
+          const u = res.data.user;
+          setUser(u);
+          setFirstName(u.admin_name || '');
+          setEmail(u.admin_email || '');
+          setPhoneNumber(u.admin_phone || '');
+          setDateOfBirth(formatDateForInput(u.admin_date) || '');
+          // setGender(u.admin_gender || '');
+          // setLocation(u.admin_state || '');
+          setLocation(u.admin_address || '2972 Westheimer Rd. Santa Ana, Illinois 85486');
+          setImage(u.admin_image || '');
+           console.log(res.data.user);
+          } else {
+           // If no session, redirect to login page
+            navigate("/admin/login");
+          }
+        })
+        .catch(() => {
+          // On any error, redirect to login page
+          navigate("/admin/login");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }, [navigate]);
+  
+    if (loading) return <div>Checking login status...</div>;
   return (
     <div className="p-4 bg-[#f3f4f6]">
       <h1 className="text-xl font-semibold text-gray-800">About Section</h1> {/* Added "About Section" title */}
@@ -53,11 +227,13 @@ export function UserProfilePage() {
                 </button>
               </div>
               <img
-                src="/imges/deivery.webp" // Updated image source to "deivery.webp"
-                alt="Ahmad Kanaan"
-                className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
-              />
-              <h2 className="text-xl font-semibold text-gray-900 mb-1">Ahmad Kanaan</h2>
+                // src={imagePreview || "/imges/deivery.webp"}
+                src={imagePreview || `http://localhost:8000/storage/${image}` || "/imges/deivery.webp"}
+              alt="Profile"
+              className="w-16 h-16 rounded-full object-cover mr-4"
+            />
+
+              <h2 className="text-xl font-semibold text-gray-900 mb-1">{firstName} {lastName}</h2>
               <p className="text-sm text-gray-600 mb-2 flex items-center justify-center">
                 {email}
                 <FaLock className="w-4 h-4 ml-2 text-gray-400" /> {/* Replaced SVG with FaLock */}
@@ -69,75 +245,110 @@ export function UserProfilePage() {
 
             {/* Change Password */}
             <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">Change Password</h2>
-                <a href="#" className="text-blue-600 text-sm">Need help?</a>
-              </div>
-              <div className="mb-4">
-                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
-                <div className="relative">
-                  <input
-                    type={showCurrentPassword ? 'text' : 'password'}
-                    id="currentPassword"
-                    className="w-full border border-gray-300 rounded-md shadow-sm p-2 pr-10 text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                    title={showCurrentPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showCurrentPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
-                  </button>
-                </div>
-                <Link to="/ForgetPass"  className="text-blue-600 text-sm mt-1 block">Forgot Current Password? Click here</Link>
-              </div>
-              <div className="mb-4">
-                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-                <div className="relative">
-                  <input
-                    type={showNewPassword ? 'text' : 'password'}
-                    id="newPassword"
-                    className="w-full border border-gray-300 rounded-md shadow-sm p-2 pr-10 text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                    title={showNewPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showNewPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-              <div>
-                <label htmlFor="reEnterPassword" className="block text-sm font-medium text-gray-700 mb-1">Re-enter Password</label>
-                <div className="relative">
-                  <input
-                    type={showReEnterPassword ? 'text' : 'password'}
-                    id="reEnterPassword"
-                    className="w-full border border-gray-300 rounded-md shadow-sm p-2 pr-10 text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
-                    value={reEnterPassword}
-                    onChange={(e) => setReEnterPassword(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowReEnterPassword(!showReEnterPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                    title={showReEnterPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showReEnterPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
-              <button className="w-full bg-green-700 text-white py-2 rounded-lg font-medium hover:bg-green-800 transition-colors mt-4">
-                Save Change
-              </button>
-            </div>
+  <div className="flex justify-between items-center mb-4">
+    <h2 className="text-lg font-semibold text-gray-800">Change Password</h2>
+    <a href="#" className="text-blue-600 text-sm">Need help?</a>
+  </div>
+
+  {/* Current Password */}
+  <div className="mb-4">
+    <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
+      Current Password
+    </label>
+    <div className="relative">
+      <input
+        type={showCurrentPassword ? 'text' : 'password'}
+        id="currentPassword"
+        className="w-full border border-gray-300 rounded-md shadow-sm p-2 pr-10 text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+        value={currentPassword}
+        onChange={(e) => setCurrentPassword(e.target.value)}
+      />
+      <button
+        type="button"
+        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+        title={showCurrentPassword ? 'Hide password' : 'Show password'}
+      >
+        {showCurrentPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
+      </button>
+    </div>
+    <Link to="/ForgetPass" className="text-blue-600 text-sm mt-1 block">
+      Forgot Current Password? Click here
+    </Link>
+  </div>
+
+  {/* New Password */}
+  <div className="mb-4">
+    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
+      New Password
+    </label>
+    <div className="relative">
+      <input
+        type={showNewPassword ? 'text' : 'password'}
+        id="newPassword"
+        className="w-full border border-gray-300 rounded-md shadow-sm p-2 pr-10 text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+        value={newPassword}
+        onChange={(e) => setNewPassword(e.target.value)}
+      />
+      <button
+        type="button"
+        onClick={() => setShowNewPassword(!showNewPassword)}
+        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+        title={showNewPassword ? 'Hide password' : 'Show password'}
+      >
+        {showNewPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
+      </button>
+    </div>
+  </div>
+{/* Re-enter Password */}
+<div className="mb-4">
+  <label
+    htmlFor="reEnterPassword"
+    className="block text-sm font-medium text-gray-700 mb-1"
+  >
+    Re-enter Password
+  </label>
+  <div className="relative">
+    <input
+      type={showReEnterPassword ? 'text' : 'password'}
+      id="reEnterPassword"
+      className="w-full border border-gray-300 rounded-md shadow-sm p-2 pr-10 text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+      value={reEnterPassword}
+      onChange={(e) => setReEnterPassword(e.target.value)}
+    />
+    <button
+      type="button"
+      onClick={() => setShowReEnterPassword(!showReEnterPassword)}
+      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+      title={showReEnterPassword ? 'Hide password' : 'Show password'}
+    >
+      {showReEnterPassword ? (
+        <FaEyeSlash className="w-5 h-5" />
+      ) : (
+        <FaEye className="w-5 h-5" />
+      )}
+    </button>
+  </div>
+</div>
+
+{/* Save Button */}
+{/* <div className="mt-4 flex justify-end"> */}
+  <button
+    onClick={handlePassword}
+    style={{
+      color: 'white',
+      backgroundColor: 'green',
+      padding: "10px 20px",
+      borderRadius: "5px",
+    }}  >
+    Save Change
+  </button>
+{/* </div> */}
+
+
+
+</div>
+
           </div>
 
           {/* Right Column: Profile Update Form */}
@@ -154,18 +365,33 @@ export function UserProfilePage() {
               {/* Profile Picture Upload */}
               <div className="flex items-center mb-6">
                 <img
-                  src="/imges/deivery.webp" // Placeholder for profile picture update
+                  src={imagePreview || `http://localhost:8000/storage/${image}` || "/imges/deivery.webp"}
                   alt="Profile"
                   className="w-16 h-16 rounded-full object-cover mr-4"
                 />
-                <div className="flex space-x-3">
-                  <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200">
-                    Upload New
-                  </button>
-                  <button className="px-4 py-2 border border-gray-300 text-red-600 rounded-md text-sm font-medium hover:bg-red-50">
-                    Delete
-                  </button>
-                </div>
+                 <div className="flex space-x-3">
+    <label
+      htmlFor="uploadProfile"
+      className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200 cursor-pointer"
+    >
+      Upload New
+    </label>
+    <input
+      id="uploadProfile"
+      type="file"
+      accept="image/*"
+      className="hidden"
+      onChange={handleImageUpload}
+    />
+
+    <button
+      onClick={handleDeleteImage}
+      className="px-4 py-2 border border-gray-300 text-red-600 rounded-md text-sm font-medium hover:bg-red-50"
+    >
+      Delete
+    </button>
+  </div>
+
               </div>
 
               {/* Form Fields */}
@@ -230,7 +456,7 @@ export function UserProfilePage() {
                   <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
                   <div className="relative mt-1 rounded-md shadow-sm">
                     <input
-                      type="text"
+                      type="date"
                       id="dateOfBirth"
                       className="block w-full rounded-md border-gray-300 pl-3 pr-10 py-2 text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
                       value={dateOfBirth}
@@ -291,6 +517,21 @@ export function UserProfilePage() {
                   </div>
                 </div>
               </div>
+              <div className="flex justify-end mt-4">
+  <button
+    type="button"
+    onClick={handleUpdate}
+    style={{
+      color: 'white',
+      backgroundColor: 'green',
+      padding: "10px 20px",
+      borderRadius: "5px",
+    }}
+  >
+    Update
+  </button>
+</div>
+
             </div>
           </div>
         </div>
