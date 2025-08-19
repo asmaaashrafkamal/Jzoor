@@ -233,7 +233,7 @@ function formatDateForInput(dateStr) {
               className="w-16 h-16 rounded-full object-cover mr-4"
             />
 
-              <h2 className="text-xl font-semibold text-gray-900 mb-1">{firstName} {lastName}</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-1">{firstName}</h2>
               <p className="text-sm text-gray-600 mb-2 flex items-center justify-center">
                 {email}
                 <FaLock className="w-4 h-4 ml-2 text-gray-400" /> {/* Replaced SVG with FaLock */}

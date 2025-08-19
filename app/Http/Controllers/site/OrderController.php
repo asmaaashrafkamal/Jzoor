@@ -167,6 +167,178 @@ public function assignDeliveryPerson(Request $request, $orderId)
     ]);
 
 }
+public function getOrderStats()
+{
+    // Current period (e.g., this month)
+    $totalOrders = Order::count();
+    $newOrders = Order::whereIn('status', ['Preparing', 'Pending', 'Shipped', 'Waiting Picked Up'])->count();
+    $completedOrders = Order::where('status', 'Delivered')->count();
+    $canceledOrders = Order::where('status', 'Canceled')->count();
+
+    // Previous period (for percentage comparison) 
+    // Example: last month
+    $prevTotal = Order::whereMonth('created_at', now()->subMonth()->month)->count();
+    $prevNew = Order::whereIn('status', ['Preparing', 'Pending', 'Shipped', 'Waiting Picked Up'])
+        ->whereMonth('created_at', now()->subMonth()->month)
+        ->count();
+    $prevCompleted = Order::where('status', 'Delivered')
+        ->whereMonth('created_at', now()->subMonth()->month)
+        ->count();
+    $prevCanceled = Order::where('status', 'Canceled')
+        ->whereMonth('created_at', now()->subMonth()->month)
+        ->count();
+
+    // Helper function to calculate change %
+    $calcChange = function ($current, $previous) {
+        if ($previous == 0) {
+            return ['change' => '100%', 'isPositive' => true];
+        }
+        $diff = $current - $previous;
+        $percent = round(($diff / $previous) * 100, 1);
+        return [
+            'change' => $percent . '%',
+            'isPositive' => $diff >= 0
+        ];
+    };
+
+    return response()->json([
+        'totalOrders' => array_merge(
+            ['value' => number_format($totalOrders)],
+            $calcChange($totalOrders, $prevTotal)
+        ),
+        'newOrders' => array_merge(
+            ['value' => number_format($newOrders)],
+            $calcChange($newOrders, $prevNew)
+        ),
+        'completedOrders' => array_merge(
+            ['value' => number_format($completedOrders)],
+            $calcChange($completedOrders, $prevCompleted)
+        ),
+        'canceledOrders' => array_merge(
+            ['value' => number_format($canceledOrders)],
+            $calcChange($canceledOrders, $prevCanceled)
+        ),
+    ]);
+}
+public function SgetOrderStats()
+{
+    $userId = session('admin_id'); // Or auth()->id()
+// dd( $userId);
+    // Build base query: orders that have items with products created by this user
+    $baseQuery = Order::whereHas('items.product', function ($q) use ($userId) {
+        $q->where('created_by', $userId); // adjust column name if it's user_id
+    });
+
+    // Current period
+    $totalOrders = (clone $baseQuery)->count();
+    $newOrders = (clone $baseQuery)->whereIn('status', ['Preparing', 'Pending', 'Shipped', 'Waiting Picked Up'])->count();
+    $completedOrders = (clone $baseQuery)->where('status', 'Delivered')->count();
+    $canceledOrders = (clone $baseQuery)->where('status', 'Canceled')->count();
+
+    // Previous period (last month)
+    $prevTotal = (clone $baseQuery)->whereMonth('created_at', now()->subMonth()->month)->count();
+    $prevNew = (clone $baseQuery)->whereIn('status', ['Preparing', 'Pending', 'Shipped', 'Waiting Picked Up'])
+        ->whereMonth('created_at', now()->subMonth()->month)->count();
+    $prevCompleted = (clone $baseQuery)->where('status', 'Delivered')
+        ->whereMonth('created_at', now()->subMonth()->month)->count();
+    $prevCanceled = (clone $baseQuery)->where('status', 'Canceled')
+        ->whereMonth('created_at', now()->subMonth()->month)->count();
+
+    // Helper function to calculate change %
+    $calcChange = function ($current, $previous) {
+        if ($previous == 0) {
+            return ['change' => '100%', 'isPositive' => true];
+        }
+        $diff = $current - $previous;
+        $percent = round(($diff / $previous) * 100, 1);
+        return [
+            'change' => $percent . '%',
+            'isPositive' => $diff >= 0
+        ];
+    };
+
+    return response()->json([
+        'totalOrders' => array_merge(
+            ['value' => number_format($totalOrders)],
+            $calcChange($totalOrders, $prevTotal)
+        ),
+        'newOrders' => array_merge(
+            ['value' => number_format($newOrders)],
+            $calcChange($newOrders, $prevNew)
+        ),
+        'completedOrders' => array_merge(
+            ['value' => number_format($completedOrders)],
+            $calcChange($completedOrders, $prevCompleted)
+        ),
+        'canceledOrders' => array_merge(
+            ['value' => number_format($canceledOrders)],
+            $calcChange($canceledOrders, $prevCanceled)
+        ),
+    ]);
+}
+
+public function getOverviewStats()
+{
+    // Current period (this month as example)
+    $currentSales  = Order::whereMonth('created_at', now()->month)->sum('total_price');
+    $currentOrders = Order::whereMonth('created_at', now()->month)->count();
+
+    // Previous period (last month)
+    $prevSales  = Order::whereMonth('created_at', now()->subMonth()->month)->sum('total_price');
+    $prevOrders = Order::whereMonth('created_at', now()->subMonth()->month)->count();
+
+    return response()->json([
+        'total_sales' => [
+            'current' => $currentSales,
+            'prev'    => $prevSales,
+        ],
+        'total_orders' => [
+            'current' => $currentOrders,
+            'prev'    => $prevOrders,
+        ],
+        'pending'  => Order::where('status', 'Pending')->count(),
+        'canceled' => Order::where('status', 'Canceled')->count(),
+    ]);
+}
+
+public function SgetOverviewStats()
+{
+    $sellerId = session('admin_id'); // Or auth()->id()
+
+    // Total sales for this seller's products
+    $totalSales = Order::whereHas('items.product', function ($q) use ($sellerId) {
+            $q->where('created_by', $sellerId);
+        })
+        ->sum('total_price');
+
+    // Total orders for this seller's products
+    $totalOrders = Order::whereHas('items.product', function ($q) use ($sellerId) {
+            $q->where('created_by', $sellerId);
+        })
+        ->count();
+
+    // Pending orders for this seller's products
+    $pending = Order::where('status', 'Pending')
+        ->whereHas('items.product', function ($q) use ($sellerId) {
+            $q->where('created_by', $sellerId);
+        })
+        ->count();
+
+    // Canceled orders for this seller's products
+    $canceled = Order::where('status', 'Canceled')
+        ->whereHas('items.product', function ($q) use ($sellerId) {
+            $q->where('created_by', $sellerId);
+        })
+        ->count();
+
+    return response()->json([
+        'total_sales'  => $totalSales,
+        'total_orders' => $totalOrders,
+        'pending'      => $pending,
+        'canceled'     => $canceled,
+    ]);
+}
+
 
 
 //-------------------------------------------end orders admin dashboard------------------------------------------------

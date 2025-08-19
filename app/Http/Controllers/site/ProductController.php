@@ -9,7 +9,9 @@ use App\Models\Product_Review;
 use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Admin;
+use App\Models\User;
 use App\Models\Order_Item;
+use App\Models\Order;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -18,7 +20,122 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
+    public function getReviewStats()
+    {
+        $ratings = Product_Review::selectRaw('rating as stars, COUNT(*) as count')
+                    ->groupBy('rating')
+                    ->orderByDesc('stars')
+                    ->get();
     
+        $total = $ratings->sum('count');
+    
+        if ($total === 0) {
+            return response()->json([
+                'ratings' => [],
+                'positiveReviews' => 0,
+                'negativeReviews' => 0,
+                'totalReviews' => 0,
+                'averageRating' => 0, // default when no reviews
+            ]);
+        }
+    
+        $positive = Product_Review::where('rating', '>=', 4)->count();
+        $negative = $total - $positive;
+    
+        // ✅ Calculate average rating
+        $average = Product_Review::avg('rating');
+    
+        return response()->json([
+            'ratings' => $ratings,
+            'positiveNo' => $positive,
+            'positiveReviews' => round(($positive / $total) * 100, 2),
+            'negativeReviews' => round(($negative / $total) * 100, 2),
+            'totalReviews' => $total,
+            'averageRating' => round($average, 2), // e.g. 4.35
+        ]);
+    }
+    
+    public function SgetReviewStats()
+    {
+        $sellerId = session('admin_id'); // Or auth()->id()
+        $ratings = Product_Review::whereHas('product', function ($q) use ($sellerId) {
+            $q->where('created_by', $sellerId);
+        })
+        ->selectRaw('rating as stars, COUNT(*) as count')
+        ->groupBy('rating')
+        ->orderByDesc('stars')
+        ->get();
+
+$total = $ratings->sum('count');
+
+if ($total === 0) {
+return response()->json([
+'ratings' => [],
+'positiveReviews' => 0,
+'negativeReviews' => 0,
+'totalReviews' => 0,
+'averageRating' => 0,
+]);
+}
+
+$positive = Product_Review::whereHas('product', function ($q) use ($sellerId) {
+            $q->where('created_by', $sellerId);
+        })
+        ->where('rating', '>=', 4)
+        ->count();
+
+$negative = $total - $positive;
+
+// ✅ Calculate average rating
+$avgRating = Product_Review::whereHas('product', function ($q) use ($sellerId) {
+                $q->where('created_by', $sellerId);
+            })
+            ->avg('rating');
+
+return response()->json([
+'ratings' => $ratings,
+'positiveNo' => $positive,
+'positiveReviews' => round(($positive / $total) * 100, 2),
+'negativeReviews' => round(($negative / $total) * 100, 2),
+'totalReviews' => $total,
+'averageRating' => round($avgRating, 2), // ✅ Rounded to 2 decimals
+]);
+    }
+    
+    
+    public function weeklyReport()
+    {
+        // Example stats
+        $customers = User::count();
+        $totalProducts = Product::count();
+        $stockProducts = Product::where('status', 'In Stock')->count();
+        $outOfStock = Product::where('status', 'Out of Stock')->count();
+        $revenue = Order::where('status', 'Delivered')->sum('total_price');
+    
+        // Example weekly data (replace with real aggregation logic)
+        $weeklyVisitors = [
+            "Mon" => 4000,
+            "Tue" => 4500,
+            "Wed" => 4700,
+            "Thu" => 3000,
+            "Fri" => 6000,
+            "Sat" => 5200,
+        ];
+    
+        return response()->json([
+            "stats" => [
+                ["label" => "Customers", "value" => $customers],
+                ["label" => "Total Product", "value" => $totalProducts],
+                ["label" => "Stock Product", "value" => $stockProducts],
+                ["label" => "Out of Stock", "value" => $outOfStock],
+                ["label" => "Revenue", "value" => $revenue],
+            ],
+            "chart" => [
+                "labels" => array_keys($weeklyVisitors),
+                "data" => array_values($weeklyVisitors),
+            ]
+        ]);
+    } 
 public function getAllCatalog()
 {
     $categories = Category::all()->map(function ($cat) {

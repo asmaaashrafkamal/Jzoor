@@ -34,8 +34,10 @@ Route::middleware(['auth.session'])->group(function () {
     Route::get('/top-products', [ProductController::class, 'getTopProducts']);
     Route::get('/best-sellers', [ProductController::class, 'getBestSellers']);
     Route::get('/catalog', [ProductController::class, 'getAllCatalog']);
+    Route::get('/report', [ProductController::class, 'weeklyReport']);
+    Route::get('/review-stats', [ProductController::class, 'getReviewStats']);
 
-//-----------------------------------end products------------------------------------------------
+    //-----------------------------------end products------------------------------------------------
 //------------------------------------start landingPage-------------------------------------------
     Route::get('/category/name1', [LandingPageController::class, 'getCategoryByName1']);
     Route::get('/category/name2', [LandingPageController::class, 'getCategoryByName2']);
@@ -55,6 +57,8 @@ Route::get('/order/{orderId}', [OrderController::class, 'show']);
 Route::put('/orders/{id}/status', [OrderController::class, 'updateStatus']);
 Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
 Route::get('/delivery-people', [OrderController::class, 'getDelivery']);
+Route::get('/dashboard-stats', [OrderController::class, 'getOverviewStats']);
+Route::get('/order-stats', [OrderController::class, 'getOrderStats']);
 Route::post('/orders/{orderId}/assign-delivery', [OrderController::class, 'assignDeliveryPerson']);
 Route::get('/get_customer', [CustomerController::class, 'get_customer']);
 Route::put('/customers/{id}', [CustomerController::class, 'customer_update']);
@@ -71,6 +75,10 @@ Route::get('/monthly-delivery', [DeliveryController::class, 'monthlyDelivery']);
 Route::get('/delivery-stats', [DeliveryController::class, 'stats']);
 Route::put('/delivery/{id}', [DeliveryController::class, 'delivery_update']);
 Route::delete('/delivery/{id}', [DeliveryController::class, 'delivery_destroy']);
+Route::get('/overview', [DeliveryController::class, 'overview']);
+Route::get('/monthly-deliveries', [DeliveryController::class, 'getMonthlyDeliveries']);
+
+
 //---------------------------------------end orders admin dashboard--------------------------------
 
 //----------------------------------------start seller dashboard-----------------------------------------
@@ -78,11 +86,11 @@ Route::get('/Sget_customer/{sellerId}', [SellerController::class, 'get_customer'
 Route::put('/Scustomers/{id}', [SellerController::class, 'customer_update']);
 Route::delete('/Scustomers/{id}', [SellerController::class, 'customer_destroy']);
 Route::get('/Smonthly-customers', [SellerController::class, 'monthlyCustomers']);
-Route::get('/Scustomer-stats', [SellerController::class, 'Cstats']);
+Route::get('/sellers-overview', [SellerController::class, 'sellersOverview']);
+
 //----------------------------------------end seller dashboard-----------------------------------------
 Route::get('/Tget_customer', [TransactionController::class, 'get_customer']);
 
-Route::get('/payment-summary', [TransactionController::class, 'getAllTransactionsStats']);
 
 // Route::get('/chat/admin/{adminId}', [ChatController::class, 'getMessagesFromDriver']);
 // Route::post('/chat/send', [ChatController::class, 'sendMessage']);

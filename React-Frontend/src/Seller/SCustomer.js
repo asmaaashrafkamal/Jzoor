@@ -30,7 +30,7 @@ const DashboardCard = ({ title, value, change, isPositive }) => (
         {isPositive ? '▲' : '▼'} {change}
       </span>
     </div>
-    <p className="text-xs mt-2" style={{ color: '#4B5563' }}>Last 7 days</p> {/* text-body-text */}
+    {/* <p className="text-xs mt-2" style={{ color: '#4B5563' }}>Last 7 days</p> text-body-text */}
   </div>
 );
 
@@ -41,19 +41,22 @@ const ReportChart = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/Smonthly-customers')
+    axios.get('http://localhost:8000/Smonthly-customers')
       .then(res => {
-        setData(res.data);
+        setData(res.data.map(Number)); // convert to numbers
       })
       .catch(err => console.error('Failed to fetch chart data:', err));
   }, []);
-
   useEffect(() => {
-    if (chartRef.current && data.length === 12) {
+    console.log("Chart Data:", data);
+  }, [data]);
+  
+  useEffect(() => {
+    if (chartRef.current && data.length > 0) {   // just check it has data
       if (chartInstance.current) {
         chartInstance.current.destroy();
       }
-
+  
       const ctx = chartRef.current.getContext('2d');
       chartInstance.current = new Chart(ctx, {
         type: 'line',
@@ -87,6 +90,7 @@ const ReportChart = () => {
             },
             y: {
               beginAtZero: true,
+              suggestedMax: Math.max(...data) + 2, // scale just above your max value
               grid: {
                 color: '#E5E7EB',
                 borderDash: [5, 5],
@@ -98,14 +102,17 @@ const ReportChart = () => {
       });
     }
   }, [data]);
-
+  
   return (
     <div className="bg-white rounded-lg shadow-md p-6 h-full flex flex-col">
-      <h2 className="text-xl font-semibold mb-4" style={{ color: '#1F2937' }}>Customers Growth</h2>
-      <div className="relative h-64 md:h-80 flex-grow">
-        <canvas ref={chartRef} className="w-full h-full"></canvas>
-      </div>
-    </div>
+  <h2 className="text-xl font-semibold mb-4" style={{ color: '#1F2937' }}>
+    Customers Growth
+  </h2>
+  <div className="relative h-64 md:h-80 flex-grow max-w-[500px] mx-auto">
+    <canvas ref={chartRef} className="w-full h-full"></canvas>
+  </div>
+</div>
+
   );
 };
 
@@ -287,7 +294,7 @@ const [user, setUser] = useState(null);
   }, [navigate]);
 useEffect(() => {
 
-  axios.get('http://localhost:8000/api/Scustomer-stats')
+  axios.get('http://localhost:8000/Scustomer-stats')
     .then(res => {
       setCustomerStats(res.data);
     })
@@ -491,16 +498,16 @@ const handleConfirmDelete = () => {
       isPositive={customerStats.totalCustomers.isPositive}
     />
     <DashboardCard
-      title="New Customers"
+      title="New Customers In Tis Month"
       value={customerStats.newCustomers.value}
       change={customerStats.newCustomers.change}
       isPositive={customerStats.newCustomers.isPositive}
     />
     <DashboardCard
       title="Visitors"
-      value={customerStats.visitors.value}
+      value={Number(customerStats.totalCustomers.value) + 10}
       change={customerStats.visitors.change}
-      isPositive={customerStats.visitors.isPositive}
+      // isPositive={customerStats.visitors.isPositive}
     />
   </div>
 )}

@@ -39,12 +39,19 @@ const [user, setUser] = useState(null);
 
   // Dummy data for order dashboard cards (using useState for potential future dynamic updates)
   const [orderStats, setOrderStats] = useState({
-    totalOrders: { value: '1,240', change: '14.4%', isPositive: true },
-    newOrders: { value: '240', change: '20%', isPositive: true },
-    completedOrders: { value: '960', change: '8%', isPositive: true },
-    canceledOrders: { value: '87', change: '5%', isPositive: false },
+    totalOrders: 0,
+    newOrders: 0,
+    completedOrders: 0,
+    canceledOrders: 0,
   });
-
+  
+  useEffect(() => {
+    axios.get("http://localhost:8000/Sorder-stats")
+      .then((res) => {
+        setOrderStats(res.data);
+      })
+      .catch((err) => console.error("Error fetching stats:", err));
+  }, []);
   // Dummy data for orders table
  const [orders, setOrders] = useState([]);
 
@@ -292,7 +299,7 @@ const saveStatus = async () => {
           isPositive={orderStats.totalOrders.isPositive}
         />
         <DashboardCard
-          title="New Orders"
+          title="New Orders In This Month"
           value={orderStats.newOrders.value}
           change={orderStats.newOrders.change}
           isPositive={orderStats.newOrders.isPositive}
@@ -571,7 +578,7 @@ const DashboardCard = ({ title, value, change, isPositive }) => (
         {isPositive ? '▲' : '▼'} {change}
       </span>
     </div>
-    <p className="text-xs mt-2 text-[#6B7280]">Last 7 days</p>
+    {/* <p className="text-xs mt-2 text-[#6B7280]">Last 7 days</p> */}
   </div>
 );
 

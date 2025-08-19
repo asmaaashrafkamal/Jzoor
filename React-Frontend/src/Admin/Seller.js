@@ -21,7 +21,7 @@ const DashboardCard = ({ title, value, change, isPositive }) => (
         {isPositive ? '▲' : '▼'} {change}
       </span>
     </div>
-    <p className="text-xs mt-2 text-gray-500">Last 7 days</p>
+    {/* <p className="text-xs mt-2 text-gray-500">Last 7 days</p> */}
   </div>
 );
 
@@ -376,17 +376,17 @@ useEffect(() => {
   }, [sellers]);
 
   // Dummy data for Product Statuses chart
-  const productStatusData = {
-    labels: ['Approved', 'Pending', 'Rejected'],
-    datasets: [
-      {
-        data: [53, 40, 7], // Percentages from the image
-        backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
-        borderColor: ['#FFFFFF', '#FFFFFF', '#FFFFFF'],
-        borderWidth: 2,
-      },
-    ],
-  };
+  // const productStatusData = {
+  //   labels: ['Approved', 'Pending', 'Rejected'],
+  //   datasets: [
+  //     {
+  //       data: [53, 40, 7], // Percentages from the image
+  //       backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+  //       borderColor: ['#FFFFFF', '#FFFFFF', '#FFFFFF'],
+  //       borderWidth: 2,
+  //     },
+  //   ],
+  // };
 
   const productStatusOptions = {
     responsive: true,
@@ -414,17 +414,17 @@ useEffect(() => {
   };
 
   // Dummy data for Sellers Statuses chart
-  const sellersStatusData = {
-    labels: ['Active', 'Top', 'Suspended'],
-    datasets: [
-      {
-        data: [640, 240, 480], // Values from the image
-        backgroundColor: ['#10B981', '#2563EB', '#EF4444'],
-        borderColor: ['#FFFFFF', '#FFFFFF', '#FFFFFF'],
-        borderWidth: 1,
-      },
-    ],
-  };
+  // const sellersStatusData = {
+  //   labels: ['Active', 'Top', 'Suspended'],
+  //   datasets: [
+  //     {
+  //       data: [640, 240, 480], // Values from the image
+  //       backgroundColor: ['#10B981', '#2563EB', '#EF4444'],
+  //       borderColor: ['#FFFFFF', '#FFFFFF', '#FFFFFF'],
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
 
   const sellersStatusOptions = {
     indexAxis: 'y', // Horizontal bar chart
@@ -465,7 +465,55 @@ useEffect(() => {
       },
     },
   };
+  const [overviewData, setOverviewData] = useState(null);
 
+  useEffect(() => {
+    const fetchOverview = () => {
+      axios.get("http://localhost:8000/api/sellers-overview")
+        .then(res => setOverviewData(res.data))
+        .catch(err => console.error("Failed to fetch overview data:", err));
+    };
+  
+    // Fetch once immediately
+    fetchOverview();
+  
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchOverview, 3000);
+  
+    // Cleanup on component unmount
+    return () => clearInterval(interval);
+  }, []);
+  
+  
+  const productStatusData = overviewData ? {
+    labels: ["Approved", "Pending", "Rejected"],
+    datasets: [
+      {
+        data: [
+          overviewData.products.approved,
+          overviewData.products.pending,
+          overviewData.products.rejected,
+        ],
+        backgroundColor: ["#10B981", "#FACC15", "#EF4444"],
+      },
+    ],
+  } : { datasets: [] };
+  
+  const sellersStatusData = overviewData ? {
+    labels: ["Active", "Inactive", "Suspended"],
+    datasets: [
+      {
+        label: "Sellers",
+        data: [
+          overviewData.sellers.active,
+          overviewData.sellers.inactive,
+          overviewData.sellers.suspended,
+        ],
+        backgroundColor: ["#3B82F6", "#9CA3AF", "#F97316"],
+      },
+    ],
+  } : { datasets: [] };
+  
   // Filter sellers based on activeTab and search term using useMemo
  const filteredSellers = useMemo(() => {
   let currentFiltered = sellers;
@@ -653,19 +701,19 @@ const handleSaveSeller = useCallback((updatedSeller) => {
             isPositive={sellerStats.totalSellers.isPositive}
           />
           <DashboardCard
-            title="New Sellers"
+            title="New Sellers Last 7 days"
             value={sellerStats.newSellers.value}
             change={sellerStats.newSellers.change}
             isPositive={sellerStats.newSellers.isPositive}
           />
           <DashboardCard
-            title="Total Sales Value"
+            title="Total Sales Value Last 7 days"
             value={sellerStats.totalSalesValue.value}
             change={sellerStats.totalSalesValue.change}
             isPositive={sellerStats.totalSalesValue.isPositive}
           />
         </div>
-      )};
+      )}
         {/* Sellers Overview Chart Section */}
         <div className="bg-white p-6 rounded-lg max-w-full flex-1 flex flex-col shadow-md mb-6">
           <div className="flex flex-col md:flex-row justify-between items-center mb-4">
@@ -705,24 +753,37 @@ const handleSaveSeller = useCallback((updatedSeller) => {
           {/* Product Statuses and Sellers Statuses Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Product Statuses Chart (Doughnut Chart) */}
-            <div className="bg-white p-4 rounded-lg flex flex-col items-center">
-              <h3 className="text-md font-semibold mb-4 text-gray-800">Products Statuses</h3>
-              <div className="w-48 h-48 mb-4">
-                <Doughnut data={productStatusData} options={productStatusOptions} />
-              </div>
-              <div className="flex flex-col space-y-2 text-sm text-gray-500">
-                <div className="flex items-center">
-                  <span className="w-3 h-3 rounded-full mr-2 bg-green-500"></span> Approved: 53%
-                </div>
-                <div className="flex items-center">
-                  <span className="w-3 h-3 rounded-full mr-2 bg-yellow-500"></span> Pending: 40%
-                </div>
-                <div className="flex items-center">
-                  <span className="w-3 h-3 rounded-full mr-2 bg-red-500"></span> Rejected: 7%
-                </div>
-              </div>
-            </div>
+  <div className="bg-white p-4 rounded-lg flex flex-col items-center">
+    <h3 className="text-md font-semibold mb-4 text-gray-800">Products Statuses</h3>
+    <div className="w-48 h-48 mb-4">
+      {productStatusData ? (
+        <Doughnut data={productStatusData} options={productStatusOptions} />
+      ) : (
+        <p className="text-gray-400 text-sm">Loading...</p>
+      )}
+    </div>
+    {/* Legend dynamic */}
+    <div className="flex flex-col space-y-2 text-sm text-gray-500">
+      {productStatusData?.labels?.map((label, index) => {
+        const value = productStatusData.datasets?.[0]?.data?.[index] || 0;
+        const total =
+        productStatusData.datasets?.[0]?.data?.reduce((a, b) => a + b, 0) || 0;
+        const percentage = total > 0 ? ((value / total) * 100).toFixed(0) : 0;
+        const color =
+        productStatusData.datasets?.[0]?.backgroundColor?.[index] || "#ccc";
 
+        return (
+          <div key={index} className="flex items-center">
+            <span
+              className="w-3 h-3 rounded-full mr-2"
+              style={{ backgroundColor: color }}
+            ></span>
+            {label}: {percentage}%
+          </div>
+        );
+      })}
+    </div>
+  </div>
             {/* Sellers Statuses Chart (Bar Chart) */}
             <div className="bg-white p-4 rounded-lg">
               <h3 className="text-md font-semibold mb-4 text-gray-800">Sellers Statuses</h3>

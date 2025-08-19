@@ -21,126 +21,169 @@ export function ProductReview() {
   const [selectedReview, setSelectedReview] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [topRatedProducts, setTopRatedProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   
-  
-  // Product review data
-  const reviewsOverview = {
-    ratings: [
-      { stars: 5, count: 90 },
-      { stars: 4, count: 65 },
-      { stars: 3, count: 300 },
-      { stars: 2, count: 60 },
-      { stars: 1, count: 25 },
-    ],
-    positiveReviews: 83.55,
-    negativeReviews: 16.45,
-  };
+  const [reviewsOverview, setReviewsOverview] = useState({
+    ratings: [],
+    positiveReviews: 0,
+    negativeReviews: 0,
+    totalReviews: 0,
+    positiveNo:0,
+    averageRating:0
 
-  // Calculate total reviews
-  const totalReviews = reviewsOverview.ratings.reduce((sum, r) => sum + r.count, 0);
-
-  // Doughnut Chart data and options
-  const doughnutData = {
-    labels: ['Positive Reviews', 'Negative Reviews'],
+  });
+  useEffect(() => {
+    axios.get("http://localhost:8000/review-stats")
+      .then((res) => {
+        setReviewsOverview(res.data);
+      })
+      .catch((err) => console.error("Error fetching review stats:", err))
+      .finally(() => setLoading(false));
+  }, []);
+  const chartData = {
+    labels: reviewsOverview.ratings.map((r) => `${r.stars} ★`),
     datasets: [
       {
-        data: [reviewsOverview.positiveReviews, reviewsOverview.negativeReviews],
-        backgroundColor: ['#4CAF50', '#F44336'], // Positive and negative colors
-        borderColor: ['#4CAF50', '#F44336'],
-        borderWidth: 1,
+        label: "Number of Reviews",
+        data: reviewsOverview.ratings.map((r) => r.count),
+        backgroundColor: "rgba(0, 180, 216, 0.6)",
+        borderRadius: 8,
       },
     ],
   };
 
-  const doughnutOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false, // Hide legend
-      },
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            let label = context.label || '';
-            if (label) {
-              label += ': ';
-            }
-            if (context.parsed !== null) {
-              label += context.parsed + '%';
-            }
-            return label;
+// Product review data
+// const reviewsOverview = {
+//   ratings: [
+//     { stars: 5, count: 90 },
+//     { stars: 4, count: 65 },
+//     { stars: 3, count: 300 },
+//     { stars: 2, count: 60 },
+//     { stars: 1, count: 25 },
+//   ],
+//   positiveReviews: 83.55,
+//   negativeReviews: 16.45,
+// };
+
+
+// Calculate total reviews
+const totalReviews = reviewsOverview.totalReviews;
+
+// Charts use API data
+const doughnutData = {
+  labels: ['Positive Reviews', 'Negative Reviews'],
+  datasets: [
+    {
+      data: [reviewsOverview.positiveReviews, reviewsOverview.negativeReviews],
+      backgroundColor: ['#4CAF50', '#F44336'],
+      borderColor: ['#4CAF50', '#F44336'],
+      borderWidth: 1,
+    },
+  ],
+};
+
+const barData = {
+  labels: (reviewsOverview?.ratings || []).map(r => `${r.stars} ★`),
+  datasets: [
+    {
+      label: 'Number of Reviews',
+      data: reviewsOverview.ratings.map(r => r.count),
+      backgroundColor: '#4CAF50',
+      borderColor: '#4CAF50',
+      borderWidth: 1,
+    },
+  ],
+};
+
+const doughnutOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false, // Hide legend
+    },
+    tooltip: {
+      callbacks: {
+        label: function(context) {
+          let label = context.label || '';
+          if (label) {
+            label += ': ';
           }
+          if (context.parsed !== null) {
+            label += context.parsed + '%';
+          }
+          return label;
         }
       }
     }
-  };
+  }
+};
 
-  // Bar Chart data and options for star ratings
-  const barData = {
-    labels: reviewsOverview.ratings.map(r => `${r.stars} ★`),
-    datasets: [
-      {
-        label: 'Number of Reviews',
-        data: reviewsOverview.ratings.map(r => r.count),
-        backgroundColor: '#4CAF50',
-        borderColor: '#4CAF50',
-        borderWidth: 1,
-      },
-    ],
-  };
+// // Bar Chart data and options for star ratings
+// const barData = {
+//   labels: reviewsOverview.ratings.map(r => `${r.stars} ★`),
+//   datasets: [
+//     {
+//       label: 'Number of Reviews',
+//       data: reviewsOverview.ratings.map(r => r.count),
+//       backgroundColor: '#4CAF50',
+//       borderColor: '#4CAF50',
+//       borderWidth: 1,
+//     },
+//   ],
+// };
 
-  const barOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    indexAxis: 'y', // Make chart horizontal
-    plugins: {
-      legend: {
-        display: false, // Hide legend
-      },
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            return `${context.dataset.label}: ${context.parsed.x}`;
-          },
-          title: function(context) {
-            const stars = parseInt(context[0].label.split(' ')[0]);
-            return `${stars} Star ★`;
-          }
+const barOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  indexAxis: 'y', // Make chart horizontal
+  plugins: {
+    legend: {
+      display: false, // Hide legend
+    },
+    tooltip: {
+      callbacks: {
+        label: function(context) {
+          return `${context.dataset.label}: ${context.parsed.x}`;
+        },
+        title: function(context) {
+          const stars = parseInt(context[0].label.split(' ')[0]);
+          return `${stars} Star ★`;
         }
+      }
+    }
+  },
+  scales: {
+    x: {
+      beginAtZero: true,
+      title: {
+        display: true,
+        text: 'Number of Reviews',
+        color: '#374151'
+      },
+      ticks: {
+          color: '#4B5563'
+      },
+      grid: {
+          color: '#E5E7EB'
       }
     },
-    scales: {
-      x: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: 'Number of Reviews',
-          color: '#374151'
-        },
-        ticks: {
-            color: '#4B5563'
-        },
-        grid: {
-            color: '#E5E7EB'
-        }
+    y: {
+      title: {
+        display: true,
+        text: 'Stars',
+        color: '#374151'
       },
-      y: {
-        title: {
-          display: true,
-          text: 'Stars',
-          color: '#374151'
-        },
-        ticks: {
-            color: '#4B5563'
-        },
-        grid: {
-            color: 'transparent' // Hide vertical grid lines
-        }
+      ticks: {
+          color: '#4B5563'
+      },
+      grid: {
+          color: 'transparent' // Hide vertical grid lines
       }
     }
-  };
+  }
+};
 
   // Top Rated Products data
   // const topRatedProducts = [
@@ -276,10 +319,10 @@ export function ProductReview() {
               </button> */}
             </div>
             <p style={{ color: '#111827' }} className="text-3xl sm:text-4xl font-bold mb-2">{totalReviews}</p>
-            <p style={{ color: '#059669' }} className="text-xs sm:text-sm flex items-center">
+            {/* <p style={{ color: '#059669' }} className="text-xs sm:text-sm flex items-center">
               <FaArrowUp className="w-4 h-4 mr-1" />
               +14.5% <span style={{ color: '#6B7280' }} className="ml-1">Last 7 days</span>
-            </p>
+            </p> */}
           </div>
 
           {/* Average Rating Card */}
@@ -291,10 +334,10 @@ export function ProductReview() {
               </button> */}
             </div>
             <div className="flex items-center mb-2">
-              <p style={{ color: '#111827' }} className="text-3xl sm:text-4xl font-bold mr-2">3.0</p>
-              {renderStars(3)}
+              <p style={{ color: '#111827' }} className="text-3xl sm:text-4xl font-bold mr-2">{reviewsOverview.averageRating}</p>
+              {renderStars(reviewsOverview.averageRating)}
             </div>
-            <p style={{ color: '#6B7280' }} className="text-xs sm:text-sm">Last 6 Months</p>
+            {/* <p style={{ color: '#6B7280' }} className="text-xs sm:text-sm">Last 6 Months</p> */}
           </div>
 
           {/* Positive Reviews Card */}
@@ -305,11 +348,11 @@ export function ProductReview() {
                 <FaEllipsisV className="w-5 h-5" />
               </button> */}
             </div>
-            <p style={{ color: '#111827' }} className="text-3xl sm:text-4xl font-bold mb-2">415</p>
-            <p style={{ color: '#059669' }} className="text-xs sm:text-sm flex items-center">
+            <p style={{ color: '#111827' }} className="text-3xl sm:text-4xl font-bold mb-2">{reviewsOverview.positiveNo}</p>
+            {/* <p style={{ color: '#059669' }} className="text-xs sm:text-sm flex items-center">
               <FaArrowUp className="w-4 h-4 mr-1" />
               +26% <span style={{ color: '#6B7280' }} className="ml-1">Last 7 days</span>
-            </p>
+            </p> */}
           </div>
         </div>
 
@@ -339,7 +382,7 @@ export function ProductReview() {
               <div className="flex items-center">
                 <div style={{ backgroundColor: '#4CAF50' }} className="w-3 h-3 rounded-full mr-2"></div>
                 <span style={{ color: '#374151' }} className="text-sm">Positive Reviews</span>
-                <span style={{ color: '#374151' }} className="text-sm ml-auto">{reviewsOverview.positiveReviews}%</span>
+                <span style={{ color: '#374151' }} className="text-sm ml-auto">{reviewsOverview.positiveNo}%</span>
               </div>
               <div className="flex items-center">
                 <div style={{ backgroundColor: '#EF4444' }} className="w-3 h-3 rounded-full mr-2"></div>

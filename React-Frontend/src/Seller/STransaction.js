@@ -293,7 +293,7 @@ const AppTransaction = () => {
 const [summary, setSummary] = useState({ transactions: 0, revenue: 0, status: 'Loading' });
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/payment-summary', { withCredentials: true })
+    axios.get('http://localhost:8000/payment-summary', { withCredentials: true })
       .then(res => {
         setSummary(res.data);
       })
@@ -318,8 +318,8 @@ const [summary, setSummary] = useState({ transactions: 0, revenue: 0, status: 'L
     isPositive={true}
   />
   <DashboardCard
-    title="Completed Transactions"
-    value={summary.transactions.toLocaleString()}
+    title="Cash Transactions"
+    value={summary.cashTransactions}
     change="20%"
     isPositive={true}
   />
@@ -330,8 +330,8 @@ const [summary, setSummary] = useState({ transactions: 0, revenue: 0, status: 'L
     isPositive={true}
   />
   <DashboardCard
-    title="Failed Transactions"
-    value="75"
+    title="Card Transactions"
+    value={summary.cardTransactions}
     change="15%"
     isPositive={false}
   />

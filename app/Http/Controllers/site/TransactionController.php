@@ -29,29 +29,39 @@ public function Sget_customer($id)
 }
 public function getAllTransactionsStats()
 {
- $cardOrders = Order::whereHas('payment', function ($q) {
-    $q->where('payment_method', 'card');
-});
+    $sellerId = session('admin_id'); // Or auth()->id()
 
-$cashOrders = Order::whereHas('payment', function ($q) {
-    $q->where('payment_method', 'cash');
-})->where('status', 'Delivered');
+    // ✅ All seller's orders
+    $orders = Order::whereHas('items.product', function ($q) use ($sellerId) {
+        $q->where('created_by', $sellerId);
+    })->with('payment')->get();
 
-$orders = $cardOrders->union($cashOrders)->get();
+    // ✅ Card Orders
+    $cardOrders = $orders->filter(function ($order) {
+        return $order->payment && $order->payment->payment_method === 'card';
+    });
 
-$totalTransactions = $orders->count();
-$totalRevenue = $orders->sum('total_price');
-  $deliveredCashTransactions = Order::where('status', 'Delivered')
-        ->whereHas('payment', function ($q) {
-            $q->where('payment_method', 'cash');
-        })->count();
+    // ✅ Cash Orders (Delivered only)
+    $cashOrders = $orders->filter(function ($order) {
+        return $order->payment 
+            && $order->payment->payment_method === 'cash'
+            && $order->status === 'Delivered';
+    });
+
+    // ✅ Stats
+    $totalTransactions = $orders->count();
+    $totalRevenue      = $orders->sum('total_price');
+    $deliveredCashTransactions = $cashOrders->count();
 
     return response()->json([
-        'transactions' => $totalTransactions,
-        'revenue' => $totalRevenue,
-        'deliveredCashTransactions'=>$deliveredCashTransactions,
+        'transactions'              => $totalTransactions,
+        'revenue'                   => $totalRevenue,
+        'deliveredCashTransactions' => $deliveredCashTransactions,
+        'cardTransactions'          => $cardOrders->count(),
+        'cashTransactions'          => $cashOrders->count(),
     ]);
 }
+
 public function getAllTransactions()
 {
     $payments = Payment::with('order.user') // make sure Order has user() relationship

@@ -44,32 +44,72 @@ export function ProductReview() {
           setLoading(false);
         });
     }, [navigate]);
-  
+    const [reviewsOverview, setReviewsOverview] = useState({
+      ratings: [],
+      positiveReviews: 0,
+      negativeReviews: 0,
+      totalReviews: 0,
+      positiveNo:0,
+      averageRating:0
+    });
+    useEffect(() => {
+      axios.get("http://localhost:8000/api/review-stats")
+        .then((res) => {
+          setReviewsOverview(res.data);
+        })
+        .catch((err) => console.error("Error fetching review stats:", err))
+        .finally(() => setLoading(false));
+    }, []);
+    const chartData = {
+      labels: reviewsOverview.ratings.map((r) => `${r.stars} ★`),
+      datasets: [
+        {
+          label: "Number of Reviews",
+          data: reviewsOverview.ratings.map((r) => r.count),
+          backgroundColor: "rgba(0, 180, 216, 0.6)",
+          borderRadius: 8,
+        },
+      ],
+    };
   
   // Product review data
-  const reviewsOverview = {
-    ratings: [
-      { stars: 5, count: 90 },
-      { stars: 4, count: 65 },
-      { stars: 3, count: 300 },
-      { stars: 2, count: 60 },
-      { stars: 1, count: 25 },
-    ],
-    positiveReviews: 83.55,
-    negativeReviews: 16.45,
-  };
+  // const reviewsOverview = {
+  //   ratings: [
+  //     { stars: 5, count: 90 },
+  //     { stars: 4, count: 65 },
+  //     { stars: 3, count: 300 },
+  //     { stars: 2, count: 60 },
+  //     { stars: 1, count: 25 },
+  //   ],
+  //   positiveReviews: 83.55,
+  //   negativeReviews: 16.45,
+  // };
 
+  
   // Calculate total reviews
-  const totalReviews = reviewsOverview.ratings.reduce((sum, r) => sum + r.count, 0);
+  const totalReviews = reviewsOverview.totalReviews;
 
-  // Doughnut Chart data and options
+  // Charts use API data
   const doughnutData = {
     labels: ['Positive Reviews', 'Negative Reviews'],
     datasets: [
       {
         data: [reviewsOverview.positiveReviews, reviewsOverview.negativeReviews],
-        backgroundColor: ['#4CAF50', '#F44336'], // Positive and negative colors
+        backgroundColor: ['#4CAF50', '#F44336'],
         borderColor: ['#4CAF50', '#F44336'],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const barData = {
+    labels: (reviewsOverview?.ratings || []).map(r => `${r.stars} ★`),
+    datasets: [
+      {
+        label: 'Number of Reviews',
+        data: reviewsOverview.ratings.map(r => r.count),
+        backgroundColor: '#4CAF50',
+        borderColor: '#4CAF50',
         borderWidth: 1,
       },
     ],
@@ -99,19 +139,19 @@ export function ProductReview() {
     }
   };
 
-  // Bar Chart data and options for star ratings
-  const barData = {
-    labels: reviewsOverview.ratings.map(r => `${r.stars} ★`),
-    datasets: [
-      {
-        label: 'Number of Reviews',
-        data: reviewsOverview.ratings.map(r => r.count),
-        backgroundColor: '#4CAF50',
-        borderColor: '#4CAF50',
-        borderWidth: 1,
-      },
-    ],
-  };
+  // // Bar Chart data and options for star ratings
+  // const barData = {
+  //   labels: reviewsOverview.ratings.map(r => `${r.stars} ★`),
+  //   datasets: [
+  //     {
+  //       label: 'Number of Reviews',
+  //       data: reviewsOverview.ratings.map(r => r.count),
+  //       backgroundColor: '#4CAF50',
+  //       borderColor: '#4CAF50',
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
 
   const barOptions = {
     responsive: true,
@@ -298,10 +338,10 @@ export function ProductReview() {
               </button> */}
             </div>
             <p style={{ color: '#111827' }} className="text-3xl sm:text-4xl font-bold mb-2">{totalReviews}</p>
-            <p style={{ color: '#059669' }} className="text-xs sm:text-sm flex items-center">
+            {/* <p style={{ color: '#059669' }} className="text-xs sm:text-sm flex items-center">
               <FaArrowUp className="w-4 h-4 mr-1" />
               +14.5% <span style={{ color: '#6B7280' }} className="ml-1">Last 7 days</span>
-            </p>
+            </p> */}
           </div>
 
           {/* Average Rating Card */}
@@ -313,10 +353,10 @@ export function ProductReview() {
               </button> */}
             </div>
             <div className="flex items-center mb-2">
-              <p style={{ color: '#111827' }} className="text-3xl sm:text-4xl font-bold mr-2">3.0</p>
-              {renderStars(3)}
+              <p style={{ color: '#111827' }} className="text-3xl sm:text-4xl font-bold mr-2">{reviewsOverview.averageRating}</p>
+              {renderStars(reviewsOverview.averageRating)}
             </div>
-            <p style={{ color: '#6B7280' }} className="text-xs sm:text-sm">Last 6 Months</p>
+            {/* <p style={{ color: '#6B7280' }} className="text-xs sm:text-sm">Last 6 Months</p> */}
           </div>
 
           {/* Positive Reviews Card */}
@@ -327,11 +367,11 @@ export function ProductReview() {
                 <FaEllipsisV className="w-5 h-5" />
               </button> */}
             </div>
-            <p style={{ color: '#111827' }} className="text-3xl sm:text-4xl font-bold mb-2">415</p>
-            <p style={{ color: '#059669' }} className="text-xs sm:text-sm flex items-center">
+            <p style={{ color: '#111827' }} className="text-3xl sm:text-4xl font-bold mb-2">{reviewsOverview.positiveNo}</p>
+            {/* <p style={{ color: '#059669' }} className="text-xs sm:text-sm flex items-center">
               <FaArrowUp className="w-4 h-4 mr-1" />
               +26% <span style={{ color: '#6B7280' }} className="ml-1">Last 7 days</span>
-            </p>
+            </p> */}
           </div>
         </div>
 

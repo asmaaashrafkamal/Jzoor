@@ -176,18 +176,24 @@ public function customer_destroy($id)
 }
 public function monthlyCustomers()
 {
+    // Start with 12 months initialized to 0
     $months = collect(range(1, 12))->mapWithKeys(fn($m) => [$m => 0]);
 
+    // Query actual counts
     $users = User::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
         ->whereYear('created_at', now()->year)
         ->groupBy('month')
         ->pluck('count', 'month');
 
-    // Merge actual counts into zero-filled months
-    $monthlyCounts = $months->merge($users)->values();
+    // Replace zeros with actual counts
+    $monthlyCounts = $months->map(function ($value, $month) use ($users) {
+        return $users[$month] ?? 0;
+    });
 
-    return response()->json($monthlyCounts);
+    return response()->json($monthlyCounts->values());
 }
+
+
 
 public function stats()
 {

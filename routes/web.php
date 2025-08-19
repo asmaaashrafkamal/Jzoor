@@ -5,6 +5,7 @@ use App\Http\Controllers\site\CategoryController;
 use App\Http\Controllers\site\ArticleController;
 use App\Http\Controllers\site\ProductController;
 use App\Http\Controllers\site\OrderController;
+use App\Http\Controllers\site\SellerController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Home\LandingPageController;
 use App\Http\Controllers\Home\StripeController;
@@ -110,8 +111,15 @@ Route::middleware(['web'])->group(function () {
     Route::post('/delivery/chat/send', [ChatController::class, 'sendMessageDelivery']);
 //------------------------------------end delivery----------------------------------
    Route::get('/delivery/orders', [OrderController::class, 'getOrdersForDelivery']);
+   Route::get('/Sorder-stats', [OrderController::class, 'SgetOrderStats']);
+   Route::get('/Sdashboard-stats', [OrderController::class, 'SgetOverviewStats']);
+   Route::get('/payment-summary', [TransactionController::class, 'getAllTransactionsStats']);
+   Route::get('/review-stats', [ProductController::class, 'SgetReviewStats']);
+
 // Store a new review (requires auth)
 Route::post('/product-reviews', [ProductController::class, 'storeReview']);
+Route::get('/Smonthly-customers', [SellerController::class, 'monthlyCustomers']);
+Route::get('/Scustomer-stats', [SellerController::class, 'Cstats']);
 
 // Get reviews for a specific product
 Route::get('/product-reviews/{productId}', [ProductController::class, 'getProductReviews']);
