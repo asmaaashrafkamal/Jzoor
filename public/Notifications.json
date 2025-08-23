@@ -1,0 +1,62 @@
+[
+    {
+        "id": "n1",
+        "type": "order",
+        "iconName": "FaShoppingCart",
+        "iconColor": "#4B5929",
+        "title": "New Order Placed",
+        "description": "Order #1234 from Ahmed Ali has been placed.",
+        "date": "2025-07-01T10:00:00Z",
+        "isRead": false,
+        "link": "/admin/orders/1234",
+        "details": "Customer: Ahmed Ali, Total: $150.00, Items: 3 products. Please process promptly."
+    },
+    {
+        "id": "n2",
+        "type": "message",
+        "iconName": "FaEnvelope",
+        "iconColor": "#af926a",
+        "title": "New Support Message",
+        "description": "You have a new message from Sarah M. regarding product XYZ.",
+        "date": "2025-07-01T09:30:00Z",
+        "isRead": false,
+        "link": "/admin/messages/567",
+        "details": "Sender: Sarah M. (sarah@example.com), Subject: Problem with delivery of item #P123. Can you check?"
+    },
+    {
+        "id": "n3",
+        "type": "low_stock",
+        "iconName": "FaExclamationTriangle",
+        "iconColor": "red",
+        "title": "Low Stock Alert: Olive Oil",
+        "description": "Product \"Palestinian Olive Oil 1L\" is running low on stock (5 units left).",
+        "date": "2025-06-30T14:00:00Z",
+        "isRead": false,
+        "link": "/admin/products/olive-oil-1l",
+        "details": "Current Stock: 5 units. Please consider reordering soon to avoid stockouts. Supplier contact: supplier@example.com"
+    },
+    {
+        "id": "n4",
+        "type": "review",
+        "iconName": "FaStar",
+        "iconColor": "yellow-500",
+        "title": "New Product Review",
+        "description": "A new 5-star review for \"Jasmine Plant\" has been submitted.",
+        "date": "2025-06-29T18:45:00Z",
+        "isRead": true,
+        "link": "/admin/reviews/987",
+        "details": "Review by: CustomerX, Rating: 5 stars, Comment: \"Absolutely beautiful plant, highly recommend!\""
+    },
+    {
+        "id": "n5",
+        "type": "order",
+        "iconName": "FaShoppingCart",
+        "iconColor": "#4B5929",
+        "title": "Order Status Update",
+        "description": "Order #1233 from Lina S. has been marked as shipped.",
+        "date": "2025-06-28T11:20:00Z",
+        "isRead": true,
+        "link": "/admin/orders/1233",
+        "details": "Order #1233 shipped via DHL, Tracking number: DH123456789. Customer notified."
+    }
+]

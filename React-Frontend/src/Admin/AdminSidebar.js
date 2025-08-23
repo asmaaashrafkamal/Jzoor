@@ -10,6 +10,7 @@ import { CiLogin } from "react-icons/ci";
 import { AiOutlineShop } from "react-icons/ai";
 import { LuSquareArrowOutUpRight } from "react-icons/lu";
 import { useState, useRef, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -269,13 +270,13 @@ const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 </div>
 
 
-      <div className="pt-4 flex cursor-pointer items-center justify-between">
+<Link to="/admin/shop" className="pt-4 no-underline text-black flex cursor-pointer items-center justify-between">
         <AiOutlineShop className="text-3xl" />
         <div className="text-sm">
           <span className="block">Your Shop</span>
         </div>
         <LuSquareArrowOutUpRight className="text-xl text-gray-700" />
-      </div>
+      </Link>
     </aside>
   );
 };

@@ -16,9 +16,22 @@ export const ProductProvider = ({ children }) => {
   const [selectedGift, setSelectedGift] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [selectedJournal, setSelectedJournal] = useState(null);
+  const [notifications, setNotifications] = useState([]);
   // تحميل البيانات من JSON باستخدام fetch
   useEffect(() => {
-    fetch('data.json')
+    fetch('/Notifications.json')
+      .then((res) => res.json())
+      .then((data) => {
+        setNotifications(data); // عرض أول 8 منتجات فقط
+      console.log(data);
+      })
+      .catch((err) => {
+        console.error('حدث خطأ   :', err);
+      });
+  }, []);
+  // تحميل البيانات من JSON باستخدام fetch
+  useEffect(() => {
+    fetch('/data.json')
       .then((res) => res.json())
       .then((data) => {
         setProducts(data); // عرض أول 8 منتجات فقط
@@ -200,6 +213,7 @@ const handleRemoveFromFavorite = (id) => {
         selectedJournal,
         pots,
         Accessories,
+        notifications,
         storage,
         care
       }}
