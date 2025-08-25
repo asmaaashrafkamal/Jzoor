@@ -13,6 +13,23 @@ use Carbon\Carbon;
 
 class OrderController extends Controller
 {
+    public function Cindex(Request $request)
+{
+    $userId = session('customer_id');
+
+    $orders = Order::with([
+        'user',
+        'items.product.creator',
+        'payment',
+        'deliveryPerson'
+    ])
+    ->where('user_id', $userId) // filter orders for the logged-in customer
+    ->latest()
+    ->get();
+    
+    return response()->json($orders);
+    
+}
 //-------------------------------------------start orders admin dashboard order page--------------------------------------
 public function index(Request $request)
 {

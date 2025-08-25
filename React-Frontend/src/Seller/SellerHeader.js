@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { FaSearch, FaUserCircle } from 'react-icons/fa';
 import { MdOutlineNotifications } from "react-icons/md";
 import { RiMenuFold2Line } from "react-icons/ri";
+import { Link, useLocation } from 'react-router-dom';
+import { ProductContext } from '../context/ProductContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 const SellerHeader = ({ setSidebarOpen }) => {
@@ -11,7 +13,19 @@ const [isDropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 const toggleDropdown = () => setDropdownOpen((prev) => !prev);
+const { notification = [] } = useContext(ProductContext);
+const location = useLocation();
+const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(
+  () => {
+  return notification.filter(n => !n.isRead).length;
+});
 
+const isNotificationsPage = location.pathname === '/seller/notification';
+
+const handleNotificationsClick = () => {
+  setUnreadNotificationsCount(0);
+};
+// Close dropdown when clicking outside
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
@@ -101,8 +115,20 @@ const toggleDropdown = () => setDropdownOpen((prev) => !prev);
             />
           </div>
 
-          <MdOutlineNotifications className="text-gray-600 text-[24px] md:text-2xl cursor-pointer" />
-          {/* <FaUserCircle className="text-gray-600 text-[24px] md:text-2xl cursor-pointer" /> */}
+          {/* Notification Icon */}
+          <Link to="/seller/notification" onClick={handleNotificationsClick} className="relative">
+            <MdOutlineNotifications
+              className={`text-[24px] md:text-2xl cursor-pointer transition-colors duration-200 ${
+                isNotificationsPage ? 'text-[#4B5929]' : 'text-[#666666]'
+              }`}
+            />
+            {unreadNotificationsCount > 0 && !isNotificationsPage && (
+              <span className="absolute -top-1.5 -right-1.5 bg-[#ff4d4f] text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center shadow-md z-10">
+                {unreadNotificationsCount}
+              </span>
+            )}
+          </Link>
+  {/* <FaUserCircle className="text-gray-600 text-[24px] md:text-2xl cursor-pointer" /> */}
     <div className="relative" ref={dropdownRef}>
           <div
             className="flex items-center gap-2 cursor-pointer"

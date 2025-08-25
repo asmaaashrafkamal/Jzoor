@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use App\Models\ChatMessage;
+use App\Models\Admin;
+use App\Notifications\MessageNotification;
 
 class ChatController extends Controller
 {
@@ -77,6 +79,14 @@ class ChatController extends Controller
             'receiver_type' => $request->receiver_type ?? 'user',
             'message' => $request->message,
         ]);
+    
+        // ✅ Notify admin if the receiver is an admin
+        if ($request->receiver_type === 'driver') {
+            $admin = Admin::find($request->receiver_id);
+            if ($admin) {
+                $admin->notify(new MessageNotification($message->message, $request->sender_id));
+            }
+        }
     
         return response()->json(['success' => true, 'data' => $message]);
     }

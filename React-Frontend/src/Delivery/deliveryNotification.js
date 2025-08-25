@@ -15,17 +15,21 @@ import Title from '../components/Title'; // افتراضيا هذا المسار
 import useScrollReveal from '../assets/useScrollReveal'; // افتراضيا هذا المسار صحيح
 // يمكن إضافة ProductContext إذا كانت الإشعارات مرتبطة ببيانات المنتجات مباشرة
 // import { ProductContext } from '../context/ProductContext';
-import { ProductContext } from '../context/ProductContext';
+import { DNotificationContext } from '../context/DeliveryNotificationContext';
 
 
 
 const DeliveryNotifications = () => {
-      const {notification} =useContext(ProductContext)
+    //   const {notification} =useContext(ProductContext)
     
     useScrollReveal('.reveal-bottom', 'default'); // استخدام ScrollReveal
 
-    const [notifications, setNotifications] = useState(notification);
-    const [filterStatus, setFilterStatus] = useState('All'); // 'All', 'Unread', 'Read'
+    const { notifications, setNotifications, markAsRead } = useContext(DNotificationContext);
+
+
+
+    // const { notifications, setNotifications } = useContext(ProductContext);
+        const [filterStatus, setFilterStatus] = useState('All'); // 'All', 'Unread', 'Read'
     const [filterType, setFilterType] = useState('All'); // 'All', 'order', 'message', 'low_stock', 'review'
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,13 +46,6 @@ const DeliveryNotifications = () => {
         return statusMatch && typeMatch;
     }).sort((a, b) => new Date(b.date) - new Date(a.date)); // ترتيب حسب الأحدث
 
-    // وظيفة لوضع علامة على إشعار كمقروء
-    const markAsRead = (id) => {
-        setNotifications(prev =>
-            prev.map(notif => (notif.id === id ? { ...notif, isRead: true } : notif))
-        );
-        // في تطبيق حقيقي: إرسال طلب للـ Backend لتحديث الحالة
-    };
 
     // وظيفة لأرشفة إشعار (يمكن اعتبارها حذف ناعم أو نقل لمكان آخر)
     const archiveNotification = (id) => {
@@ -91,7 +88,7 @@ const DeliveryNotifications = () => {
         <div className="bg-[#fdf9f3] min-h-screen">
             <section className="py-[30px] md:py-[50px] container mx-auto px-4" id="AdminNotifications">
                 <Title
-                    name="Seller Notifications"
+                    name="Delivery Notifications"
                     description="View and manage all system alerts and updates."
                 />
 
@@ -127,10 +124,7 @@ const DeliveryNotifications = () => {
                             className="px-4 py-2 rounded-full text-sm font-medium border border-gray-300 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#4B5929]"
                         >
                             <option value="All">All Types</option>
-                            <option value="order">Orders</option>
                             <option value="message">Messages</option>
-                            <option value="low_stock">Low Stock</option>
-                            <option value="review">Reviews</option>
                             {/* يمكنك إضافة المزيد من الأنواع هنا */}
                         </select>
                     </div>

@@ -17,9 +17,54 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Notifications\ReviewNotification;
+use App\Notifications\LowStockNotification;
+
 
 class ProductController extends Controller
 {
+    public function lowStockProducts()
+{
+    $threshold = 5;
+
+    // Get all products with low stock
+    $products = Product::where('stock_quantity', '<=', $threshold)->get();
+
+    if ($products->isEmpty()) {
+        return response()->json(['message' => 'No low-stock products'], 200);
+    }
+
+    $admins = Admin::where('type', 'A')->get(); // Only type A admins
+
+    foreach ($products as $product) {
+
+        // Skip if already notified and stock hasn't changed
+        if ($product->last_low_stock_notification && $product->stock_quantity == $product->last_stock_quantity) {
+            continue;
+        }
+
+        foreach ($admins as $admin) {
+            $alreadyNotified = $admin->notifications()
+                ->where('type', LowStockNotification::class)
+                ->where('data->product_name', $product->name)
+                ->exists();
+
+            if (!$alreadyNotified) {
+                $admin->notify(new LowStockNotification($product->name, $product->stock_quantity));
+            }
+        }
+
+        // Update last notified info
+        $product->last_low_stock_notification = now();
+        $product->last_stock_quantity = $product->stock_quantity;
+        $product->save();
+    }
+
+        return response()->json([
+            'message' => 'Notifications sent for low-stock products',
+            'products' => $products,
+        ]);
+    }
     public function getReviewStats()
     {
         $ratings = Product_Review::selectRaw('rating as stars, COUNT(*) as count')
@@ -485,7 +530,8 @@ public function storeReview(Request $request)
         'rating' => $validated['rating'],
         'review' => $validated['review'],
     ]);
-
+    $review->load('product');
+    auth()->user()->notify(new ReviewNotification($review));
     return response()->json($review, 201);
 }
 

@@ -11,6 +11,7 @@ use App\Http\Controllers\Home\LandingPageController;
 use App\Http\Controllers\Home\StripeController;
 use App\Http\Controllers\Home\ProfileController;
 use App\Http\Controllers\site\ProfileController as Profile;
+use App\Http\Controllers\site\NotificationController;
 use App\Http\Controllers\Home\ChatController;
 use App\Http\Controllers\site\TransactionController;
 
@@ -127,9 +128,11 @@ Route::get('/top-product', [ProductController::class, 'getTopProduct']);//admin
 Route::get('/all-reviews-seller', [ProductController::class, 'getAllReviewSeller']);//seller
 Route::get('/top-product-seller', [ProductController::class, 'getTopProductSeller']);//seller
 Route::delete('/destroy/{id}', [ProductController::class, 'destroyReview']);
+Route::get('/orders', [OrderController::class, 'Cindex']);
 
     });
     Route::get('/all-reviews', [ProductController::class, 'getAllReviews']);// admin
+    Route::get('/notifications1', [NotificationController::class, 'Sindex']);
 
 
     Route::get('/{any}', function () {

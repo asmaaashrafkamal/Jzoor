@@ -64,7 +64,7 @@ export function OrderHistoryPage() {
 const fetchOrders = async () => {
   setLoading(true);
   try {
-    const res = await axios.get('http://localhost:8000/api/orders');
+    const res = await axios.get('http://localhost:8000/orders');
 
     // Transform backend data to match your frontend structure
     const formattedOrders = res.data.map((order) => ({

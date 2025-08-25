@@ -11,6 +11,7 @@ use App\Http\Controllers\Home\LandingPageController;
 use App\Http\Controllers\Home\ProfileController;
 use App\Http\Controllers\site\DeliveryController;
 use App\Http\Controllers\site\SellerController;
+use App\Http\Controllers\site\NotificationController;
 use App\Http\Controllers\site\TransactionController;
 use App\Http\Controllers\Home\ChatController;
 use App\Http\Controllers\ReviewController;
@@ -97,5 +98,10 @@ Route::get('/Tget_customer', [TransactionController::class, 'get_customer']);
 Route::get('/transactions', [TransactionController::class, 'getAllTransactions']);
 
 });
-
-
+// routes/api.php
+Route::get('/notifications', [NotificationController::class, 'index']);
+Route::post('/notifications', [NotificationController::class, 'store']);
+Route::post('/notifications/read/{id}', [NotificationController::class, 'markAsRead']);
+Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+Route::get('/low-stock-products', [ProductController::class, 'lowStockProducts']);

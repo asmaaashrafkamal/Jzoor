@@ -15,16 +15,17 @@ import Title from '../components/Title'; // افتراضيا هذا المسار
 import useScrollReveal from '../assets/useScrollReveal'; // افتراضيا هذا المسار صحيح
 // يمكن إضافة ProductContext إذا كانت الإشعارات مرتبطة ببيانات المنتجات مباشرة
 // import { ProductContext } from '../context/ProductContext';
-import { ProductContext } from '../context/ProductContext';
+import { SNotificationContext } from "../context/SNotificationContext";
 
 
 
 const SellerNotifications = () => {
-      const {notification} =useContext(ProductContext)
-    
-    useScrollReveal('.reveal-bottom', 'default'); // استخدام ScrollReveal
 
-    const [notifications, setNotifications] = useState(notification);
+    const { notifications, setNotifications, markAsRead } = useContext(SNotificationContext);
+
+
+
+    // const { notifications, setNotifications } = useContext(ProductContext);
     const [filterStatus, setFilterStatus] = useState('All'); // 'All', 'Unread', 'Read'
     const [filterType, setFilterType] = useState('All'); // 'All', 'order', 'message', 'low_stock', 'review'
 
@@ -43,12 +44,12 @@ const SellerNotifications = () => {
     }).sort((a, b) => new Date(b.date) - new Date(a.date)); // ترتيب حسب الأحدث
 
     // وظيفة لوضع علامة على إشعار كمقروء
-    const markAsRead = (id) => {
-        setNotifications(prev =>
-            prev.map(notif => (notif.id === id ? { ...notif, isRead: true } : notif))
-        );
-        // في تطبيق حقيقي: إرسال طلب للـ Backend لتحديث الحالة
-    };
+    // const markAsRead = (id) => {
+    //     setNotifications(prev =>
+    //         prev.map(notif => (notif.id === id ? { ...notif, isRead: true } : notif))
+    //     );
+    //     // في تطبيق حقيقي: إرسال طلب للـ Backend لتحديث الحالة
+    // };
 
     // وظيفة لأرشفة إشعار (يمكن اعتبارها حذف ناعم أو نقل لمكان آخر)
     const archiveNotification = (id) => {

@@ -16,6 +16,7 @@ import useScrollReveal from '../assets/useScrollReveal'; // افتراضيا ه�
 // يمكن إضافة ProductContext إذا كانت الإشعارات مرتبطة ببيانات المنتجات مباشرة
 // import { ProductContext } from '../context/ProductContext';
 import { ProductContext } from '../context/ProductContext';
+import { NotificationContext } from "../context/NotificationContext";
 
 
 
@@ -23,8 +24,16 @@ const AdminNotifications = () => {
  
     
     useScrollReveal('.reveal-bottom', 'default'); // استخدام ScrollReveal
-    const { notifications } = useContext(ProductContext);
-    const [localNotifications, setNotifications] = useState(notifications);
+
+// const { notifications, markAsRead } = useContext(NotificationContext); ❌ remove this
+
+// remove local state
+// const [notifications, setNotifications] = useState([]);
+
+const { notifications, setNotifications, markAsRead } = useContext(NotificationContext);
+
+
+
     // const { notifications, setNotifications } = useContext(ProductContext);
         const [filterStatus, setFilterStatus] = useState('All'); // 'All', 'Unread', 'Read'
     const [filterType, setFilterType] = useState('All'); // 'All', 'order', 'message', 'low_stock', 'review'
@@ -44,12 +53,12 @@ const AdminNotifications = () => {
     }).sort((a, b) => new Date(b.date) - new Date(a.date)); // ترتيب حسب الأحدث
 
     // وظيفة لوضع علامة على إشعار كمقروء
-    const markAsRead = (id) => {
-        setNotifications(prev =>
-            prev.map(notif => (notif.id === id ? { ...notif, isRead: true } : notif))
-        );
-        // في تطبيق حقيقي: إرسال طلب للـ Backend لتحديث الحالة
-    };
+    // const markAsRead = (id) => {
+    //     setNotifications(prev =>
+    //         prev.map(notif => (notif.id === id ? { ...notif, isRead: true } : notif))
+    //     );
+    //     // في تطبيق حقيقي: إرسال طلب للـ Backend لتحديث الحالة
+    // };
 
     // وظيفة لأرشفة إشعار (يمكن اعتبارها حذف ناعم أو نقل لمكان آخر)
     const archiveNotification = (id) => {
@@ -129,7 +138,7 @@ const AdminNotifications = () => {
                         >
                             <option value="All">All Types</option>
                             <option value="order">Orders</option>
-                            <option value="message">Messages</option>
+                            {/* <option value="message">Messages</option> */}
                             <option value="low_stock">Low Stock</option>
                             <option value="review">Reviews</option>
                             {/* يمكنك إضافة المزيد من الأنواع هنا */}
