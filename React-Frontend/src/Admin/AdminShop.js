@@ -214,19 +214,21 @@ const AdminShop = () => {
                                         </div>
                                         <div className="p-4">
                                             <div className="flex justify-between items-center mb-1 text-base text-gray-600">
-                                                <span className="line-through text-gray-400">
-                                                ${product.price}
-                                                </span>
-                                                <span className="text-[#af926a] font-bold text-lg">
-                                                ${product.discounted_price}                                                </span>
+                                            <span className="line-through text-gray-400">
+                                            ${Number(product.price).toFixed(2)}
+                                            </span>
+                                            <span className="text-[#af926a] font-bold text-lg">
+                                            ${ (Number(product.price) - (Number(product.price) * Number(product.discounted_price)) / 100).toFixed(2) }
+                                            </span>
+
                                             </div>
                                             <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mt-4">
-                                                <button
+                                                {/* <button
                                                     onClick={() => handleEditProduct(product)}
                                                     className="flex-1 bg-[#4B5929] no-underline text-white w-full text-center py-2 rounded-full hover:bg-[#A8C686] transition text-sm flex items-center justify-center gap-1"
                                                 >
                                                     <FaEdit /> Edit
-                                                </button>
+                                                </button> */}
                                                 <button
                                                     onClick={() => handleDeleteProduct(product.id)}
                                                     className="flex-1 bg-red no-underline text-white w-full text-center py-2 rounded-full hover:bg-red-700 transition text-sm flex items-center justify-center gap-1"
@@ -297,10 +299,17 @@ const AdminShop = () => {
 </div>
 
 
-                                   {/* السعر */}
-                                    <p className="text-2xl font-bold mt-2">
-                                    ${selectedProductDetails.discounted_price || selectedProductDetails.price}
-                                    </p>
+                       {/* السعر */}
+<p className="text-2xl font-bold mt-2">
+  ${selectedProductDetails.price && selectedProductDetails.discounted_price
+    ? (
+        Number(selectedProductDetails.price) - 
+        (Number(selectedProductDetails.price) * Number(selectedProductDetails.discounted_price) / 100)
+      ).toFixed(2)
+    : Number(selectedProductDetails.price).toFixed(2)
+  }
+</p>
+
 
                                     {/* عرض كمية المخزون */}
                                     <p className="text-sm text-gray-600 mt-1">
@@ -309,43 +318,47 @@ const AdminShop = () => {
                                         {selectedProductDetails.stock_quantity}
                                     </span>
                                     </p>
-
-                                {/* Sizes */}
+                                    {/* Sizes */}
+                                    {selectedProductDetails.sizes && selectedProductDetails.sizes.length > 0 && (
                                     <div className="mt-3">
-                                    <p className="font-semibold mb-1 text-sm">Pot Size</p>
-                                    <div className="flex gap-2">
-                                        {selectedProductDetails.sizes?.map((s) => (
-                                        <button
+                                        <p className="font-semibold mb-1 text-sm">Pot Size</p>
+                                        <div className="flex gap-2">
+                                        {selectedProductDetails.sizes.map((s) => (
+                                            <button
                                             key={s.id}
                                             className={`w-9 h-9 rounded-full border ${
-                                            selectedSize === s.size
+                                                selectedSize === s.size
                                                 ? "bg-[#af926a] text-white"
                                                 : "bg-white text-[#4B5929] border-[#af926a]"
                                             } text-sm font-medium transition-colors`}
                                             onClick={() => setSelectedSize(s.size)}
-                                        >
+                                            >
                                             {s.size}
-                                        </button>
+                                            </button>
                                         ))}
+                                        </div>
                                     </div>
-                                    </div>
+                                    )}
 
                                     {/* Colors */}
+                                    {selectedProductDetails.colors && selectedProductDetails.colors.length > 0 && (
                                     <div className="mt-3">
-                                    <p className="font-semibold mb-1 text-sm">Pot Colors</p>
-                                    <div className="flex gap-2">
-                                        {selectedProductDetails.colors?.map((c, index) => (
-                                        <button
+                                        <p className="font-semibold mb-1 text-sm">Pot Colors</p>
+                                        <div className="flex gap-2">
+                                        {selectedProductDetails.colors.map((c, index) => (
+                                            <button
                                             key={c.id}
                                             className={`w-7 h-7 rounded-full border-2 ${
-                                            selectedColor === index ? "border-[#4B5929]" : "border-gray-300"
+                                                selectedColor === index ? "border-[#4B5929]" : "border-gray-300"
                                             } transition-all duration-200`}
                                             onClick={() => setSelectedColor(index)}
                                             style={{ backgroundColor: c.color_code }}
-                                        />
+                                            />
                                         ))}
+                                        </div>
                                     </div>
-                                    </div>
+                                    )}
+
 
                                     {/* الكمية */}
                                     <div className="mt-4 flex items-center gap-3">
