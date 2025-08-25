@@ -14,6 +14,11 @@ use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 class CategoryController extends Controller
 {
+    public function allWithProducts()
+{
+    $categories = Category::with(['products.sizes', 'products.colors','products.reviews'])->get();
+    return response()->json($categories);
+}
 public function store(Request $request)
 {
     $validated = $request->validate([

@@ -53,6 +53,7 @@ Route::middleware(['auth.session'])->group(function () {
 //-------------------------------------------------------------------------------------------
 //--------------------------------------admin dashboard orders----------------------------------
 Route::get('/orders', [OrderController::class, 'index']);
+Route::get('/categories-with-products', [CategoryController::class, 'allWithProducts']);
 Route::get('/SellerOrders/{id}', [OrderController::class, 'SellerOrders']);
 Route::get('/order/{orderId}', [OrderController::class, 'show']);
 Route::put('/orders/{id}/status', [OrderController::class, 'updateStatus']);

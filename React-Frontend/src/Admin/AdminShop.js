@@ -1,62 +1,91 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { ProductContext } from "../context/ProductContext";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
-import { Link, Navigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ScrollReveal from "scrollreveal";
 import Title from "../components/Title";
 import useScrollReveal from "../assets/useScrollReveal";
+import axios from "axios";
+import { toast } from "react-toastify"; // make sure you have react-toastify installed and imported
 
 const AdminShop = () => {
     useScrollReveal('.reveal-bottom', 'default');
 
-    const {
-        products,
-        pots,
-        storage,
-        care,
-        gifts,
-        Accessories,
-    } = useContext(ProductContext);
+    // const {
+    //     products,
+    //     pots,
+    //     storage,
+    //     care,
+    //     gifts,
+    //     Accessories,
+    // } = useContext(ProductContext);
 
-    const [filteredProducts, setFilteredProducts] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('All');
-
+  
+    const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProductDetails, setSelectedProductDetails] = useState(null);
     const [selectedSize, setSelectedSize] = useState("M");
     const [selectedColor, setSelectedColor] = useState(0);
     const [quantity, setQuantity] = useState(1);
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState("All");
+  
+    useEffect(() => {
+      axios.get("http://localhost:8000/api/categories-with-products") // your Laravel API endpoint
+        .then(res => setCategories(res.data))
+        .catch(err => console.error(err));
+    }, []);
+  
+    const filteredProducts = selectedCategory === "All"
+    ? categories.flatMap(cat => cat.products)
+    : categories.find(cat => cat.cat_name === selectedCategory)?.products || [];
+  
+  
+    // useEffect(() => {
+    //     let productsToFilter = [];
+    //     switch (selectedCategory) {
+    //         case 'All':
+    //             productsToFilter = products;
+    //             break;
+    //         case 'Products':
+    //             productsToFilter = products;
+    //             break;
+    //         case 'Pots':
+    //             productsToFilter = pots;
+    //             break;
+    //         case 'Storage':
+    //             productsToFilter = storage;
+    //             break;
+    //         case 'Care':
+    //             productsToFilter = care;
+    //             break;
+    //         case 'Gifts':
+    //             productsToFilter = gifts;
+    //             break;
+    //         case 'Accessories':
+    //             productsToFilter = Accessories;
+    //             break;
+    //         default:
+    //             productsToFilter = products;
+    //     }
+    //     setFilteredProducts(productsToFilter);
+
+    //     ScrollReveal().reveal(".reveal-top-Product", {
+    //         origin: "top",
+    //         distance: "50px",
+    //         duration: 1000,
+    //         delay: 200,
+    //         easing: "ease",
+    //         reset: false,
+    //         opacity: 0,
+    //         scale: 0.9,
+    //         interval: 100,
+    //     });
+    // }, [selectedCategory, products, pots, storage, care, gifts, Accessories]);
 
     useEffect(() => {
-        let productsToFilter = [];
-        switch (selectedCategory) {
-            case 'All':
-                productsToFilter = products;
-                break;
-            case 'Products':
-                productsToFilter = products;
-                break;
-            case 'Pots':
-                productsToFilter = pots;
-                break;
-            case 'Storage':
-                productsToFilter = storage;
-                break;
-            case 'Care':
-                productsToFilter = care;
-                break;
-            case 'Gifts':
-                productsToFilter = gifts;
-                break;
-            case 'Accessories':
-                productsToFilter = Accessories;
-                break;
-            default:
-                productsToFilter = products;
-        }
-        setFilteredProducts(productsToFilter);
-
-        ScrollReveal().reveal(".reveal-top-Product", {
+        if (filteredProducts.length > 0) {
+          ScrollReveal().reveal(".reveal-top-Product", {
             origin: "top",
             distance: "50px",
             duration: 1000,
@@ -66,22 +95,36 @@ const AdminShop = () => {
             opacity: 0,
             scale: 0.9,
             interval: 100,
-        });
-    }, [selectedCategory, products, pots, storage, care, gifts, Accessories]);
-
-
+          });
+        }
+      }, [filteredProducts]);
+      
     const handleEditProduct = (product) => {
         alert(`Edit product: ${product.name}`);
     };
 
-    const handleDeleteProduct = (productId) => {
+    const handleDeleteProduct = async (productId) => {
         if (window.confirm("Are you sure you want to delete this product?")) {
-            alert(`Delete product with ID: ${productId}`);
+          try {
+            await axios.delete(`http://localhost:8000/api/products/${productId}`);
+            toast.success('Product deleted successfully');
+      
+            // Optionally, remove the deleted product from the UI without reloading
+            setCategories(prevCategories =>
+              prevCategories.map(cat => ({
+                ...cat,
+                products: cat.products.filter(prod => prod.id !== productId)
+              }))
+            );
+          } catch (error) {
+            console.error("Failed to delete product:", error);
+            toast.error('Failed to delete the product');
+          }
         }
-    };
+      };
 
     const handleAddProduct = () => {
-       Navigate("/admin/addProduct")
+       navigate("/admin/addProduct")
     };
 
     const openProductDetailsModal = (product) => {
@@ -107,20 +150,31 @@ const AdminShop = () => {
 
                 {/* Filter/Category Buttons */}
                 <div className="flex justify-center flex-wrap gap-3 mb-8 reveal-bottom">
-                    {['All', 'Products', 'Pots', 'Storage', 'Care', 'Gifts', 'Accessories'].map(category => (
-                        <button
-                            key={category}
-                            onClick={() => setSelectedCategory(category)}
-                            className={`px-5 py-2 rounded-full font-medium transition-all duration-300 shadow-sm
-                                ${selectedCategory === category
-                                    ? 'bg-[#4B5929] text-white hover:bg-[#A8C686]'
-                                    : 'bg-white text-[#4B5929] border border-[#A8C686] hover:bg-[#e6e2da]'
-                                }`}
-                        >
-                            {category}
-                        </button>
-                    ))}
+                <button
+                    onClick={() => setSelectedCategory("All")}
+                    className={`px-5 py-2 rounded-full font-medium transition-all duration-300 shadow-sm
+                    ${selectedCategory === "All"
+                        ? 'bg-[#4B5929] text-white hover:bg-[#A8C686]'
+                        : 'bg-white text-[#4B5929] border border-[#A8C686] hover:bg-[#e6e2da]'
+                    }`}
+                >
+                    All
+                </button>
+                {categories.map(cat => (
+                    <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.cat_name)}
+                    className={`px-5 py-2 rounded-full font-medium transition-all duration-300 shadow-sm
+                        ${selectedCategory === cat.cat_name
+                            ? 'bg-[#4B5929] text-white hover:bg-[#A8C686]'
+                            : 'bg-white text-[#4B5929] border border-[#A8C686] hover:bg-[#e6e2da]'
+                        }`}
+                    >
+                    {cat.cat_name}
+                    </button>
+                ))}
                 </div>
+
 
                 {/* Add New Product Button */}
                 <div className="flex justify-end mb-8 reveal-bottom">
@@ -147,11 +201,12 @@ const AdminShop = () => {
                                             className="relative w-full h-60 overflow-hidden cursor-pointer"
                                             onClick={() => openProductDetailsModal(product)}
                                         >
-                                            <img
-                                                src={product.img}
-                                                alt={product.name}
-                                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                            />
+                                    <img
+                                        src={`http://localhost:8000/storage/${product.image}`}
+                                        alt={product.name}
+                                        />
+
+
                                             <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition duration-300"></div>
                                             <p className="absolute bottom-2 left-2 text-white text-lg font-semibold bg-black/40 px-2 py-1 rounded group-hover:-translate-y-20 transition duration-300">
                                                 {product.name}
@@ -160,11 +215,10 @@ const AdminShop = () => {
                                         <div className="p-4">
                                             <div className="flex justify-between items-center mb-1 text-base text-gray-600">
                                                 <span className="line-through text-gray-400">
-                                                    ${product.prev_price}
+                                                ${product.price}
                                                 </span>
                                                 <span className="text-[#af926a] font-bold text-lg">
-                                                    ${product.new_price}
-                                                </span>
+                                                ${product.discounted_price}                                                </span>
                                             </div>
                                             <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mt-4">
                                                 <button
@@ -203,7 +257,7 @@ const AdminShop = () => {
                                 {/* صورة المنتج */}
                                 <div>
                                     <img
-                                        src={selectedProductDetails.img}
+                                        src={`http://localhost:8000/storage/${selectedProductDetails.image}`}
                                         alt={selectedProductDetails.name}
                                         className="w-full h-auto max-h-[420px] object-cover rounded-xl shadow-md"
                                     />
@@ -213,66 +267,84 @@ const AdminShop = () => {
                                 <div className="flex flex-col gap-2 text-[#4B5929]">
                                     <h2 className="text-3xl font-bold">{selectedProductDetails.name}</h2>
                                     <p className="text-gray-600 text-sm md:text-base">
-                                        A hardy evergreen with silver-green leaves, perfect for patios and indoor spaces.
+                                         {selectedProductDetails.description}
                                     </p>
 
-                                    {/* التقييم */}
-                                    <div className="flex items-center gap-1 text-yellow-500 mt-1">
-                                        <div className="flex text-lg">
-                                            {[...Array(5)].map((_, i) => (
-                                                <i key={i} className="fas fa-star"></i>
-                                            ))}
-                                        </div>
-                                        <span className="text-black font-semibold ml-1">4.2</span>
-                                        <span className="text-gray-500 text-xs md:text-sm">(210 Reviews)</span>
-                                    </div>
+                                  {/* التقييم */}
+<div className="flex items-center gap-2 mt-1">
+  <div className="flex text-lg text-yellow-500">
+    {[...Array(5)].map((_, i) => {
+      // Calculate average rating
+      const avgRating = selectedProductDetails.reviews.length > 0
+        ? selectedProductDetails.reviews.reduce((sum, r) => sum + r.rating, 0) / selectedProductDetails.reviews.length
+        : 0;
+      return (
+        <i
+          key={i}
+          className={`fas fa-star ${i < Math.round(avgRating) ? 'text-yellow-500' : 'text-gray-300'}`}
+        ></i>
+      );
+    })}
+  </div>
+  <span className="text-black font-semibold ml-1">
+    {selectedProductDetails.reviews.length > 0 
+      ? (selectedProductDetails.reviews.reduce((sum, r) => sum + r.rating, 0) / selectedProductDetails.reviews.length).toFixed(1) 
+      : '0.0'}
+  </span>
+  <span className="text-gray-500 text-xs md:text-sm">
+    ({selectedProductDetails.reviews.length} Reviews)
+  </span>
+</div>
 
-                                    {/* السعر */}
-                                    <p className="text-2xl font-bold mt-2">${selectedProductDetails.new_price}</p>
+
+                                   {/* السعر */}
+                                    <p className="text-2xl font-bold mt-2">
+                                    ${selectedProductDetails.discounted_price || selectedProductDetails.price}
+                                    </p>
 
                                     {/* عرض كمية المخزون */}
                                     <p className="text-sm text-gray-600 mt-1">
-                                        Stock Level:{" "}
-                                        <span className={selectedProductDetails.stock_level > 10 ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>
-                                            {selectedProductDetails.stock_level}
-                                        </span>
+                                    Stock Level:{" "}
+                                    <span className={selectedProductDetails.stock_quantity > 10 ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>
+                                        {selectedProductDetails.stock_quantity}
+                                    </span>
                                     </p>
 
-                                    {/* الحجم */}
+                                {/* Sizes */}
                                     <div className="mt-3">
-                                        <p className="font-semibold mb-1 text-sm">Pot Size</p>
-                                        <div className="flex gap-2">
-                                            {["S", "M", "L"].map((size) => (
-                                                <button
-                                                    key={size}
-                                                    className={`w-9 h-9 rounded-full border ${
-                                                        selectedSize === size
-                                                            ? "bg-[#af926a] text-white"
-                                                            : "bg-white text-[#4B5929] border-[#af926a]"
-                                                    } text-sm font-medium transition-colors`}
-                                                    onClick={() => setSelectedSize(size)}
-                                                >
-                                                    {size}
-                                                </button>
-                                            ))}
-                                        </div>
+                                    <p className="font-semibold mb-1 text-sm">Pot Size</p>
+                                    <div className="flex gap-2">
+                                        {selectedProductDetails.sizes?.map((s) => (
+                                        <button
+                                            key={s.id}
+                                            className={`w-9 h-9 rounded-full border ${
+                                            selectedSize === s.size
+                                                ? "bg-[#af926a] text-white"
+                                                : "bg-white text-[#4B5929] border-[#af926a]"
+                                            } text-sm font-medium transition-colors`}
+                                            onClick={() => setSelectedSize(s.size)}
+                                        >
+                                            {s.size}
+                                        </button>
+                                        ))}
+                                    </div>
                                     </div>
 
-                                    {/* اللون */}
+                                    {/* Colors */}
                                     <div className="mt-3">
-                                        <p className="font-semibold mb-1 text-sm">Pot Colors</p>
-                                        <div className="flex gap-2">
-                                            {["#4B5929", "#c4a484", "#e0d6cd", "#a67c52"].map((color, index) => (
-                                                <button
-                                                    key={color}
-                                                    className={`w-7 h-7 rounded-full border-2 ${
-                                                        selectedColor === index ? "border-[#4B5929]" : "border-gray-300"
-                                                    } transition-all duration-200`}
-                                                    onClick={() => setSelectedColor(index)}
-                                                    style={{ backgroundColor: color }}
-                                                />
-                                            ))}
-                                        </div>
+                                    <p className="font-semibold mb-1 text-sm">Pot Colors</p>
+                                    <div className="flex gap-2">
+                                        {selectedProductDetails.colors?.map((c, index) => (
+                                        <button
+                                            key={c.id}
+                                            className={`w-7 h-7 rounded-full border-2 ${
+                                            selectedColor === index ? "border-[#4B5929]" : "border-gray-300"
+                                            } transition-all duration-200`}
+                                            onClick={() => setSelectedColor(index)}
+                                            style={{ backgroundColor: c.color_code }}
+                                        />
+                                        ))}
+                                    </div>
                                     </div>
 
                                     {/* الكمية */}
