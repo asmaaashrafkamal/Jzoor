@@ -16,6 +16,8 @@ const Register = () => {
     const [address, setAdressName] = useState('');
     const [Birth_date, setBirthDate] = useState('');
     const [phone, setPhone] = useState('');
+
+
  const handleSubmit = async (e) => {
   e.preventDefault();
 
@@ -141,22 +143,23 @@ const Register = () => {
                 placeholder="Your Email"
               />
             </div>
-  <div className="text-left">
-              <label
-                htmlFor="full-name"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
-             Birth Date
-              </label>
-              <input
-                type="text"
-                id="full-name"
-                value={Birth_date}
-                onChange={(e) => setBirthDate(e.target.value)}
-                className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] placeholder:text-[14px]"
-                placeholder="Your Date of Birth"
-              />
-            </div>
+            <div className="text-left">
+  <label
+    htmlFor="birth-date"
+    className="block text-gray-700 text-sm font-bold mb-2"
+  >
+    Birth Date
+  </label>
+  <input
+    type="date"
+    id="birth-date"
+    value={Birth_date}
+    onChange={(e) => setBirthDate(e.target.value)}
+    className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] placeholder:text-[14px]"
+    placeholder="Your Date of Birth"
+  />
+</div>
+
   <div className="text-left">
               <label
                 htmlFor="full-name"
@@ -218,7 +221,7 @@ const Register = () => {
                 value={state}
                 onChange={(e) => setState(e.target.value)}
                 className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] placeholder:text-[14px]"
-                placeholder="Your Full Name"
+                placeholder="Your State"
               />
             </div>
     <div className="text-left">
@@ -234,7 +237,7 @@ const Register = () => {
                 value={address}
                 onChange={(e) => setAdressName(e.target.value)}
                 className="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-[#4B5929] placeholder:text-[14px]"
-                placeholder="Your Full Name"
+                placeholder="Your Address"
               />
             </div>
             <div className="text-left">
@@ -253,7 +256,6 @@ const Register = () => {
                 <option value="">Select Gender</option>
                 <option value="female">Female</option>
                 <option value="male">Male</option>
-                <option value="other">Other</option>
               </select>
             </div>
 

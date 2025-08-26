@@ -118,26 +118,39 @@ if (response.status === 200 || response.status === 201) {
 
         {/* <p className="text-sm text-gray-500">You can update your information here</p> */}
         <div className="flex items-center  space-x-4 mt-4">
-       {image && (
-      <img
-        src={
-          typeof image === 'string'
-            ? `http://localhost:8000/storage/${image}`
-            : URL.createObjectURL(image)
-        }
-        alt="Profile Preview"
-        className="w-20 h-20 rounded-full object-cover"
-      />
-    )}
+        {image ? (
+  <img
+    src={
+      typeof image === "string"
+        ? `http://localhost:8000/storage/${image}` // من الـ backend
+        : URL.createObjectURL(image)               // من input (File object)
+    }
+    alt="Profile Preview"
+    className="w-20 h-20 rounded-full object-cover"
+  />
+) : (
+  <img
+    src="/default-avatar.png" // صورة افتراضية
+    alt="Default Avatar"
+    className="w-20 h-20 rounded-full object-cover"
+  />
+)}
 
 
-        <input
-          type="file"
-          accept="image/*"
-          className="hidden"
-          id="imageUpload"
-          onChange={(e) => setImage(e.target.files[0])}
-        />
+
+
+<input
+  type="file"
+  accept="image/*"
+  className="hidden"
+  id="imageUpload"
+  onChange={(e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]); // File object
+    }
+  }}
+/>
+
 
         <label htmlFor="imageUpload" className="bg-green text-white text-sm px-2 py-2 rounded hover:bg-green-hover cursor-pointer">
           + Change Image

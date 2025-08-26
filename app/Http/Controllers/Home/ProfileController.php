@@ -25,7 +25,7 @@ public function store(Request $request)
         'address' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email,' . $user->id,
         'password' => 'nullable|string|min:6|confirmed',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'image' => 'nullable',
         'Birth_date' => 'required|date',
         'phone' => 'required|string|max:255',
     ]);
