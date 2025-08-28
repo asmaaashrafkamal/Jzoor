@@ -80,6 +80,7 @@ Route::delete('/delivery/{id}', [DeliveryController::class, 'delivery_destroy'])
 Route::get('/overview', [DeliveryController::class, 'overview']);
 Route::get('/monthly-deliveries', [DeliveryController::class, 'getMonthlyDeliveries']);
 
+Route::get('/payment-summary', [TransactionController::class, 'getAllTransactionsStats']);
 
 //---------------------------------------end orders admin dashboard--------------------------------
 

@@ -378,7 +378,7 @@ const [summary, setSummary] = useState({ transactions: 0, revenue: 0, status: 'L
             <table className="w-full divide-y" style={{ borderColor: '#E5E7EB' }}>
               <thead style={{ backgroundColor: '#F9FAFB' }}>
                 <tr>
-                  {['Id','Transaction Id', 'Customer name', 'Date', 'Total', 'Method', 'Status', 'Action'].map(header => (
+                  {['Id','Transaction Id', 'Customer name', 'Date', 'Total', 'Method', 'Status'].map(header => (
                     <th
                       key={header}
                       className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
@@ -423,9 +423,9 @@ const [summary, setSummary] = useState({ transactions: 0, revenue: 0, status: 'L
                           {transaction.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm cursor-pointer" style={{ color: '#2563EB' }}>
+                      {/* <td className="px-6 py-4 whitespace-nowrap text-sm cursor-pointer" style={{ color: '#2563EB' }}>
                         View Details
-                      </td>
+                      </td> */}
                     </tr>
                   ))
                 ) : (
